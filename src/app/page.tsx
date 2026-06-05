@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -22,7 +21,8 @@ import {
   BarChart3,
   Smartphone,
   Apple,
-  ArrowUpRight
+  ArrowUpRight,
+  Wrench
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

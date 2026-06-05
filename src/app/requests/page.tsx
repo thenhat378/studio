@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -6,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive } from 'lucide-react';
+import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
