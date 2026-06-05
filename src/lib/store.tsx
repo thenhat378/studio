@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { User, RepairRequest, Equipment } from './types';
+import type { User, RepairRequest, Equipment, UserRole } from './types';
 import { useFirebase } from '@/firebase';
 import { 
   onAuthStateChanged, 
@@ -28,6 +28,7 @@ interface AppContextType {
   currentUser: User | null;
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginAsTestAccount: (role: UserRole) => void;
   register: (email: string, pass: string, name: string, unit: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -58,7 +59,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (!auth || !db) return;
+    if (!auth || !db) {
+      setIsInitialized(true);
+      return;
+    }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -67,7 +71,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
-            // Tự động tạo hồ sơ mặc định nếu dùng Google Auth lần đầu
             const newUser: User = {
               id: firebaseUser.uid,
               name: firebaseUser.displayName || 'Người dùng mới',
@@ -82,7 +85,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
           console.error("Firestore error loading user profile:", e);
         }
       } else {
-        setCurrentUser(null);
+        // Only reset if not in test mode
+        const storedUser = localStorage.getItem('test_user');
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+        } else {
+          setCurrentUser(null);
+        }
       }
       setIsInitialized(true);
     });
@@ -96,8 +105,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
       setRequests(data);
-    }, (error) => {
-      console.error("Firestore requests sync error:", error);
     });
     return () => unsubscribe();
   }, [db]);
@@ -114,13 +121,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, pass: string) => {
     if (!auth) throw new Error("Firebase Auth chưa khởi tạo.");
     await signInWithEmailAndPassword(auth, email, pass);
+    localStorage.removeItem('test_user');
   };
 
   const loginWithGoogle = async () => {
     if (!auth) throw new Error("Firebase Auth chưa khởi tạo.");
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
     await signInWithPopup(auth, provider);
+    localStorage.removeItem('test_user');
+  };
+
+  const loginAsTestAccount = (role: UserRole) => {
+    const testUsers: Record<UserRole, User> = {
+      'requester': { id: 'test-req', name: 'Nhân viên (Test)', role: 'requester', unit: 'Phòng Hành chính', email: 'req@test.com' },
+      'unit_leader': { id: 'test-leader', name: 'Lãnh đạo (Test)', role: 'unit_leader', unit: 'Phòng Hành chính', email: 'leader@test.com' },
+      'csvc_manager': { id: 'test-manager', name: 'Quản lý CSVC (Test)', role: 'csvc_manager', unit: 'Phòng CSVC', email: 'manager@test.com' },
+      'technician': { id: 'test-tech', name: 'Kỹ thuật viên (Test)', role: 'technician', unit: 'Tổ Kỹ thuật', email: 'tech@test.com' },
+    };
+    const user = testUsers[role];
+    setCurrentUser(user);
+    localStorage.setItem('test_user', JSON.stringify(user));
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
@@ -135,11 +155,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     await setDoc(doc(db, 'users', res.user.uid), newUser);
     setCurrentUser(newUser);
+    localStorage.removeItem('test_user');
   };
 
   const logout = async () => {
-    if (!auth) return;
-    await signOut(auth);
+    if (auth) await signOut(auth);
+    setCurrentUser(null);
+    localStorage.removeItem('test_user');
   };
 
   const resetPassword = async (email: string) => {
@@ -169,6 +191,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       currentUser,
       login,
       loginWithGoogle,
+      loginAsTestAccount,
       register,
       logout,
       resetPassword,

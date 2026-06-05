@@ -2,7 +2,7 @@
 
 /**
  * Cấu hình Firebase chính thức từ người dùng.
- * Đảm bảo các thông số này khớp chính xác với Project Settings > Web App trong Firebase Console.
+ * Các thông số này được sử dụng để kết nối ứng dụng với dự án Firebase của bạn.
  */
 
 export const firebaseConfig = {

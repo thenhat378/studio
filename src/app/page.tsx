@@ -22,7 +22,9 @@ import {
   Mail,
   Building2,
   BarChart3,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -35,7 +37,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 export default function Overview() {
-  const { currentUser, login, loginWithGoogle, register, resetPassword, requests, users, isInitialized } = useAppStore();
+  const { 
+    currentUser, 
+    login, 
+    loginWithGoogle, 
+    loginAsTestAccount,
+    register, 
+    resetPassword, 
+    requests, 
+    users, 
+    isInitialized 
+  } = useAppStore();
+  
   const { toast } = useToast();
   
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -70,22 +83,15 @@ export default function Overview() {
       }
     } catch (error: any) {
       console.error("Auth Error:", error);
-      let message = "Lỗi xác thực. Vui lòng kiểm tra lại cấu hình.";
+      let message = "Lỗi xác thực. Có thể do cấu hình Firebase API Key chưa khớp.";
       
-      // Chẩn đoán lỗi cụ thể để hướng dẫn người dùng kiểm tra Console
       if (error.code === 'auth/api-key-not-valid') {
-        message = "LỖI API KEY: Hãy vào Google Cloud Console kiểm tra xem API Key có bị giới hạn không.";
+        message = "LỖI API KEY: Vui lòng kiểm tra lại cấu hình trong Firebase Console.";
       } else if (error.code === 'auth/operation-not-allowed') {
-        message = "CHƯA BẬT SIGN-IN: Hãy vào Firebase Console > Authentication > Sign-in method và bật Email/Password.";
-      } else if (error.code === 'auth/user-not-found') {
-        message = "Tài khoản không tồn tại.";
-      } else if (error.code === 'auth/wrong-password') {
-        message = "Mật khẩu không chính xác.";
-      } else if (error.code === 'auth/invalid-api-key') {
-        message = "API KEY SAI: Vui lòng kiểm tra lại file config.ts";
+        message = "CHƯA BẬT ĐĂNG NHẬP: Vui lòng bật Email/Password trong Firebase Auth.";
       }
       
-      toast({ variant: "destructive", title: "Thông báo lỗi", description: message });
+      toast({ variant: "destructive", title: "Thông báo", description: message });
     } finally {
       setIsLoading(false);
     }
@@ -98,32 +104,13 @@ export default function Overview() {
       toast({ title: "Đăng nhập Google thành công" });
     } catch (error: any) {
       console.error("Google Auth Error:", error);
-      let message = "Không thể đăng nhập Google.";
-      
-      if (error.code === 'auth/operation-not-allowed') {
-        message = "CHƯA BẬT GOOGLE: Hãy vào Firebase Console > Authentication > Sign-in method và bật Google Provider.";
-      } else if (error.code === 'auth/popup-blocked') {
-        message = "TRÌNH DUYỆT CHẶN POPUP: Vui lòng cho phép mở cửa sổ mới để đăng nhập.";
-      } else if (error.code === 'auth/unauthorized-domain') {
-        message = "TÊN MIỀN CHƯA ĐƯỢC CẤP PHÉP: Hãy thêm tên miền hiện tại vào danh sách 'Authorized domains' trong Firebase Auth.";
-      }
-      
-      toast({ variant: "destructive", title: "Lỗi Google Auth", description: message });
+      toast({ 
+        variant: "destructive", 
+        title: "Lỗi Google Auth", 
+        description: "Vui lòng kiểm tra phương thức Google trong Firebase Console." 
+      });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (!email) {
-      toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập Email để đặt lại mật khẩu." });
-      return;
-    }
-    try {
-      await resetPassword(email);
-      toast({ title: "Đã gửi Email", description: "Vui lòng kiểm tra hộp thư của bạn." });
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Lỗi", description: error.message });
     }
   };
 
@@ -145,9 +132,6 @@ export default function Overview() {
               <CardTitle className="text-xl font-black text-slate-800">
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Kiểm tra Sign-in method trong Firebase Console
-              </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <form onSubmit={handleAuth} className="space-y-5">
@@ -155,99 +139,80 @@ export default function Overview() {
                   <>
                     <div className="space-y-1.5">
                       <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Họ và tên</Label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                        <Input 
-                          placeholder="Nguyễn Văn A" 
-                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                        />
-                      </div>
+                      <Input 
+                        placeholder="Nguyễn Văn A" 
+                        className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Đơn vị / Phòng ban</Label>
-                      <div className="relative">
-                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                        <Input 
-                          placeholder="Phòng Hành chính" 
-                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
-                          value={unit}
-                          onChange={(e) => setUnit(e.target.value)}
-                        />
-                      </div>
+                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Đơn vị</Label>
+                      <Input 
+                        placeholder="Phòng Hành chính" 
+                        className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                        value={unit}
+                        onChange={(e) => setUnit(e.target.value)}
+                      />
                     </div>
                   </>
                 )}
 
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Email tài khoản</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                    <Input 
-                      type="email"
-                      placeholder="example@due.edu.vn" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
+                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Email</Label>
+                  <Input 
+                    type="email"
+                    placeholder="example@due.edu.vn" 
+                    className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Mật khẩu</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                    <Input 
-                      type="password" 
-                      placeholder="••••••••" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
+                  <Input 
+                    type="password" 
+                    placeholder="••••••••" 
+                    className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
 
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary hover:bg-primary/90 uppercase tracking-widest text-xs shadow-xl" disabled={isLoading}>
-                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Đăng nhập ngay" : "Đăng ký ngay")}
+                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary uppercase tracking-widest text-xs shadow-xl" disabled={isLoading}>
+                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Đăng nhập" : "Đăng ký")}
                 </Button>
               </form>
 
               <div className="relative flex items-center gap-4 py-2">
                 <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc trải nghiệm nhanh</span>
                 <div className="h-px bg-slate-100 flex-1"></div>
               </div>
 
-              <Button 
-                variant="outline" 
-                className="w-full h-14 font-bold rounded-2xl border-2 flex gap-2 items-center justify-center text-xs uppercase"
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z"/>
-                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Tiếp tục với Google
-              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('requester')}>
+                  <User className="h-3 w-3 mr-1" /> Nhân viên
+                </Button>
+                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('unit_leader')}>
+                  <ShieldCheck className="h-3 w-3 mr-1" /> Lãnh đạo
+                </Button>
+                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('csvc_manager')}>
+                  <UserCheck className="h-3 w-3 mr-1" /> Quản lý
+                </Button>
+                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('technician')}>
+                  <Wrench className="h-3 w-3 mr-1" /> Kỹ thuật
+                </Button>
+              </div>
 
-              <div className="flex items-center justify-between px-2">
+              <div className="text-center mt-4">
                 <Button 
                   variant="link" 
                   className="p-0 h-auto text-[11px] font-black text-primary uppercase"
                   onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
                 >
-                  {authMode === 'login' ? 'Đăng ký tài khoản' : 'Đã có tài khoản?'}
-                </Button>
-                <Button 
-                  variant="link" 
-                  className="p-0 h-auto text-[11px] font-black text-slate-400 uppercase"
-                  onClick={handleResetPassword}
-                >
-                  Quên mật khẩu?
+                  {authMode === 'login' ? 'Tạo tài khoản mới' : 'Đã có tài khoản? Đăng nhập'}
                 </Button>
               </div>
             </CardContent>
@@ -257,7 +222,7 @@ export default function Overview() {
     );
   }
 
-  // Dashboard View (Khi đã đăng nhập thành công)
+  // Dashboard View
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
@@ -332,7 +297,7 @@ export default function Overview() {
         ))}
       </div>
 
-      {currentUser.role === 'csvc_manager' && (
+      {currentUser.role === 'csvc_manager' && techPerformance.length > 0 && (
         <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
           <CardHeader className="px-8 py-6 border-b border-slate-50">
             <CardTitle className="text-lg font-black text-slate-800 flex items-center gap-2">
