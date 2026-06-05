@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon } from 'lucide-react';
+import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -41,12 +41,24 @@ export default function NewRequest() {
     if (!files) return;
 
     Array.from(files).forEach(file => {
+      // Giới hạn dung lượng ảnh khoảng 2MB để tránh lỗi Firestore payload
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "Ảnh quá lớn",
+          description: "Vui lòng chọn ảnh dưới 2MB."
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImages(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
+    // Reset input value to allow selecting same file again
+    e.target.value = '';
   };
 
   const removeImage = (index: number) => {
@@ -93,22 +105,23 @@ export default function NewRequest() {
     setIsSubmitting(true);
     const equip = equipment.find(e => e.id === formData.equipmentId);
     
+    // Đảm bảo không có trường undefined để tránh lỗi Firestore
     const requestData: any = {
-      title: formData.title,
-      description: formData.description,
-      equipmentId: formData.equipmentId,
+      title: formData.title || '',
+      description: formData.description || '',
+      equipmentId: formData.equipmentId || '',
       equipmentName: equip?.name || '',
       category: equip?.category || 'General',
-      requesterId: currentUser.id,
-      requesterName: currentUser.name,
-      unit: currentUser.unit || 'Unknown',
-      images: images,
+      requesterId: currentUser.id || '',
+      requesterName: currentUser.name || '',
+      unit: currentUser.unit || 'Không xác định',
+      images: images.length > 0 ? images : [],
     };
 
     if (aiSuggestions) {
       requestData.aiSuggestions = {
-        causes: aiSuggestions.causes,
-        recommendedEquipment: aiSuggestions.recommendedEquipment
+        causes: aiSuggestions.causes || [],
+        recommendedEquipment: aiSuggestions.recommendedEquipment || []
       };
     }
 
@@ -201,10 +214,9 @@ export default function NewRequest() {
                 </Select>
               </div>
 
-              {/* Tính năng hình ảnh đính kèm */}
               <div className="space-y-3 pt-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
-                  <ImageIcon className="h-3.5 w-3.5" /> Hình ảnh đính kèm (Nếu có)
+                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Mở máy ảnh)
                 </Label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {images.map((img, idx) => (
@@ -219,10 +231,28 @@ export default function NewRequest() {
                       </button>
                     </div>
                   ))}
+                  <label className="aspect-square rounded-2xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors bg-slate-50/50">
+                    <Camera className="h-8 w-8 text-primary/60" />
+                    <span className="text-[9px] font-black text-primary/60 uppercase">Chụp ảnh</span>
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      capture="environment" 
+                      className="hidden" 
+                      onChange={handleImageChange} 
+                    />
+                  </label>
                   <label className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
-                    <ImagePlus className="h-6 w-6 text-slate-300" />
-                    <span className="text-[9px] font-black text-slate-400 uppercase">Thêm ảnh</span>
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                    <ImagePlus className="h-8 w-8 text-slate-300" />
+                    <span className="text-[9px] font-black text-slate-400 uppercase">Thư viện</span>
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleImageChange} 
+                    />
                   </label>
                 </div>
               </div>
