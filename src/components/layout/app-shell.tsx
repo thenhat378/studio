@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect } from 'react';
@@ -24,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Chuyển hướng về trang chủ (nơi chứa form đăng nhập) ngay khi đăng xuất
+  // Chuyển hướng về trang chủ ngay khi đăng xuất
   useEffect(() => {
     if (isInitialized && !currentUser && pathname !== '/') {
       router.push('/');
@@ -33,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!isInitialized) return null;
 
-  // Nếu chưa đăng nhập, chỉ hiển thị nội dung (trang chủ sẽ hiển thị form login)
+  // Nếu chưa đăng nhập, chỉ hiển thị nội dung (trang chủ hiển thị form login)
   if (!currentUser) {
     return <div className="min-h-screen bg-slate-50/50">{children}</div>;
   }
@@ -131,14 +132,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                <Wrench className="h-6 w-6 p-1 bg-primary text-white rounded-lg" /> FixFlow
             </Link>
           </div>
-          <div className="ml-auto flex items-center gap-4">
-             <div className="hidden sm:flex flex-col items-end">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{new Date().toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
-                <span className="text-xs font-mono">{new Date().toLocaleDateString('vi-VN')}</span>
+          <div className="ml-auto flex items-center gap-2 md:gap-4">
+             <div className="hidden lg:flex flex-col items-end">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Date().toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
+                <span className="text-[10px] font-mono">{new Date().toLocaleDateString('vi-VN')}</span>
              </div>
-             <Button variant="ghost" size="icon" className="rounded-full bg-muted/50">
-               <User className="h-5 w-5 text-muted-foreground" />
+             
+             {/* Nút đăng xuất trực tiếp trên Header */}
+             <Button 
+               variant="outline" 
+               size="sm" 
+               className="rounded-xl border-destructive/20 text-destructive hover:bg-destructive/10 h-9 font-bold px-3"
+               onClick={() => logout()}
+             >
+               <LogOut className="h-4 w-4 md:mr-2" />
+               <span className="hidden sm:inline text-xs">Đăng xuất</span>
              </Button>
+
+             <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+               <User className="h-5 w-5 text-muted-foreground" />
+             </div>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-10 bg-slate-50/50">
