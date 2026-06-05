@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -33,6 +32,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Dialog,
   DialogContent,
@@ -57,6 +58,8 @@ export default function Overview() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const dueLogo = PlaceHolderImages.find(img => img.id === 'due-logo');
 
   if (!isInitialized) return null;
 
@@ -86,14 +89,26 @@ export default function Overview() {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-slate-50/50">
         <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="text-center space-y-2">
-            <div className="inline-flex p-4 bg-primary/10 rounded-3xl mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
-              <Wrench className="h-12 w-12 text-primary" />
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+               <div className="relative w-32 h-32 p-2 bg-white rounded-2xl shadow-xl overflow-hidden group">
+                  {dueLogo && (
+                    <Image 
+                      src={dueLogo.imageUrl}
+                      alt={dueLogo.description}
+                      width={128}
+                      height={128}
+                      className="object-contain mix-multiply"
+                      data-ai-hint={dueLogo.imageHint}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors"></div>
+               </div>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-primary">Quản lý sửa chữa</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-primary uppercase">Ứng dụng Quản lý sửa chữa</h1>
           </div>
 
-          <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-sm">
+          <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
               <CardDescription>Nhập thông tin để truy cập hệ thống</CardDescription>
@@ -156,7 +171,7 @@ export default function Overview() {
                     </Dialog>
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-11 font-bold bg-primary" disabled={isLoading}>
+                <Button type="submit" className="w-full h-11 font-bold bg-primary shadow-lg shadow-primary/20" disabled={isLoading}>
                   {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
                 </Button>
               </form>
@@ -178,10 +193,10 @@ export default function Overview() {
                   <ShieldCheck className="h-3.5 w-3.5 text-accent" /> Lãnh đạo đơn vị
                 </Button>
                 <Button onClick={() => login('csvc_manager')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
-                  <ClipboardList className="h-3.5 w-3.5 text-indigo-600" /> Quản lý CSVC
+                  <ClipboardList className="h-3.5 w-3.5 text-primary/80" /> Quản lý CSVC
                 </Button>
                 <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
-                  <Wrench className="h-3.5 w-3.5 text-emerald-600" /> Kỹ thuật viên
+                  <Wrench className="h-3.5 w-3.5 text-secondary" /> Kỹ thuật viên
                 </Button>
               </div>
             </CardContent>
@@ -203,10 +218,10 @@ export default function Overview() {
   });
 
   const stats = [
-    { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-primary', bg: 'bg-primary/10' },
+    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-accent', bg: 'bg-accent/10' },
     { label: 'Chờ phê duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-secondary', bg: 'bg-secondary/10' },
   ];
 
   const recentRequests = roleFilteredRequests.slice(0, 6);
@@ -233,12 +248,12 @@ export default function Overview() {
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'pending_approval': return <Badge variant="outline" className="border-rose-200 text-rose-600 bg-rose-50">Chờ duyệt</Badge>;
-      case 'approved': return <Badge variant="outline" className="border-indigo-200 text-indigo-600 bg-indigo-50">Đã duyệt</Badge>;
-      case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã duyệt hoàn thành</Badge>;
-      case 'closed': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã đóng</Badge>;
+      case 'approved': return <Badge variant="outline" className="border-primary/20 text-primary bg-primary/5">Đã duyệt</Badge>;
+      case 'assigned': return <Badge variant="outline" className="border-primary/20 text-primary bg-primary/5">Đã phân công</Badge>;
+      case 'in_progress': return <Badge variant="outline" className="border-accent/20 text-accent bg-accent/5">Đang thực hiện</Badge>;
+      case 'completed': return <Badge variant="outline" className="border-secondary/20 text-secondary bg-secondary/5">Kỹ thuật đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-secondary/20 text-secondary bg-secondary/5">Đã duyệt hoàn thành</Badge>;
+      case 'closed': return <Badge variant="outline" className="border-secondary/30 text-secondary bg-secondary/10">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -319,18 +334,18 @@ export default function Overview() {
                       {tech.name}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                      <Badge variant="secondary" className="bg-accent/10 text-accent hover:bg-accent/20">
                         {tech.inProgress} phiếu
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                      <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20">
                         {tech.completed} phiếu
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1 font-bold text-amber-600">
-                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+                      <div className="flex items-center justify-center gap-1 font-bold text-accent">
+                        <Star className="h-4 w-4 fill-accent text-accent" />
                         {tech.avgRating}
                       </div>
                     </TableCell>

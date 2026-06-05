@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "due-logo",
+      "description": "Logo DUE SINCE 1975",
+      "imageUrl": "https://picsum.photos/seed/due-logo/400/400",
+      "imageHint": "university logo"
+    },
+    {
+      "id": "hero-repair",
+      "description": "Professional technician repairing equipment",
+      "imageUrl": "https://picsum.photos/seed/repair1/1200/600",
+      "imageHint": "repair technician"
+    },
+    {
+      "id": "equipment-catalog",
+      "description": "Office and technical equipment catalog",
+      "imageUrl": "https://picsum.photos/seed/equip/800/600",
+      "imageHint": "office equipment"
+    }
+  ]
+}
