@@ -192,21 +192,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const resetSystem = async () => {
-    if (!db) return;
+    if (!db || !currentUser) return;
     const batch = writeBatch(db);
     
     // Xóa tất cả phiếu yêu cầu
     const requestSnap = await getDocs(collection(db, 'requests'));
-    requestSnap.forEach(doc => batch.delete(doc.ref));
+    requestSnap.forEach(docSnap => batch.delete(docSnap.ref));
     
-    // Xóa tất cả người dùng
+    // Xóa tất cả người dùng NGOẠI TRỪ tài khoản Admin hiện tại
     const userSnap = await getDocs(collection(db, 'users'));
-    userSnap.forEach(doc => batch.delete(doc.ref));
+    userSnap.forEach(docSnap => {
+      if (docSnap.id !== currentUser.id) {
+        batch.delete(docSnap.ref);
+      }
+    });
 
-    // GIỮ LẠI danh mục thiết bị (không xóa bảng equipment theo yêu cầu)
-
+    // GIỮ LẠI danh mục thiết bị (không xóa bảng equipment)
     await batch.commit();
-    logout();
+    // Không gọi logout() để giữ phiên làm việc của Admin
   };
 
   return (

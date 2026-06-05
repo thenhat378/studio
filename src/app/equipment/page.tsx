@@ -101,12 +101,14 @@ export default function EquipmentCatalog() {
   };
 
   const handleReset = async () => {
-    if (confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ Phiếu yêu cầu và tất cả Tài khoản người dùng (Danh mục Thiết bị sẽ được GIỮ LẠI). Bạn sẽ bị đăng xuất. Tiếp tục?")) {
+    if (confirm("XÁC NHẬN: Bạn muốn xóa toàn bộ Phiếu yêu cầu và các tài khoản người dùng khác? (Danh mục Thiết bị và tài khoản Admin của bạn sẽ được GIỮ LẠI).")) {
       setIsResetting(true);
       try {
         await resetSystem();
-        toast({ title: "Đã Reset dữ liệu đăng ký", description: "Danh mục thiết bị vẫn được giữ nguyên. Vui lòng đăng ký lại tài khoản." });
-        router.push('/');
+        toast({ 
+          title: "Đã làm sạch dữ liệu", 
+          description: "Phiếu yêu cầu và các tài khoản người dùng khác đã được xóa. Tài khoản Admin và Thiết bị vẫn giữ nguyên." 
+        });
       } catch (error) {
         toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu." });
       } finally {
@@ -135,8 +137,8 @@ export default function EquipmentCatalog() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReset} className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 text-rose-500 border-rose-100 hover:bg-rose-50">
-            {isResetting ? <Loader2 className="animate-spin" /> : <RefreshCcw className="h-5 w-5" />}
-            Reset phiếu & người dùng
+            {isResetting ? <Loader2 className="animate-spin h-5 w-5" /> : <RefreshCcw className="h-5 w-5" />}
+            Dọn dẹp Phiếu & Người dùng
           </Button>
           <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-blue-100">
             <Plus className="h-5 w-5" />
