@@ -26,10 +26,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Equipment } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 
 export default function EquipmentCatalog() {
   const { equipment, addEquipment, updateEquipment, deleteEquipment, resetSystem, currentUser } = useAppStore();
   const { toast } = useToast();
+  const router = useRouter();
   
   const [search, setSearch] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -99,11 +101,12 @@ export default function EquipmentCatalog() {
   };
 
   const handleReset = async () => {
-    if (confirm("CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ Phiếu yêu cầu và Thiết bị để phục vụ kiểm thử lại từ đầu. Bạn có chắc chắn?")) {
+    if (confirm("CẢNH BÁO CỰC ĐỘ: Hành động này sẽ xóa TOÀN BỘ dữ liệu (Yêu cầu, Thiết bị, Người dùng) để làm sạch hệ thống. Bạn sẽ bị đăng xuất và phải đăng ký lại từ đầu. Tiếp tục?")) {
       setIsResetting(true);
       try {
         await resetSystem();
-        toast({ title: "Đã reset hệ thống", description: "Toàn bộ dữ liệu đã được làm sạch." });
+        toast({ title: "Đã làm sạch hệ thống", description: "Vui lòng đăng ký tài khoản mới để bắt đầu." });
+        router.push('/');
       } catch (error) {
         toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu." });
       } finally {
@@ -134,7 +137,7 @@ export default function EquipmentCatalog() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReset} className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 text-rose-500 border-rose-100 hover:bg-rose-50">
             {isResetting ? <Loader2 className="animate-spin" /> : <RefreshCcw className="h-5 w-5" />}
-            Xóa toàn bộ dữ liệu
+            Xóa sạch hệ thống (Reset)
           </Button>
           <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-blue-100">
             <Plus className="h-5 w-5" />
@@ -170,7 +173,7 @@ export default function EquipmentCatalog() {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            </CardHeader>
+            </Header>
             <CardContent className="p-6 pt-0">
               <CardTitle className="text-lg font-black text-slate-800 mb-3">{item.name}</CardTitle>
               <div className="flex items-center justify-between">

@@ -176,7 +176,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const resetSystem = async () => {
-    if (!db || currentUser?.role !== 'admin') return;
+    if (!db) return;
     const batch = writeBatch(db);
     
     // Xóa tất cả yêu cầu
@@ -187,7 +187,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const equipSnap = await getDocs(collection(db, 'equipment'));
     equipSnap.forEach(doc => batch.delete(doc.ref));
 
+    // Xóa tất cả người dùng (Để đăng ký lại từ đầu)
+    const userSnap = await getDocs(collection(db, 'users'));
+    userSnap.forEach(doc => batch.delete(doc.ref));
+
     await batch.commit();
+    logout(); // Đăng xuất để người dùng đăng ký lại
   };
 
   return (
