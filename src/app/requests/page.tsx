@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList } from 'lucide-react';
+import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -35,11 +36,20 @@ export default function RequestsList() {
   };
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-24">
       <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800">Danh sách phiếu</h1>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Theo dõi tiến độ sửa chữa</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-black text-slate-800">Danh sách phiếu</h1>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Theo dõi tiến độ sửa chữa</p>
+          </div>
+          {currentUser?.role === 'requester' && (
+            <Link href="/requests/new" className="hidden md:block">
+              <Button className="bg-[#0054A4] rounded-2xl h-11 font-bold gap-2">
+                <Plus className="h-4 w-4" /> Tạo phiếu mới
+              </Button>
+            </Link>
+          )}
         </div>
         
         <div className="relative">
@@ -107,6 +117,7 @@ export default function RequestsList() {
         )}
       </div>
 
+      {/* Mobile Floating Action Button */}
       {currentUser?.role === 'requester' && (
         <div className="fixed bottom-24 right-6 z-40 md:hidden">
           <Link href="/requests/new">

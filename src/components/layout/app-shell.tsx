@@ -49,12 +49,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
 
-  // Bottom Nav items (Max 5 for mobile)
-  const bottomNavItems = filteredNav.slice(0, 5);
+  // Bottom Nav items (Max 4 to make room for FAB)
+  const bottomNavItems = filteredNav.slice(0, 4);
 
   return (
     <div className="flex min-h-screen bg-[#F4F7FE]">
-      {/* Desktop Sidebar (Only visible on MD+) */}
+      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-white no-print fixed h-full z-40">
         <div className="flex h-16 items-center px-6 border-b shrink-0">
           <Link href="/" className="flex items-center gap-2 font-black text-lg text-primary tracking-tighter">
@@ -79,6 +79,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Button>
             </Link>
           ))}
+          {currentUser.role === 'requester' && (
+            <Link href="/requests/new">
+              <Button variant="ghost" className="w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl text-orange-600 hover:bg-orange-50">
+                <PlusCircle className="h-5 w-5" />
+                Tạo phiếu mới
+              </Button>
+            </Link>
+          )}
         </div>
         <div className="p-4 border-t">
           <Button 
@@ -93,7 +101,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 md:ml-64">
-        {/* Mobile Header (Fixed) */}
+        {/* Mobile Header */}
         <header className="md:hidden glass-morphism fixed top-0 left-0 w-full h-16 flex items-center justify-between px-6 z-50">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary/30">
@@ -135,6 +143,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         </Link>
                       </SheetClose>
                     ))}
+                    {currentUser.role === 'requester' && (
+                      <SheetClose asChild>
+                        <Link href="/requests/new">
+                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-orange-500">
+                            <PlusCircle className="h-5 w-5" /> Tạo phiếu mới
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                    )}
                   </div>
                   <Button 
                     variant="ghost" 
@@ -174,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
 
-        {/* Mobile Bottom Navigation (Fixed) */}
+        {/* Mobile Bottom Navigation */}
         <nav className="md:hidden glass-morphism fixed bottom-0 left-0 w-full h-20 px-6 flex items-center justify-between z-50 rounded-t-[2.5rem] card-shadow">
           {bottomNavItems.map((item) => (
             <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1 group">

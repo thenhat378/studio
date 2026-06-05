@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -22,7 +23,9 @@ import {
   Smartphone,
   Apple,
   ArrowUpRight,
-  Wrench
+  Wrench,
+  PlusCircle,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -204,7 +207,31 @@ export default function Overview() {
          </div>
       </div>
 
-      {/* Stats Grid - Horizontal Scroll on small screens if needed, but 2x2 grid is better */}
+      {/* Quick Action for Requester */}
+      {currentUser.role === 'requester' && (
+        <Link href="/requests/new">
+          <Card className="border-none bg-white rounded-[2rem] card-shadow overflow-hidden group active:scale-95 transition-all">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-orange-50 flex items-center justify-center border border-orange-100">
+                  <PlusCircle className="h-7 w-7 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-800">Tạo yêu cầu sửa chữa</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-orange-400" /> Có hỗ trợ AI phân tích lỗi
+                  </p>
+                </div>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <ChevronRight className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
+
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow">
