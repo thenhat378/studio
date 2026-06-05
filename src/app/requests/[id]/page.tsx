@@ -74,7 +74,7 @@ export default function RequestDetail() {
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
       case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge className="bg-cyan-600">CSVC đã nghiệm thu kỹ thuật</Badge>;
+      case 'verified': return <Badge className="bg-cyan-600">CSVC đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge className="bg-green-700 text-white">Đã đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
@@ -235,7 +235,7 @@ export default function RequestDetail() {
                 {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                   <div className="flex gap-3">
                     <Button className="bg-emerald-600 flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
-                      <CheckCircle2 className="h-5 w-5" /> Duyệt kỹ thuật
+                      <CheckCircle2 className="h-5 w-5" /> Duyệt hoàn thành
                     </Button>
                     <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
                       Yêu cầu làm lại

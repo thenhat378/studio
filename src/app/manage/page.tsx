@@ -64,8 +64,8 @@ export default function ManagementPage() {
   const handleVerify = (id: string) => {
     updateRequestStatus(id, 'verified');
     toast({
-      title: "Đã nghiệm thu kỹ thuật",
-      description: "Kết quả sửa chữa đã được xác nhận. Chờ đơn vị yêu cầu xác nhận cuối cùng."
+      title: "Đã duyệt hoàn thành",
+      description: "Kết quả sửa chữa đã được xác nhận. Chờ đơn vị yêu cầu nghiệm thu cuối cùng."
     });
   };
 
@@ -177,7 +177,7 @@ export default function ManagementPage() {
         <TabsContent value="review" className="mt-6 space-y-4">
            <div className="flex items-center gap-2 mb-4 text-emerald-600">
             <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm font-medium">Có {pendingReview.length} phiếu đã hoàn thành cần duyệt kỹ thuật.</span>
+            <span className="text-sm font-medium">Có {pendingReview.length} phiếu đã hoàn thành cần duyệt hoàn thành.</span>
           </div>
 
           {pendingReview.map(req => (
@@ -207,7 +207,7 @@ export default function ManagementPage() {
                     className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none"
                     onClick={() => handleVerify(req.id)}
                   >
-                    <CheckCircle2 className="h-4 w-4" /> Duyệt
+                    <CheckCircle2 className="h-4 w-4" /> Duyệt hoàn thành
                   </Button>
                   <Button 
                     size="sm"

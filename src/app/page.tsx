@@ -210,7 +210,7 @@ export default function Dashboard() {
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">CSVC đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
