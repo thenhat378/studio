@@ -352,7 +352,8 @@ export default function Overview() {
           </Card>
           
           <div className="flex flex-col items-center gap-4">
-            <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] text-center">
+            <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] text-center flex items-center justify-center gap-2">
+              <ShieldCheck className="h-3 w-3" />
               2026 Được phát triển bởi Phòng Cơ sở vật chất
             </p>
             <div className="flex gap-4 opacity-40 hover:opacity-100 transition-opacity">
