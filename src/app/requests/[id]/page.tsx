@@ -10,7 +10,6 @@ import {
   ShieldAlert, 
   Clock, 
   Star, 
-  Bell, 
   ThumbsUp,
   CheckCircle,
   ShieldCheck,
@@ -100,6 +99,10 @@ export default function RequestDetail() {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header điều hướng - Ẩn khi in */}
@@ -108,7 +111,7 @@ export default function RequestDetail() {
           <ChevronLeft className="h-4 w-4" /> Quay lại
         </Button>
         {req.status === 'closed' && (
-          <Button variant="default" onClick={() => window.print()} className="gap-2 bg-primary font-bold">
+          <Button variant="default" onClick={handlePrint} className="gap-2 bg-primary font-bold">
             <Printer className="h-4 w-4" /> In phiếu lưu trữ
           </Button>
         )}
@@ -261,7 +264,7 @@ export default function RequestDetail() {
         <Card className="border-none shadow-sm">
           <CardHeader className="bg-accent/5">
             <CardTitle className="text-lg flex items-center gap-2 font-bold">
-              <ShieldAlert className="h-5 w-5" /> Thực hiện các bước nghiệm thu
+              <ShieldAlert className="h-5 w-5" /> Khu vực xử lý nghiệp vụ
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
@@ -302,7 +305,7 @@ export default function RequestDetail() {
                   )}
                   {req.status === 'in_progress' && (
                     <div className="space-y-4 p-4 border-2 border-dashed border-primary/20 rounded-2xl">
-                      <Label className="font-bold text-primary">Báo cáo kết quả công việc</Label>
+                      <Label className="font-bold text-primary">Báo cáo hoàn thành công việc</Label>
                       <Select onValueChange={(val) => setRepairType(val as RepairType)}>
                         <SelectTrigger className="h-12 border-primary/30"><SelectValue placeholder="Chọn hình thức xử lý..." /></SelectTrigger>
                         <SelectContent>
@@ -353,11 +356,9 @@ export default function RequestDetail() {
                     <p className="text-emerald-800 font-black text-xl">NGHIỆM THU HOÀN TẤT</p>
                     <p className="text-sm text-emerald-600 font-medium">Phiếu đã được đóng và lưu trữ vào hệ thống.</p>
                   </div>
-                  {currentUser?.role === 'technician' && (
-                    <Button variant="outline" className="mt-2 border-emerald-200 text-emerald-700 hover:bg-emerald-100" onClick={() => window.print()}>
-                      <Printer className="mr-2 h-4 w-4" /> In phiếu lưu trữ ngay
-                    </Button>
-                  )}
+                  <Button variant="default" className="mt-2 bg-primary font-bold shadow-lg" onClick={handlePrint}>
+                    <Printer className="mr-2 h-4 w-4" /> In phiếu lưu trữ ngay
+                  </Button>
                 </div>
               )}
             </div>

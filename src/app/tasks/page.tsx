@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell, Printer, Search } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell, Printer, Search, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -207,7 +207,7 @@ export default function TasksPage() {
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="w-full">
                     <Button variant="default" className="w-full bg-primary hover:bg-primary/90 gap-1 font-bold">
-                      <Printer className="h-4 w-4" /> Xem & In phiếu báo cáo
+                      <Printer className="h-4 w-4" /> Xem & In phiếu
                     </Button>
                   </Link>
                 </div>
