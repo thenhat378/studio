@@ -475,9 +475,13 @@ export default function Overview() {
     );
   }
 
+  // Lọc phiếu theo vai trò và chuẩn hóa đơn vị
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
-    if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
+    if (currentUser.role === 'unit_leader') {
+      if (!currentUser.unit || !r.unit) return false;
+      return r.unit.trim().toLowerCase() === currentUser.unit.trim().toLowerCase();
+    }
     if (currentUser.role === 'technician') return r.technicianId === currentUser.id;
     return true;
   });
@@ -505,7 +509,7 @@ export default function Overview() {
           { label: 'Tất cả phiếu', value: roleFilteredRequests.length, icon: User },
           { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Wrench },
           { label: 'Hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2 },
-          { label: 'Cần duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: ShieldCheck },
+          { label: 'Cần duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval' || r.status === 'verified').length, icon: ShieldCheck },
         ].map((stat, i) => (
           <Card key={i} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow">
             <CardContent className="p-6 flex flex-col items-center text-center space-y-1">

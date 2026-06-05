@@ -134,9 +134,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const userId = `user_${Date.now()}`;
     const userData: User = {
       id: userId,
-      name: data.name,
+      name: data.name.trim(),
       role: data.role,
-      unit: data.unit,
+      unit: data.unit.trim(),
       phoneNumber: data.phone,
       password: data.pass
     };
@@ -161,6 +161,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     const rawData = {
       ...req,
+      unit: req.unit.trim(),
       createdAt: new Date().toISOString(),
       status: 'pending_approval'
     };

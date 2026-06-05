@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, CheckCircle2, Clock, Star } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, CheckCircle2, Clock, Star, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -30,10 +30,10 @@ export default function ApprovalsPage() {
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
-  // Lọc phiếu theo đơn vị của lãnh đạo (không phân biệt hoa thường)
+  // Lọc phiếu theo đơn vị của lãnh đạo (chuẩn hóa so sánh)
   const unitRequests = requests.filter(r => {
-    if (!currentUser?.unit) return false;
-    return r.unit?.trim().toLowerCase() === currentUser.unit.trim().toLowerCase();
+    if (!currentUser?.unit || !r.unit) return false;
+    return r.unit.trim().toLowerCase() === currentUser.unit.trim().toLowerCase();
   });
 
   // Phiếu chờ duyệt bước 2 (Chỉ đơn vị mình)
@@ -78,6 +78,16 @@ export default function ApprovalsPage() {
     setRejectingId(null);
     setRejectionReason('');
   };
+
+  if (!currentUser?.unit) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+        <AlertCircle className="h-16 w-16 text-rose-500 mb-6" />
+        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Thông tin Đơn vị chưa xác định</h2>
+        <p className="text-sm text-slate-500 max-w-md">Tài khoản của bạn chưa được gán thông tin Đơn vị. Vui lòng liên hệ Admin để cập nhật thông tin trước khi thực hiện duyệt phiếu.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
