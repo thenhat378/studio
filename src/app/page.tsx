@@ -21,7 +21,9 @@ import {
   HardDrive,
   Lock,
   Mail,
-  LogOut
+  Star,
+  BarChart3,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -40,9 +42,17 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Dashboard() {
-  const { currentUser, login, logout, requests, isInitialized } = useAppStore();
+  const { currentUser, login, logout, requests, users, isInitialized } = useAppStore();
   const { toast } = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -63,7 +73,6 @@ export default function Dashboard() {
     
     setIsLoading(true);
     setTimeout(() => {
-      // Demo logic
       login('requester');
       setIsLoading(false);
       toast({
@@ -196,12 +205,31 @@ export default function Dashboard() {
 
   const stats = [
     { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
     { label: 'Chờ phê duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
     { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
 
   const recentRequests = roleFilteredRequests.slice(0, 6);
+
+  // Thống kê hiệu suất kỹ thuật viên dành cho Quản lý CSVC
+  const technicians = users.filter(u => u.role === 'technician');
+  const techPerformance = technicians.map(tech => {
+    const techReqs = requests.filter(r => r.technicianId === tech.id);
+    const completedCount = techReqs.filter(r => r.status === 'closed').length;
+    const inProgressCount = techReqs.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length;
+    const ratings = techReqs.filter(r => r.rating !== undefined).map(r => r.rating as number);
+    const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : 'N/A';
+
+    return {
+      id: tech.id,
+      name: tech.name,
+      completed: completedCount,
+      inProgress: inProgressCount,
+      avgRating,
+      total: techReqs.length
+    };
+  });
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -255,6 +283,70 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
+
+      {/* Phần Mức độ xử lý công việc của Kỹ thuật viên (Chỉ dành cho QL CSVC) */}
+      {currentUser.role === 'csvc_manager' && (
+        <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-accent">
+          <CardHeader className="flex flex-row items-center justify-between bg-muted/20 px-6 py-4">
+            <div>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-accent" />
+                Hiệu suất xử lý của Kỹ thuật viên
+              </CardTitle>
+              <CardDescription>Cơ sở để đánh giá năng suất và chất lượng phục vụ</CardDescription>
+            </div>
+            <div className="p-2 bg-accent/10 rounded-full">
+               <Users className="h-5 w-5 text-accent" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/10">
+                  <TableHead className="font-bold">Kỹ thuật viên</TableHead>
+                  <TableHead className="text-center font-bold">Đang xử lý</TableHead>
+                  <TableHead className="text-center font-bold">Đã hoàn thành</TableHead>
+                  <TableHead className="text-center font-bold">Đánh giá trung bình</TableHead>
+                  <TableHead className="text-right font-bold">Mức độ hoàn thành</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {techPerformance.map((tech) => (
+                  <TableRow key={tech.id} className="hover:bg-accent/5 transition-colors">
+                    <TableCell className="font-medium flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                        {tech.name.charAt(0)}
+                      </div>
+                      {tech.name}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                        {tech.inProgress} phiếu
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                        {tech.completed} phiếu
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1 font-bold text-amber-600">
+                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+                        {tech.avgRating}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-sm font-mono font-bold text-primary">
+                        {tech.total > 0 ? Math.round((tech.completed / tech.total) * 100) : 0}%
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-none shadow-sm overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/20 px-6 py-4">
