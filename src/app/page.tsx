@@ -220,7 +220,7 @@ export default function Overview() {
               <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
             </h1>
             <p className="text-sm font-bold text-slate-500 max-w-[80%] mx-auto">
-              Phiếu yêu cầu cấp phát sửa chữa thiết bị
+              Phiếu Yêu cầu cấp phát sửa chữa thiết bị
             </p>
           </div>
 
