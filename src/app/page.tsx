@@ -189,7 +189,7 @@ export default function Overview() {
           </Card>
           
           <p className="text-center text-xs text-muted-foreground">
-            © 2024 FixFlow Pro v1.0 • Phát triển bởi Phòng Công nghệ thông tin
+            © 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất
           </p>
         </div>
       </div>
