@@ -44,6 +44,7 @@ export interface RepairRequest {
   technicianName?: string;
   createdAt: string;
   completedAt?: string;
+  images?: string[]; // Array of base64 strings
   aiSuggestions?: {
     causes: string[];
     recommendedEquipment: string[];

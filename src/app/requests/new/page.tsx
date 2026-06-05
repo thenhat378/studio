@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 export default function NewRequest() {
   const { equipment, addRequest, currentUser } = useAppStore();
@@ -28,11 +29,29 @@ export default function NewRequest() {
     equipmentId: '',
   });
 
+  const [images, setImages] = useState<string[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<{
     causes: string[];
     category: string;
     recommendedEquipment: string[];
   } | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleAiAssist = async () => {
     if (!formData.description) {
@@ -83,6 +102,7 @@ export default function NewRequest() {
       requesterId: currentUser.id,
       requesterName: currentUser.name,
       unit: currentUser.unit || 'Unknown',
+      images: images,
     };
 
     if (aiSuggestions) {
@@ -179,6 +199,32 @@ export default function NewRequest() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Tính năng hình ảnh đính kèm */}
+              <div className="space-y-3 pt-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
+                  <ImageIcon className="h-3.5 w-3.5" /> Hình ảnh đính kèm (Nếu có)
+                </Label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-slate-100 group">
+                      <Image src={img} alt="Preview" fill className="object-cover" />
+                      <button 
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-1 right-1 bg-rose-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <label className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                    <ImagePlus className="h-6 w-6 text-slate-300" />
+                    <span className="text-[9px] font-black text-slate-400 uppercase">Thêm ảnh</span>
+                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </label>
+                </div>
               </div>
             </CardContent>
           </Card>

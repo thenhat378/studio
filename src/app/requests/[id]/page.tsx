@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   Wrench,
   User,
-  Info
+  Info,
+  ImageIcon
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { RepairType } from '@/lib/types';
+import Image from 'next/image';
 
 export default function RequestDetail() {
   const params = useParams();
@@ -143,7 +145,19 @@ export default function RequestDetail() {
             <div className="pl-4 italic text-slate-800 border-l-2 ml-2 py-1">
               {req.technicianReport || 'Chưa cập nhật nội dung.'}
             </div>
-            <p><span className="font-bold">7. Kết quả nghiệm thu:</span> {req.status === 'closed' ? `Đã hoàn thành - Đánh giá: ${req.rating}/5 sao` : 'Đang thực hiện'}</p>
+            {req.images && req.images.length > 0 && (
+              <div>
+                <p className="font-bold mb-2">7. Hình ảnh sự cố:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {req.images.map((img, i) => (
+                    <div key={i} className="relative aspect-square border">
+                       <Image src={img} alt="Incident" fill className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p><span className="font-bold">8. Kết quả nghiệm thu:</span> {req.status === 'closed' ? `Đã hoàn thành - Đánh giá: ${req.rating}/5 sao` : 'Đang thực hiện'}</p>
           </div>
         </div>
 
@@ -187,6 +201,22 @@ export default function RequestDetail() {
               <Label className="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest">Mô tả sự cố:</Label>
               <p className="text-sm font-bold text-slate-700 leading-relaxed">{req.description}</p>
             </div>
+
+            {/* Hiển thị hình ảnh đính kèm */}
+            {req.images && req.images.length > 0 && (
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest">
+                  <ImageIcon className="h-3.5 w-3.5" /> Hình ảnh sự cố:
+                </Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {req.images.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                      <Image src={img} alt={`Incident photo ${idx + 1}`} fill className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {req.technicianReport && (
               <div className="bg-blue-50 p-5 rounded-3xl border border-blue-100 space-y-3">
@@ -391,4 +421,3 @@ export default function RequestDetail() {
     </div>
   );
 }
-
