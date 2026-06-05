@@ -1,14 +1,18 @@
 'use client';
 
 /**
+ * QUAN TRỌNG: Lỗi "API Key not valid" xảy ra do bạn chưa điền thông số Firebase thực tế.
+ * 
  * HƯỚNG DẪN:
- * 1. Truy cập Firebase Console -> Project Settings.
- * 2. Tại mục "Your apps", chọn ứng dụng Web.
- * 3. Sao chép các thông số từ firebaseConfig và dán vào đây.
+ * 1. Truy cập https://console.firebase.google.com/
+ * 2. Chọn dự án của bạn -> Nhấn vào biểu tượng bánh răng (Project Settings).
+ * 3. Cuộn xuống phần "Your apps" -> Chọn ứng dụng Web (biểu tượng </>).
+ * 4. Sao chép đối tượng `firebaseConfig` và dán các giá trị vào bên dưới.
+ * 5. Đừng quên vào mục "Authentication" -> "Sign-in method" và BẬT "Email/Password".
  */
 
 export const firebaseConfig = {
-  apiKey: "AIzaSy...", // Thay bằng API Key của bạn
+  apiKey: "AIzaSy...", // DÁN API KEY THẬT CỦA BẠN VÀO ĐÂY
   authDomain: "your-project-id.firebaseapp.com",
   projectId: "your-project-id",
   storageBucket: "your-project-id.firebasestorage.app",

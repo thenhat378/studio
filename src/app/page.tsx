@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -93,11 +92,16 @@ export default function Overview() {
       if (error.code === 'auth/email-already-in-use') message = "Email này đã được đăng ký sử dụng.";
       if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
       if (error.code === 'auth/invalid-email') message = "Định dạng Email không hợp lệ.";
-      if (error.code === 'auth/api-key-not-valid') message = "Cấu hình Firebase không hợp lệ (API Key). Vui lòng kiểm tra config.ts.";
+      if (error.code === 'auth/api-key-not-valid') {
+        message = "Cấu hình Firebase không hợp lệ (API Key). Vui lòng dán thông số thật vào tệp src/firebase/config.ts.";
+      }
+      if (error.code === 'auth/operation-not-allowed') {
+        message = "Vui lòng BẬT 'Email/Password' trong mục Authentication -> Sign-in method trên Firebase Console.";
+      }
       
       toast({ 
         variant: "destructive", 
-        title: "Lỗi xác thực", 
+        title: "Lỗi kết nối Firebase", 
         description: message 
       });
     } finally {
