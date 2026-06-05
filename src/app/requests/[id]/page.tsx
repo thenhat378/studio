@@ -18,10 +18,11 @@ import {
   Clock,
   Star,
   Bell,
-  Play
+  Play,
+  ClipboardPen
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { Badge } from '@/badge';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -73,6 +74,11 @@ export default function RequestDetail() {
        toast({
          title: "Đã xác nhận hoàn thành",
          description: "Phiếu yêu cầu hiện đã được đóng và nghiệm thu."
+       });
+    } else if (status === 'verified') {
+       toast({
+         title: "Đã duyệt hoàn thành",
+         description: "Đã xác nhận kết quả sửa chữa. Đang chờ đơn vị yêu cầu xác nhận cuối cùng."
        });
     } else {
        toast({
@@ -217,11 +223,11 @@ export default function RequestDetail() {
                   </div>
                 )}
 
-                {/* KỸ THUẬT VIÊN BÁO CÁO HOÀN THÀNH */}
+                {/* NHÂN VIÊN KỸ THUẬT: BÁO CÁO HOÀN THÀNH */}
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
-                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức sửa chữa (Listbox)</Label>
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức sửa chữa</Label>
                       <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                         <SelectTrigger className="h-12 border-primary/20">
                           <SelectValue placeholder="Chọn hình thức..." />
@@ -244,9 +250,12 @@ export default function RequestDetail() {
                       disabled={!report.trim() || !repairType} 
                       onClick={() => handleAction('completed', { technicianReport: report, repairType })}
                     >
-                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành
+                      <ClipboardPen className="h-5 w-5" /> Báo cáo hoàn thành
                     </Button>
-                    <p className="text-[10px] text-center text-muted-foreground italic">Lưu ý: Hệ thống sẽ tự động gửi thông báo cho Người yêu cầu và Quản lý PCSVC.</p>
+                    <div className="bg-blue-50 p-3 rounded-lg flex items-start gap-2 border border-blue-100">
+                       <Bell className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                       <p className="text-[10px] text-blue-800 font-bold leading-tight">Sau khi gửi, hệ thống sẽ tự động thông báo cho Người yêu cầu và Quản lý PCSVC.</p>
+                    </div>
                   </div>
                 )}
                 
@@ -263,7 +272,7 @@ export default function RequestDetail() {
                       <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng của bạn</Label>
                       <StarRating value={rating} onChange={setRating} />
                     </div>
-                    <Button className="bg-primary w-full h-14 text-md font-bold gap-2" onClick={() => handleAction('closed', { rating })}>
+                    <Button className="bg-primary w-full h-14 text-md font-bold gap-2 shadow-lg shadow-primary/20" onClick={() => handleAction('closed', { rating })}>
                       <CheckCircle2 className="h-5 w-5" /> Xác nhận hoàn thành & Đóng phiếu
                     </Button>
                   </div>

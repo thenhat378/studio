@@ -5,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell } from 'lucide-react';
-import { Badge } from '@/badge';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -153,7 +153,7 @@ export default function TasksPage() {
           </DialogHeader>
           <div className="py-4 space-y-6">
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức sửa chữa (Listbox)</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức sửa chữa</Label>
               <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                 <SelectTrigger className="h-12 border-primary/20">
                   <SelectValue placeholder="Chọn hình thức..." />
