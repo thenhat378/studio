@@ -2,7 +2,7 @@
 
 /**
  * Cấu hình Firebase chính thức từ người dùng.
- * Đã cập nhật với thông số thực tế để xóa lỗi API Key.
+ * Đảm bảo các thông số này khớp chính xác với Project Settings > Web App trong Firebase Console.
  */
 
 export const firebaseConfig = {

@@ -32,6 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 export default function Overview() {
   const { currentUser, login, loginWithGoogle, register, resetPassword, requests, users, isInitialized } = useAppStore();
@@ -69,17 +70,22 @@ export default function Overview() {
       }
     } catch (error: any) {
       console.error("Auth Error:", error);
-      let message = "Lỗi xác thực. Vui lòng kiểm tra lại.";
+      let message = "Lỗi xác thực. Vui lòng kiểm tra lại cấu hình.";
+      
+      // Chẩn đoán lỗi cụ thể để hướng dẫn người dùng kiểm tra Console
       if (error.code === 'auth/api-key-not-valid') {
-        message = "LỖI API KEY: Vui lòng kiểm tra API Key trong Google Cloud Console.";
+        message = "LỖI API KEY: Hãy vào Google Cloud Console kiểm tra xem API Key có bị giới hạn không.";
       } else if (error.code === 'auth/operation-not-allowed') {
-        message = "CHƯA BẬT: Bạn cần bật Email/Password hoặc Google Auth trong Firebase Console.";
+        message = "CHƯA BẬT SIGN-IN: Hãy vào Firebase Console > Authentication > Sign-in method và bật Email/Password.";
       } else if (error.code === 'auth/user-not-found') {
         message = "Tài khoản không tồn tại.";
       } else if (error.code === 'auth/wrong-password') {
         message = "Mật khẩu không chính xác.";
+      } else if (error.code === 'auth/invalid-api-key') {
+        message = "API KEY SAI: Vui lòng kiểm tra lại file config.ts";
       }
-      toast({ variant: "destructive", title: "Thông báo", description: message });
+      
+      toast({ variant: "destructive", title: "Thông báo lỗi", description: message });
     } finally {
       setIsLoading(false);
     }
@@ -92,17 +98,17 @@ export default function Overview() {
       toast({ title: "Đăng nhập Google thành công" });
     } catch (error: any) {
       console.error("Google Auth Error:", error);
-      let message = "Không thể đăng nhập Google. Kiểm tra lại Sign-in method trong Firebase.";
-      if (error.code === 'auth/popup-blocked') {
-        message = "TRÌNH DUYỆT CHẶN POPUP: Vui lòng cho phép mở cửa sổ mới.";
-      } else if (error.code === 'auth/operation-not-allowed') {
-        message = "CHƯA BẬT GOOGLE: Hãy bật Google Provider trong Firebase Authentication.";
+      let message = "Không thể đăng nhập Google.";
+      
+      if (error.code === 'auth/operation-not-allowed') {
+        message = "CHƯA BẬT GOOGLE: Hãy vào Firebase Console > Authentication > Sign-in method và bật Google Provider.";
+      } else if (error.code === 'auth/popup-blocked') {
+        message = "TRÌNH DUYỆT CHẶN POPUP: Vui lòng cho phép mở cửa sổ mới để đăng nhập.";
+      } else if (error.code === 'auth/unauthorized-domain') {
+        message = "TÊN MIỀN CHƯA ĐƯỢC CẤP PHÉP: Hãy thêm tên miền hiện tại vào danh sách 'Authorized domains' trong Firebase Auth.";
       }
-      toast({ 
-        variant: "destructive", 
-        title: "Lỗi Google Auth", 
-        description: message 
-      });
+      
+      toast({ variant: "destructive", title: "Lỗi Google Auth", description: message });
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +146,7 @@ export default function Overview() {
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Sử dụng Email hoặc Google để đăng nhập
+                Kiểm tra Sign-in method trong Firebase Console
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -251,6 +257,7 @@ export default function Overview() {
     );
   }
 
+  // Dashboard View (Khi đã đăng nhập thành công)
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
@@ -400,5 +407,3 @@ export default function Overview() {
     </div>
   );
 }
-
-// Cần thêm các biểu tượng bị thiếu từ lucide-react nếu cần
