@@ -204,7 +204,7 @@ export default function Overview() {
                 <Wrench className="h-10 w-10 text-primary" />
              </div>
             <h1 className="text-4xl font-black text-[#0054A4] uppercase tracking-tighter">REQUISITION DUE</h1>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Cơ sở hạ tầng & Sửa chữa thiết bị</p>
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Phiếu Yêu cầu cấp phát sửa chữa thiết bị</p>
           </div>
 
           <Card className="border-none shadow-2xl rounded-[3.5rem] overflow-hidden bg-white">
