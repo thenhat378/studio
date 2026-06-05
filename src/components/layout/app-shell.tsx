@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect } from 'react';
@@ -5,7 +6,7 @@ import {
   LayoutDashboard, 
   PlusCircle, 
   ClipboardList, 
-  LogOut, 
+  Power,
   Wrench,
   ShieldCheck,
   Package,
@@ -55,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-16 items-center px-6 border-b shrink-0">
           <Link href="/" className="flex items-center gap-2 font-black text-sm text-primary tracking-tighter uppercase">
             <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" />
-            <span>Requisition form DUE</span>
+            <span>Requisition DUE</span>
           </Link>
         </div>
         <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
@@ -90,7 +91,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="w-full justify-start text-rose-500 hover:bg-rose-50 h-12 rounded-2xl font-bold" 
             onClick={() => logout()}
           >
-            <LogOut className="mr-3 h-5 w-5" /> Đăng xuất
+            <Power className="mr-3 h-5 w-5" /> Đăng xuất
           </Button>
         </div>
       </aside>
@@ -154,7 +155,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-rose-500 mt-auto"
                     onClick={() => logout()}
                   >
-                    <LogOut className="h-5 w-5" /> Đăng xuất
+                    <Power className="h-5 w-5" /> Đăng xuất
                   </Button>
                 </div>
               </SheetContent>
