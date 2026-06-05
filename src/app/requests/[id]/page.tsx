@@ -17,7 +17,8 @@ import {
   HardDrive,
   UserCheck,
   XCircle,
-  Clock
+  Clock,
+  Star
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export default function RequestDetail() {
   const params = useParams();
@@ -42,6 +44,7 @@ export default function RequestDetail() {
   const { requests, currentUser, updateRequestStatus, users } = useAppStore();
   const [report, setReport] = useState('');
   const [selectedTechId, setSelectedTechId] = useState('');
+  const [rating, setRating] = useState<number>(5);
 
   const req = requests.find(r => r.id === id);
   const technicians = users.filter(u => u.role === 'technician');
@@ -81,11 +84,29 @@ export default function RequestDetail() {
     }
   };
 
+  const StarRating = ({ value, onChange, readOnly = false }: { value: number, onChange?: (val: number) => void, readOnly?: boolean }) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star 
+            key={star}
+            className={cn(
+              "h-6 w-6 transition-all",
+              star <= value ? "fill-amber-400 text-amber-400" : "text-muted-foreground",
+              !readOnly && "cursor-pointer hover:scale-110 active:scale-95"
+            )}
+            onClick={() => !readOnly && onChange?.(star)}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* Print Header */}
       <div className="print-only mb-8 text-center border-b pb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
+        <h1 className="text-3xl font-bold text-primary mb-2 uppercase">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
         <p className="text-sm font-mono">Mã số phiếu: {req.id} | Ngày in: {new Date().toLocaleString('vi-VN')}</p>
       </div>
 
@@ -112,9 +133,11 @@ export default function RequestDetail() {
                 <CardTitle className="text-2xl font-bold">{req.title}</CardTitle>
                 <div className="scale-110">{getStatusBadge(req.status)}</div>
               </div>
-              <CardDescription className="flex items-center gap-2 mt-2">
-                <Clock className="h-3.5 w-3.5" /> Khởi tạo lúc: {new Date(req.createdAt).toLocaleString('vi-VN')}
-              </CardDescription>
+              <div className="flex flex-col gap-1 mt-3">
+                <CardDescription className="flex items-center gap-2 text-foreground font-medium">
+                  <Clock className="h-3.5 w-3.5 text-primary" /> Thời gian báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent className="space-y-8 pt-6">
               <div>
@@ -125,7 +148,7 @@ export default function RequestDetail() {
               </div>
 
               {req.aiSuggestions && (
-                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 space-y-4">
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 space-y-4 no-print">
                   <div className="flex items-center gap-2 text-primary font-bold">
                     <Sparkles className="h-5 w-5" /> Phân tích FixFlow AI
                   </div>
@@ -164,6 +187,20 @@ export default function RequestDetail() {
                 </div>
               )}
 
+              {req.status === 'closed' && req.rating && (
+                <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6">
+                  <Label className="text-xs uppercase text-amber-700 font-extrabold tracking-widest flex items-center gap-2 mb-3">
+                    <Star className="h-4 w-4 fill-amber-400" /> Đánh giá hài lòng của đơn vị
+                  </Label>
+                  <div className="flex flex-col gap-2">
+                    <StarRating value={req.rating} readOnly />
+                    <p className="text-sm font-medium text-amber-900">
+                      Mức độ: {req.rating}/5 sao
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {req.rejectionReason && (
                 <div className="bg-rose-50 border border-rose-100 rounded-2xl p-6">
                   <Label className="text-xs uppercase text-rose-700 font-extrabold mb-3 block tracking-widest">Lý do từ chối</Label>
@@ -190,14 +227,20 @@ export default function RequestDetail() {
                 )}
 
                 {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2">Xác nhận đơn vị:</p>
-                      <p className="text-xs text-emerald-600">Vui lòng kiểm tra thiết bị. Nếu đã hoạt động tốt, hãy xác nhận để kết thúc toàn bộ quy trình.</p>
+                      <p className="text-sm text-emerald-800 font-bold mb-2">Xác nhận nghiệm thu & Đánh giá:</p>
+                      <p className="text-xs text-emerald-600 mb-4">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng về cách xử lý của kỹ thuật viên.</p>
+                      
+                      <div className="space-y-3">
+                        <Label className="text-xs font-bold text-muted-foreground uppercase">Mức độ hài lòng</Label>
+                        <StarRating value={rating} onChange={setRating} />
+                      </div>
                     </div>
+                    
                     <div className="flex gap-3">
-                      <Button className="bg-primary flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('closed')}>
-                        <CheckCircle2 className="h-5 w-5" /> Xác nhận & Đóng phiếu
+                      <Button className="bg-primary flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('closed', { rating })}>
+                        <CheckCircle2 className="h-5 w-5" /> Nghiệm thu & Đóng phiếu
                       </Button>
                       <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
                         Cần sửa lại
@@ -262,7 +305,7 @@ export default function RequestDetail() {
                 {req.status === 'closed' && (
                    <div className="p-6 bg-green-50 rounded-2xl text-green-700 font-bold flex flex-col items-center gap-2 border border-green-200">
                       <CheckCircle2 className="h-10 w-10 text-green-500 mb-2" />
-                      Yêu cầu đã hoàn tất.
+                      Yêu cầu đã hoàn tất và được nghiệm thu.
                    </div>
                 )}
 

@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, FileText, CheckCircle2, LogOut } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, FileText, CheckCircle2, LogOut, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -19,12 +19,16 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from '@/lib/utils';
 
 export default function ApprovalsPage() {
   const { requests, currentUser, updateRequestStatus, logout } = useAppStore();
   const { toast } = useToast();
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  
+  const [ratingId, setRatingId] = useState<string | null>(null);
+  const [currentRating, setCurrentRating] = useState(5);
 
   const unitRequests = requests.filter(r => 
     !currentUser?.unit || r.unit === currentUser.unit
@@ -41,12 +45,20 @@ export default function ApprovalsPage() {
     });
   };
 
-  const handleConfirmAcceptance = (id: string) => {
-    updateRequestStatus(id, 'closed');
+  const handleOpenRating = (id: string) => {
+    setRatingId(id);
+    setCurrentRating(5);
+  };
+
+  const handleConfirmAcceptance = () => {
+    if (!ratingId) return;
+    
+    updateRequestStatus(ratingId, 'closed', { rating: currentRating });
     toast({
       title: "Đã nghiệm thu",
-      description: "Đơn vị đã xác nhận hoàn thành và đóng phiếu yêu cầu."
+      description: "Đơn vị đã xác nhận hài lòng và đóng phiếu yêu cầu."
     });
+    setRatingId(null);
   };
 
   const handleReject = () => {
@@ -70,7 +82,7 @@ export default function ApprovalsPage() {
             <ShieldCheck className="h-6 w-6 text-accent" />
             Phê duyệt & Nghiệm thu ({currentUser?.unit})
           </h1>
-          <p className="text-muted-foreground">Xét duyệt và xác nhận kết quả sửa chữa của đơn vị</p>
+          <p className="text-muted-foreground">Xét duyệt và đánh giá chất lượng sửa chữa tại đơn vị</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2 border-primary/20 text-primary font-bold">
@@ -115,10 +127,10 @@ export default function ApprovalsPage() {
                     <h3 className="font-bold text-lg truncate">{req.title}</h3>
                     <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200">Chờ duyệt</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Người yêu cầu: <span className="font-medium text-foreground">{req.requesterName}</span> • 
-                    Thiết bị: <span className="font-medium text-foreground">{req.equipmentName}</span>
-                  </p>
+                  <div className="flex flex-col gap-1 text-sm text-muted-foreground mt-1">
+                    <p>Người yêu cầu: <span className="font-medium text-foreground">{req.requesterName}</span></p>
+                    <p className="flex items-center gap-1"><Clock className="h-3 w-3" /> Báo hỏng lúc: {new Date(req.createdAt).toLocaleString('vi-VN')}</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
@@ -150,10 +162,10 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Chờ đơn vị xác nhận</Badge>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật đã xong</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Đã sửa xong & CSVC đã nghiệm thu kỹ thuật. Vui lòng kiểm tra thực tế.
+                    Đã sửa xong & CSVC đã duyệt. Vui lòng kiểm tra và đánh giá để đóng phiếu.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -165,9 +177,9 @@ export default function ApprovalsPage() {
                   <Button 
                     size="sm" 
                     className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none" 
-                    onClick={() => handleConfirmAcceptance(req.id)}
+                    onClick={() => handleOpenRating(req.id)}
                   >
-                    <CheckCircle2 className="h-4 w-4" /> Nghiệm thu & Đóng phiếu
+                    <CheckCircle2 className="h-4 w-4" /> Nghiệm thu & Đánh giá
                   </Button>
                 </div>
               </CardContent>
@@ -180,6 +192,40 @@ export default function ApprovalsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Dialog Đánh giá nghiệm thu */}
+      <Dialog open={!!ratingId} onOpenChange={(open) => !open && setRatingId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nghiệm thu & Đánh giá dịch vụ</DialogTitle>
+            <DialogDescription>Vui lòng đánh giá mức độ hài lòng của đơn vị về kết quả sửa chữa và thái độ phục vụ của kỹ thuật viên.</DialogDescription>
+          </DialogHeader>
+          <div className="py-6 flex flex-col items-center gap-4">
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={star}
+                  className={cn(
+                    "h-10 w-10 cursor-pointer transition-all",
+                    star <= currentRating ? "fill-amber-400 text-amber-400" : "text-muted-foreground hover:text-amber-200"
+                  )}
+                  onClick={() => setCurrentRating(star)}
+                />
+              ))}
+            </div>
+            <p className="text-sm font-bold text-primary">
+              {currentRating === 5 ? "Rất hài lòng" : 
+               currentRating === 4 ? "Hài lòng" :
+               currentRating === 3 ? "Bình thường" :
+               currentRating === 2 ? "Không hài lòng" : "Rất kém"}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRatingId(null)}>Hủy</Button>
+            <Button className="bg-emerald-600" onClick={handleConfirmAcceptance}>Xác nhận Nghiệm thu</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!rejectingId} onOpenChange={(open) => !open && setRejectingId(null)}>
         <DialogContent>
