@@ -89,34 +89,35 @@ export default function Overview() {
 
   if (!currentUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4 bg-[#F0F2F5]">
+      <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#F0F2F5]">
         <div className="w-full max-w-[440px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-               <div className="relative w-40 h-40 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-4 border-white flex items-center justify-center overflow-hidden p-2 transition-transform hover:scale-105 duration-500">
+               <div className="relative w-44 h-44 bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] rounded-xl flex items-center justify-center p-4 transition-transform hover:scale-105 duration-500 overflow-hidden border border-slate-100">
                   <Image 
                     src={dueLogo?.imageUrl || "https://picsum.photos/seed/due-university-logo/400/400"}
                     alt="DUE Logo"
-                    width={140}
-                    height={140}
+                    width={150}
+                    height={150}
                     className="object-contain"
                     priority
+                    data-ai-hint="university logo"
                   />
                </div>
             </div>
-            <h1 className="text-3xl font-black tracking-tighter text-[#0054A4] uppercase leading-tight drop-shadow-sm">
+            <h1 className="text-2xl font-black tracking-tight text-[#0054A4] uppercase leading-tight drop-shadow-sm px-4">
               Ứng dụng Quản lý sửa chữa
             </h1>
           </div>
 
-          <Card className="border-none shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] bg-white overflow-hidden rounded-[2.5rem] relative">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
-            <CardHeader className="text-center pt-12 pb-4">
+          <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] bg-white overflow-hidden rounded-[2.5rem] relative">
+            <div className="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
+            <CardHeader className="text-center pt-10 pb-2">
               <CardTitle className="text-2xl font-bold text-slate-800">Đăng nhập</CardTitle>
-              <CardDescription className="text-slate-400 text-sm font-medium uppercase tracking-[0.1em]">Hệ thống quản lý nội bộ DUE</CardDescription>
+              <CardDescription className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Hệ thống quản lý nội bộ DUE</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 pt-2 px-10 pb-12">
-              <form onSubmit={handleLogin} className="space-y-5">
+            <CardContent className="space-y-6 pt-6 px-10 pb-12">
+              <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="username" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tên đăng nhập</Label>
                   <div className="relative group">
@@ -124,7 +125,7 @@ export default function Overview() {
                     <Input 
                       id="username" 
                       placeholder="Username hoặc Email" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/20 transition-all text-base border-2 hover:border-slate-100"
+                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-base border-2 hover:border-slate-100 placeholder:text-slate-400"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
@@ -138,12 +139,12 @@ export default function Overview() {
                       id="password" 
                       type="password" 
                       placeholder="••••••••" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/20 transition-all text-base border-2 hover:border-slate-100"
+                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-base border-2 hover:border-slate-100 placeholder:text-slate-400"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  <div className="flex justify-end pr-1">
+                  <div className="flex justify-end pt-1">
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="link" className="px-0 font-bold text-xs text-[#0054A4] h-auto py-0 hover:text-[#F58220] transition-colors">
@@ -173,39 +174,39 @@ export default function Overview() {
                     </Dialog>
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-[#0054A4] hover:bg-[#003d7a] transition-all uppercase tracking-[0.2em] text-sm shadow-xl shadow-[#0054A4]/20" disabled={isLoading}>
+                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-[#0054A4] hover:bg-[#003d7a] transition-all uppercase tracking-[0.15em] text-sm shadow-xl shadow-[#0054A4]/20" disabled={isLoading}>
                   {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
                 </Button>
               </form>
 
-              <div className="relative my-10">
+              <div className="relative mt-12 mb-8">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t border-slate-100"></span>
                 </div>
-                <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.3em]">
-                  <span className="bg-white px-6 text-slate-300">Demo nhanh các vai trò</span>
+                <div className="relative flex justify-center text-[9px] uppercase font-black tracking-[0.3em]">
+                  <span className="bg-white px-4 text-slate-300">Demo nhanh các vai trò</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Button onClick={() => login('requester')} variant="outline" className="justify-start text-[10px] h-14 px-5 gap-3 rounded-2xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 hover:shadow-md transition-all font-bold group">
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={() => login('requester')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 transition-all font-bold group">
                   <User className="h-5 w-5 text-[#0054A4] group-hover:scale-110 transition-transform" /> Người yêu cầu
                 </Button>
-                <Button onClick={() => login('unit_leader')} variant="outline" className="justify-start text-[10px] h-14 px-5 gap-3 rounded-2xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#F58220]/30 hover:shadow-md transition-all font-bold group">
+                <Button onClick={() => login('unit_leader')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#F58220]/30 transition-all font-bold group">
                   <ShieldCheck className="h-5 w-5 text-[#F58220] group-hover:scale-110 transition-transform" /> Lãnh đạo đơn vị
                 </Button>
-                <Button onClick={() => login('csvc_manager')} variant="outline" className="justify-start text-[10px] h-14 px-5 gap-3 rounded-2xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 hover:shadow-md transition-all font-bold group">
+                <Button onClick={() => login('csvc_manager')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 transition-all font-bold group">
                   <ClipboardList className="h-5 w-5 text-[#0054A4]/70 group-hover:scale-110 transition-transform" /> Quản lý CSVC
                 </Button>
-                <Button onClick={() => login('technician')} variant="outline" className="justify-start text-[10px] h-14 px-5 gap-3 rounded-2xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#00A651]/30 hover:shadow-md transition-all font-bold group">
+                <Button onClick={() => login('technician')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#00A651]/30 transition-all font-bold group">
                   <Key className="h-5 w-5 text-[#00A651] group-hover:scale-110 transition-transform" /> Kỹ thuật viên
                 </Button>
               </div>
             </CardContent>
           </Card>
           
-          <div className="text-center">
-            <p className="text-[11px] font-bold text-slate-400 tracking-[0.1em]">
+          <div className="text-center mt-auto py-4">
+            <p className="text-[10px] font-bold text-slate-400 tracking-[0.05em] leading-relaxed max-w-[300px] mx-auto opacity-70">
               © 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất
             </p>
           </div>
