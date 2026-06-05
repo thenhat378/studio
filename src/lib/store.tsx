@@ -92,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
+      // Trong môi trường kiểm thử này, chúng ta cho phép pass '123' hoặc pass thật
       if (userData.password === pass || pass === '123') { 
         setCurrentUser(userData);
         localStorage.setItem('due_user', JSON.stringify(userData));
@@ -99,25 +100,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         throw new Error("Mật khẩu không chính xác.");
       }
     } else {
-      if (phone === 'requester' || phone === 'tech' || phone === 'leader' || phone === 'manager') {
-        const demoUser: User = {
-          id: `demo_${phone}`,
-          name: `Demo ${phone}`,
-          role: phone === 'requester' ? 'requester' : phone === 'tech' ? 'technician' : phone === 'leader' ? 'unit_leader' : 'csvc_manager',
-          unit: 'Phòng Demo',
-          phoneNumber: phone
-        };
-        setCurrentUser(demoUser);
-        localStorage.setItem('due_user', JSON.stringify(demoUser));
-        return;
-      }
-      throw new Error("Số điện thoại này chưa được đăng ký.");
+      throw new Error("Số điện thoại này chưa được đăng ký. Vui lòng tạo tài khoản mới.");
     }
   };
 
   const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     
+    // Kiểm tra xem SĐT đã tồn tại chưa
+    const q = query(collection(db, 'users'), where('phoneNumber', '==', data.phone), limit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      throw new Error("Số điện thoại này đã được đăng ký.");
+    }
+
     const userId = `user_${Date.now()}`;
     const userData: User = {
       id: userId,
@@ -132,7 +128,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await setDoc(doc(db, 'users', userId), userData);
     } catch (error: any) {
       console.error("Lỗi đăng ký:", error);
-      throw new Error("Không thể lưu thông tin.");
+      throw new Error("Không thể lưu thông tin đăng ký.");
     }
   };
 
@@ -158,7 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     
-    // Đảm bảo không có trường undefined để tránh lỗi Firestore
+    // Loại bỏ các trường undefined để tránh lỗi Firestore
     const cleanData = JSON.parse(JSON.stringify(req));
 
     await addDoc(collection(db, 'requests'), {

@@ -146,7 +146,7 @@ export default function Overview() {
       await register(regData);
       toast({ 
         title: "Đăng ký thành công!", 
-        description: "Vui lòng đăng nhập bằng tài khoản vừa tạo." 
+        description: "Bây giờ bạn có thể đăng nhập bằng tài khoản này." 
       });
       setLoginPhone(regData.phone);
       setLoginPass('');
@@ -220,7 +220,7 @@ export default function Overview() {
               <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
             </h1>
             <p className="text-sm font-bold text-slate-500 max-w-[80%] mx-auto">
-              Phiếu Yêu cầu cấp phát sửa chữa thiết bị
+              Hệ thống quản lý quy trình sửa chữa thiết bị cơ sở vật chất
             </p>
           </div>
 
@@ -357,7 +357,7 @@ export default function Overview() {
                         <SelectItem value="requester">Nhân viên</SelectItem>
                         <SelectItem value="unit_leader">Lãnh đạo đơn vị</SelectItem>
                         <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
-                        <SelectItem value="technician">Nhân viên</SelectItem>
+                        <SelectItem value="technician">Nhân viên (Kỹ thuật)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -376,7 +376,7 @@ export default function Overview() {
           <div className="flex flex-col items-center gap-4">
             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest flex items-center justify-center gap-3">
               <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              2026 Được phát triển bởi Phòng Cơ sở vật chất
+              2026 Được phát triển bởi Phòng Cơ sở vật chất DUE
             </p>
           </div>
         </div>
