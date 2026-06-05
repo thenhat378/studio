@@ -23,7 +23,9 @@ import {
   Star,
   BarChart3,
   Users,
-  Key
+  Smartphone,
+  Info,
+  Apple
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -78,7 +80,15 @@ export default function Overview() {
       else if (username === 'leader') login('unit_leader');
       else if (username === 'manager') login('csvc_manager');
       else if (username === 'tech') login('technician');
-      else login('requester'); // Mặc định
+      else {
+        toast({
+          variant: "destructive",
+          title: "Sai tài khoản",
+          description: "Vui lòng sử dụng: requester, leader, manager hoặc tech"
+        });
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(false);
       toast({
@@ -102,7 +112,6 @@ export default function Overview() {
             <div className="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
             <CardHeader className="text-center pt-10 pb-2">
               <CardTitle className="text-2xl font-bold text-slate-800">Đăng nhập</CardTitle>
-              <CardDescription className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Hệ thống quản lý nội bộ DUE</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6 px-10 pb-12">
               <form onSubmit={handleLogin} className="space-y-6">
@@ -112,7 +121,7 @@ export default function Overview() {
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-[#0054A4] transition-colors" />
                     <Input 
                       id="username" 
-                      placeholder="Username hoặc Email" 
+                      placeholder="Nhập tên đăng nhập" 
                       className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-base border-2 hover:border-slate-100 placeholder:text-slate-400"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -132,7 +141,43 @@ export default function Overview() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  <div className="flex justify-end pt-1">
+                  <div className="flex justify-between items-center pt-1">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="link" className="px-0 font-bold text-xs text-[#0054A4]/60 h-auto py-0 hover:text-[#0054A4] transition-colors flex items-center gap-1">
+                          <Smartphone className="h-3 w-3" /> Cài đặt App
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="rounded-[2rem] border-none shadow-2xl max-w-sm">
+                        <DialogHeader>
+                          <DialogTitle className="text-xl font-black text-[#0054A4] flex items-center gap-2">
+                            <Smartphone className="h-6 w-6" /> Cài đặt ứng dụng
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-6 py-4">
+                          <div className="space-y-3">
+                            <p className="text-sm font-bold flex items-center gap-2 text-slate-700">
+                              <Apple className="h-4 w-4" /> Trên iPhone (Safari):
+                            </p>
+                            <ol className="text-xs space-y-2 text-slate-500 list-decimal pl-4 font-medium">
+                              <li>Nhấn biểu tượng <b>Chia sẻ</b> (ô vuông mũi tên lên).</li>
+                              <li>Chọn <b>"Thêm vào màn hình chính"</b>.</li>
+                              <li>Nhấn <b>"Thêm"</b> để hoàn tất.</li>
+                            </ol>
+                          </div>
+                          <div className="space-y-3">
+                            <p className="text-sm font-bold flex items-center gap-2 text-slate-700">
+                              <Smartphone className="h-4 w-4" /> Trên Android (Chrome):
+                            </p>
+                            <ol className="text-xs space-y-2 text-slate-500 list-decimal pl-4 font-medium">
+                              <li>Nhấn dấu <b>3 chấm</b> ở góc trên bên phải.</li>
+                              <li>Chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào MH chính"</b>.</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="link" className="px-0 font-bold text-xs text-[#0054A4] h-auto py-0 hover:text-[#F58220] transition-colors">
