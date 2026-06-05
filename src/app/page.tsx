@@ -37,6 +37,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Overview() {
   const { 
@@ -199,12 +201,20 @@ export default function Overview() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
         <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="text-center space-y-4">
-             <div className="inline-flex p-6 bg-white rounded-[2.5rem] shadow-2xl mb-2 border border-slate-100">
-                <Wrench className="h-10 w-10 text-primary" />
-             </div>
-            <h1 className="text-4xl font-black text-[#0054A4] uppercase tracking-tighter">REQUISITION DUE</h1>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Phiếu Yêu cầu cấp phát sửa chữa thiết bị</p>
+          <div className="text-center space-y-6">
+            <div className="relative h-32 w-32 mx-auto mb-2 animate-in slide-in-from-top-4 duration-700">
+              <Image 
+                src={PlaceHolderImages.find(img => img.id === 'due-logo')?.imageUrl || ''}
+                alt="DUE Logo"
+                fill
+                className="object-contain"
+                data-ai-hint="university logo"
+              />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-4xl font-black text-[#0054A4] uppercase tracking-tighter">REQUISITION DUE</h1>
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Phiếu Yêu cầu cấp phát sửa chữa thiết bị</p>
+            </div>
           </div>
 
           <Card className="border-none shadow-2xl rounded-[3.5rem] overflow-hidden bg-white">
