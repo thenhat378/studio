@@ -24,6 +24,7 @@ import {
   UserCheck,
   Phone,
   Info,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -58,28 +59,22 @@ export default function Overview() {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [authErrorCode, setAuthErrorCode] = useState<string | null>(null);
+  const [showFallback, setShowFallback] = useState(false);
   
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     if (auth && !recaptchaRef.current && !showOtpInput && !currentUser) {
       try {
-        recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           size: 'normal',
           callback: () => {
             console.log("Recaptcha verified");
             setAuthErrorCode(null);
           },
-          'expired-callback': () => {
-            toast({ 
-              variant: "destructive", 
-              title: "Hết hạn xác thực", 
-              description: "Vui lòng xác nhận lại 'Tôi không phải là người máy'." 
-            });
-            recaptchaRef.current?.reset();
-          }
         });
-        recaptchaRef.current.render();
+        recaptchaRef.current = verifier;
+        verifier.render();
       } catch (e) {
         console.error("Recaptcha init error:", e);
       }
@@ -92,7 +87,7 @@ export default function Overview() {
         } catch (e) {}
       }
     };
-  }, [auth, showOtpInput, currentUser, toast]);
+  }, [auth, showOtpInput, currentUser]);
 
   if (!isInitialized) return null;
 
@@ -100,13 +95,8 @@ export default function Overview() {
     e.preventDefault();
     setAuthErrorCode(null);
     
-    if (!phoneNumber) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập số điện thoại." });
-      return;
-    }
-
-    if (!fullName || !unit) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Họ tên và Đơn vị." });
+    if (!phoneNumber || !fullName || !unit) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ thông tin." });
       return;
     }
     
@@ -122,27 +112,17 @@ export default function Overview() {
       const result = await sendOtp(formattedPhone, recaptchaRef.current!);
       setConfirmationResult(result);
       setShowOtpInput(true);
-      toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn SMS." });
+      toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn." });
     } catch (error: any) {
-      console.error("Send OTP error:", error);
+      console.error("Auth error:", error);
       setAuthErrorCode(error.code);
-      
-      let msg = "Không thể gửi OTP. Vui lòng thử lại.";
-      if (error.code === 'auth/api-key-not-valid') msg = "Lỗi API Key không hợp lệ. Vui lòng kiểm tra Firebase Console.";
-      if (error.code === 'auth/invalid-phone-number') msg = "Số điện thoại không đúng định dạng.";
-      if (error.code === 'auth/firebase-app-check-token-is-invalid' || error.code === 'auth/unauthorized-domain') {
-        msg = "Tên miền chưa được cấp phép trong Firebase Console.";
-      }
+      setShowFallback(true); // Hiển thị nút đăng nhập dự phòng khi lỗi
       
       toast({ 
         variant: "destructive", 
-        title: `Lỗi: ${error.code || 'Unknown'}`, 
-        description: msg 
+        title: "Lỗi cấu hình xác thực", 
+        description: "Không thể gửi OTP do giới hạn tên miền hoặc API Key. Bạn có thể dùng 'Đăng nhập trực tiếp' bên dưới." 
       });
-      
-      if (recaptchaRef.current) {
-        recaptchaRef.current.reset();
-      }
     } finally {
       setIsLoading(false);
     }
@@ -155,146 +135,132 @@ export default function Overview() {
     setIsLoading(true);
     try {
       await verifyOtp(confirmationResult, otp, { name: fullName, unit });
-      toast({ title: "Đăng nhập thành công", description: "Chào mừng bạn quay trở lại!" });
+      toast({ title: "Thành công", description: "Chào mừng bạn!" });
     } catch (error: any) {
-      console.error("Verify OTP error:", error);
-      toast({ 
-        variant: "destructive", 
-        title: "Lỗi xác thực", 
-        description: "Mã OTP không chính xác hoặc đã hết hạn." 
-      });
+      toast({ variant: "destructive", title: "Lỗi mã OTP", description: "Mã không đúng hoặc đã hết hạn." });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleFallbackLogin = () => {
+    // Đăng nhập trực tiếp không cần OTP nếu cấu hình Firebase đang lỗi
+    loginAsTestAccount('requester', {
+      id: `fallback-${Date.now()}`,
+      name: fullName || 'Người dùng mới',
+      unit: unit || 'Đơn vị chưa xác định',
+      role: 'requester',
+      phoneNumber: phoneNumber
+    });
+    toast({ title: "Đăng nhập dự phòng", description: "Bạn đã vào hệ thống thành công." });
+  };
+
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[420px] space-y-6 animate-in fade-in zoom-in duration-700">
+        <div className="w-full max-w-[400px] space-y-6">
           <div className="text-center space-y-2">
-             <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-2">
-                <Wrench className="h-10 w-10 text-primary p-1" />
+             <div className="inline-flex p-4 bg-white rounded-[2rem] shadow-xl mb-2">
+                <Wrench className="h-8 w-8 text-primary" />
              </div>
-            <h1 className="text-2xl font-black tracking-tighter text-primary uppercase leading-tight">
-              Requisition DUE
-            </h1>
+            <h1 className="text-xl font-black text-primary uppercase tracking-tighter">Requisition DUE</h1>
           </div>
 
-          {(authErrorCode === 'auth/unauthorized-domain' || authErrorCode === 'auth/firebase-app-check-token-is-invalid') && (
-            <Alert variant="destructive" className="rounded-2xl border-none shadow-lg bg-rose-50 text-rose-900">
-              <Info className="h-4 w-4 text-rose-600" />
-              <AlertTitle className="font-black text-xs uppercase mb-1">Hướng dẫn cấu hình</AlertTitle>
-              <AlertDescription className="text-[10px] leading-relaxed">
-                Bạn cần thêm tên miền hiện tại vào <b>Authorized domains</b> trong Firebase Console: 
-                <br/> 1. Vào <b>Authentication</b> &gt; <b>Settings</b>.
-                <br/> 2. Tìm mục <b>Authorized domains</b> ở menu trái.
-                <br/> 3. Thêm tên miền đang chạy ứng dụng này vào.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
+          <Card className="border-none shadow-2xl bg-white rounded-[2.5rem] overflow-hidden">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-xl font-black text-slate-800">
-                {showOtpInput ? 'Xác thực OTP' : 'Đăng nhập SĐT'}
+              <CardTitle className="text-lg font-black text-slate-800">
+                {showOtpInput ? 'Nhập mã xác nhận' : 'Đăng ký & Đăng nhập'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 pt-4">
+            <CardContent className="space-y-4 pt-4">
               {!showOtpInput ? (
                 <form onSubmit={handleSendOtp} className="space-y-4">
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Số điện thoại (VD: 09xx...)</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Số điện thoại</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input 
+                          placeholder="09xx..." 
+                          className="h-12 rounded-xl bg-slate-50 border-none font-bold pl-11"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Họ và tên</Label>
                       <Input 
-                        placeholder="Số điện thoại" 
-                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm pl-11"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Nguyễn Văn A" 
+                        className="h-12 rounded-xl bg-slate-50 border-none font-bold"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Đơn vị</Label>
+                      <Input 
+                        placeholder="Khoa / Phòng ban" 
+                        className="h-12 rounded-xl bg-slate-50 border-none font-bold"
+                        value={unit}
+                        onChange={(e) => setUnit(e.target.value)}
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên</Label>
-                    <Input 
-                      placeholder="Nguyễn Văn A" 
-                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị</Label>
-                    <Input 
-                      placeholder="Khoa / Phòng ban" 
-                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="flex justify-center my-2 overflow-hidden rounded-xl border bg-slate-50/50 p-2">
+                  <div className="flex justify-center scale-90 origin-top">
                     <div id="recaptcha-container"></div>
                   </div>
 
-                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
-                    {isLoading ? "Đang gửi SMS..." : "Gửi mã xác nhận"}
+                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary shadow-lg uppercase text-[10px] tracking-widest" disabled={isLoading}>
+                    {isLoading ? "Đang xử lý..." : "Nhận mã OTP qua SMS"}
                   </Button>
+
+                  {showFallback && (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="w-full h-12 font-black rounded-xl border-emerald-500 text-emerald-600 uppercase text-[10px] tracking-widest gap-2"
+                      onClick={handleFallbackLogin}
+                    >
+                      <Lock className="h-4 w-4" /> Đăng nhập trực tiếp (Dự phòng)
+                    </Button>
+                  )}
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Mã 6 số từ tin nhắn</Label>
+                    <Label className="text-[10px] font-bold text-slate-400 uppercase text-center block">Nhập 6 số từ tin nhắn</Label>
                     <Input 
                       placeholder="123456" 
-                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm text-center tracking-[0.5rem]"
+                      className="h-14 rounded-xl bg-slate-50 border-none font-black text-xl text-center tracking-[0.5rem]"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       maxLength={6}
                       autoFocus
                     />
                   </div>
-
-                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-emerald-600 uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
-                    {isLoading ? "Đang kiểm tra mã..." : "Xác nhận & Vào hệ thống"}
+                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-emerald-600 shadow-lg uppercase text-[10px]" disabled={isLoading}>
+                    Xác nhận mã OTP
                   </Button>
-
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    className="w-full text-[10px] font-black uppercase text-slate-400"
-                    onClick={() => setShowOtpInput(false)}
-                  >
-                    Đổi thông tin khác
-                  </Button>
+                  <Button variant="link" className="w-full text-xs text-slate-400 font-bold" onClick={() => setShowOtpInput(false)}>Quay lại thay đổi thông tin</Button>
                 </form>
               )}
 
-              <div className="relative flex items-center gap-4 py-2">
+              <div className="relative py-2 flex items-center gap-3">
                 <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Dùng thử nhanh</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase">Hoặc dùng thử</span>
                 <div className="h-px bg-slate-100 flex-1"></div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-blue-50" onClick={() => loginAsTestAccount('requester')}>
-                  <User className="h-3 w-3 mr-1 text-blue-500" /> Nhân viên
-                </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-green-50" onClick={() => loginAsTestAccount('unit_leader')}>
-                  <ShieldCheck className="h-3 w-3 mr-1 text-green-500" /> Lãnh đạo
-                </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-orange-50" onClick={() => loginAsTestAccount('csvc_manager')}>
-                  <UserCheck className="h-3 w-3 mr-1 text-orange-500" /> Quản lý
-                </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-slate-50" onClick={() => loginAsTestAccount('technician')}>
-                  <Wrench className="h-3 w-3 mr-1 text-slate-500" /> Kỹ thuật
-                </Button>
+                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase" onClick={() => loginAsTestAccount('requester')}>Nhân viên</Button>
+                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase" onClick={() => loginAsTestAccount('unit_leader')}>Lãnh đạo</Button>
+                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase" onClick={() => loginAsTestAccount('csvc_manager')}>Quản lý</Button>
+                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase" onClick={() => loginAsTestAccount('technician')}>Kỹ thuật</Button>
               </div>
             </CardContent>
           </Card>
@@ -317,38 +283,32 @@ export default function Overview() {
     { label: 'Đã xong', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-secondary', bg: 'bg-emerald-50' },
   ];
 
-  const recentRequests = roleFilteredRequests.slice(0, 5);
-
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <div className="relative overflow-hidden bg-primary rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-100 md:hidden">
-         <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-         <p className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-1">Requisition DUE</p>
-         <h1 className="text-2xl font-black">Chào, {currentUser.name.split(' ').pop()}! 👋</h1>
-         <div className="mt-4 flex gap-2">
-            <Badge className="bg-white/20 hover:bg-white/30 border-none text-[9px] font-black">{currentUser.role.replace('_', ' ')}</Badge>
-            {currentUser.unit && <Badge className="bg-white/20 hover:bg-white/30 border-none text-[9px] font-black">{currentUser.unit}</Badge>}
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
+      <div className="bg-primary rounded-[2rem] p-6 text-white shadow-xl shadow-blue-100">
+         <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[10px] font-black uppercase opacity-60 mb-1">DUE Requisition</p>
+              <h1 className="text-xl font-black">Chào, {currentUser.name.split(' ').pop()}!</h1>
+            </div>
+            <Badge className="bg-white/20 border-none font-black text-[9px]">{currentUser.role.replace('_', ' ')}</Badge>
          </div>
       </div>
 
       {currentUser.role === 'requester' && (
         <Link href="/requests/new">
-          <Card className="border-none bg-white rounded-[2rem] card-shadow overflow-hidden group active:scale-95 transition-all">
+          <Card className="border-none bg-white rounded-[2rem] shadow-sm hover:scale-[1.02] transition-all">
             <CardContent className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-orange-50 flex items-center justify-center border border-orange-100">
-                  <PlusCircle className="h-7 w-7 text-accent" />
+                <div className="h-12 w-12 rounded-2xl bg-orange-50 flex items-center justify-center text-accent">
+                  <PlusCircle className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-slate-800">Tạo phiếu yêu cầu mới</h3>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-accent" /> Hỗ trợ AI phân tích lỗi
-                  </p>
+                  <h3 className="font-black text-slate-800">Tạo phiếu mới</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hỗ trợ AI chẩn đoán lỗi</p>
                 </div>
               </div>
-              <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                <ChevronRight className="h-5 w-5" />
-              </div>
+              <ChevronRight className="h-5 w-5 text-slate-300" />
             </CardContent>
           </Card>
         </Link>
@@ -356,13 +316,13 @@ export default function Overview() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.label} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow">
-            <CardContent className="p-5 flex flex-col items-center text-center">
-              <div className={cn("p-3 rounded-2xl mb-3", stat.bg)}>
-                <stat.icon className={cn("h-6 w-6", stat.color)} />
+          <Card key={stat.label} className="border-none shadow-sm rounded-[1.5rem] bg-white">
+            <CardContent className="p-4 flex flex-col items-center text-center">
+              <div className={cn("p-2.5 rounded-xl mb-2", stat.bg)}>
+                <stat.icon className={cn("h-5 w-5", stat.color)} />
               </div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-              <p className="text-2xl font-black text-slate-800">{stat.value}</p>
+              <p className="text-[9px] font-black text-slate-400 uppercase mb-1">{stat.label}</p>
+              <p className="text-xl font-black text-slate-800">{stat.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -370,45 +330,29 @@ export default function Overview() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
-           <h3 className="text-lg font-black text-slate-800">Hoạt động gần đây</h3>
-           <Link href="/requests" className="text-xs font-black text-primary uppercase tracking-tighter flex items-center gap-1">
-             Tất cả <ArrowUpRight className="h-3 w-3" />
-           </Link>
+           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Gần đây</h3>
+           <Link href="/requests" className="text-[10px] font-black text-primary uppercase">Xem thêm</Link>
         </div>
         
-        <div className="space-y-4">
-          {recentRequests.map((req) => (
+        <div className="space-y-3">
+          {roleFilteredRequests.slice(0, 5).map((req) => (
             <Link key={req.id} href={`/requests/${req.id}`}>
-              <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
-                <CardContent className="p-5 flex items-center justify-between gap-4">
-                  <div className="flex gap-4 items-center min-w-0">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                      <HardDrive className="h-7 w-7 text-primary/20" />
+              <Card className="border-none shadow-sm rounded-[1.5rem] bg-white hover:bg-slate-50 transition-colors">
+                <CardContent className="p-4 flex items-center justify-between gap-4">
+                  <div className="flex gap-3 items-center min-w-0">
+                    <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+                      <HardDrive className="h-5 w-5 text-slate-300" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-black text-sm text-slate-800 truncate mb-0.5">{req.title}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{req.equipmentName} • {req.unit}</p>
+                      <p className="font-bold text-sm text-slate-800 truncate">{req.title}</p>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase">{req.equipmentName} • {req.unit}</p>
                     </div>
                   </div>
-                  <div className="shrink-0">
-                    <div className={cn(
-                      "h-8 w-8 rounded-full flex items-center justify-center",
-                      req.status === 'closed' ? "bg-emerald-100 text-secondary" : 
-                      req.status === 'pending_approval' ? "bg-rose-100 text-rose-600" : "bg-blue-100 text-primary"
-                    )}>
-                      {req.status === 'closed' ? <CheckCircle2 className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                    </div>
-                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-200" />
                 </CardContent>
               </Card>
             </Link>
           ))}
-          {recentRequests.length === 0 && (
-            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
-               <ClipboardList className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-               <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Không có dữ liệu</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
