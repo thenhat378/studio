@@ -16,7 +16,8 @@ import {
   deleteDoc,
   getDocs,
   where,
-  limit
+  limit,
+  writeBatch
 } from 'firebase/firestore';
 
 interface AppContextType {
@@ -32,6 +33,7 @@ interface AppContextType {
   addEquipment: (data: Omit<Equipment, 'id'>) => Promise<void>;
   updateEquipment: (id: string, data: Partial<Equipment>) => Promise<void>;
   deleteEquipment: (id: string) => Promise<void>;
+  resetSystem: () => Promise<void>;
   users: User[];
   isInitialized: boolean;
   loading: boolean;
@@ -89,7 +91,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const login = async (phone: string, pass: string) => {
-    if (!db) throw new Error("Database chưa sẵn sàng. Vui lòng thử lại sau giây lát.");
+    if (!db) throw new Error("Database chưa sẵn sàng.");
     
     const q = query(collection(db, 'users'), where('phoneNumber', '==', phone), limit(1));
     const snap = await getDocs(q);
@@ -103,7 +105,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         throw new Error("Mật khẩu không chính xác.");
       }
     } else {
-      throw new Error("Số điện thoại này chưa được đăng ký. Vui lòng tạo tài khoản mới.");
+      throw new Error("Số điện thoại chưa được đăng ký.");
     }
   };
 
@@ -126,26 +128,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       password: data.pass
     };
 
-    try {
-      await setDoc(doc(db, 'users', userId), userData);
-    } catch (error: any) {
-      console.error("Lỗi đăng ký:", error);
-      throw new Error("Không thể lưu thông tin đăng ký.");
-    }
+    await setDoc(doc(db, 'users', userId), userData);
   };
 
   const resetPassword = async (phone: string, newPass: string) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    
     const q = query(collection(db, 'users'), where('phoneNumber', '==', phone), limit(1));
     const snap = await getDocs(q);
-    
-    if (snap.empty) {
-      throw new Error("Không tìm thấy tài khoản với số điện thoại này.");
-    }
-
-    const userId = snap.docs[0].id;
-    await updateDoc(doc(db, 'users', userId), { password: newPass });
+    if (snap.empty) throw new Error("Không tìm thấy tài khoản.");
+    await updateDoc(doc(db, 'users', snap.docs[0].id), { password: newPass });
   };
 
   const logout = () => {
@@ -155,9 +146,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    
     const cleanData = JSON.parse(JSON.stringify(req));
-
     await addDoc(collection(db, 'requests'), {
       ...cleanData,
       createdAt: new Date().toISOString(),
@@ -168,11 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
     const cleanExtra = extra ? JSON.parse(JSON.stringify(extra)) : {};
-    const updateData: any = { 
-      status,
-      ...cleanExtra
-    };
-    await updateDoc(doc(db, 'requests', id), updateData);
+    await updateDoc(doc(db, 'requests', id), { status, ...cleanExtra });
   };
 
   const addEquipment = async (data: Omit<Equipment, 'id'>) => {
@@ -190,23 +175,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await deleteDoc(doc(db, 'equipment', id));
   };
 
+  const resetSystem = async () => {
+    if (!db || currentUser?.role !== 'admin') return;
+    const batch = writeBatch(db);
+    
+    // Xóa tất cả yêu cầu
+    const requestSnap = await getDocs(collection(db, 'requests'));
+    requestSnap.forEach(doc => batch.delete(doc.ref));
+    
+    // Xóa tất cả thiết bị
+    const equipSnap = await getDocs(collection(db, 'equipment'));
+    equipSnap.forEach(doc => batch.delete(doc.ref));
+
+    await batch.commit();
+  };
+
   return (
     <AppContext.Provider value={{
-      currentUser, 
-      login,
-      register,
-      resetPassword,
-      logout,
-      requests, 
-      addRequest, 
-      updateRequestStatus,
-      equipment,
-      addEquipment,
-      updateEquipment,
-      deleteEquipment,
-      users, 
-      isInitialized,
-      loading
+      currentUser, login, register, resetPassword, logout,
+      requests, addRequest, updateRequestStatus,
+      equipment, addEquipment, updateEquipment, deleteEquipment,
+      resetSystem, users, isInitialized, loading
     }}>
       {children}
     </AppContext.Provider>
