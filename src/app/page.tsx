@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,13 +18,17 @@ import {
   Building,
   AlertCircle,
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  Check,
+  X,
+  Info
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export default function Overview() {
   const { 
@@ -50,6 +54,20 @@ export default function Overview() {
     unit: '',
     role: 'requester' as UserRole
   });
+
+  // Password validation states
+  const [passValidation, setPassValidation] = useState({
+    length: false,
+    special: false
+  });
+  const [showPassHint, setShowPassHint] = useState(false);
+
+  useEffect(() => {
+    setPassValidation({
+      length: regData.pass.length >= 8,
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(regData.pass)
+    });
+  }, [regData.pass]);
 
   if (!isInitialized) {
     return (
@@ -81,6 +99,15 @@ export default function Overview() {
     e.preventDefault();
     if (!regData.name || !regData.phone || !regData.unit) {
       toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ các trường." });
+      return;
+    }
+
+    if (!passValidation.length || !passValidation.special) {
+      toast({ 
+        variant: "destructive", 
+        title: "Mật khẩu yếu", 
+        description: "Mật khẩu phải từ 8 ký tự và có ký tự đặc biệt." 
+      });
       return;
     }
     
@@ -184,12 +211,31 @@ export default function Overview() {
                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu</Label>
                       <Input 
                         type="password"
-                        placeholder="••••" 
+                        placeholder="••••••••" 
                         className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
                         value={regData.pass}
-                        onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))}
+                        onChange={e => {
+                          setRegData(prev => ({...prev, pass: e.target.value}));
+                          setShowPassHint(true);
+                        }}
+                        onFocus={() => setShowPassHint(true)}
                         required
                       />
+                      {showPassHint && (
+                        <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <p className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-1.5 mb-1">
+                            <Info className="h-3 w-3" /> Yêu cầu mật khẩu:
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {passValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                            <span className={cn("text-[10px] font-bold uppercase tracking-tighter", passValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {passValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                            <span className={cn("text-[10px] font-bold uppercase tracking-tighter", passValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt (!@#...)</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -219,7 +265,10 @@ export default function Overview() {
                     </Select>
                   </div>
 
-                  <Button className="w-full h-16 rounded-[1.8rem] bg-[#00A651] font-black uppercase tracking-widest text-xs mt-4 shadow-2xl shadow-emerald-100 transition-transform active:scale-95" disabled={isSubmitting}>
+                  <Button 
+                    className="w-full h-16 rounded-[1.8rem] bg-[#00A651] font-black uppercase tracking-widest text-xs mt-4 shadow-2xl shadow-emerald-100 transition-transform active:scale-95 disabled:opacity-50" 
+                    disabled={isSubmitting || !passValidation.length || !passValidation.special}
+                  >
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐĂNG KÝ"}
                   </Button>
                 </form>
