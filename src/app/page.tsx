@@ -15,9 +15,6 @@ import {
   ChevronRight,
   User,
   Lock,
-  Smartphone,
-  Apple,
-  ArrowUpRight,
   Wrench,
   PlusCircle,
   Sparkles,
@@ -25,6 +22,7 @@ import {
   Mail,
   Building2,
   BarChart3,
+  ArrowUpRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -34,19 +32,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
 
 export default function Overview() {
   const { currentUser, login, loginWithGoogle, register, resetPassword, requests, users, isInitialized } = useAppStore();
@@ -64,7 +49,7 @@ export default function Overview() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Email và Mật khẩu." });
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập Email và Mật khẩu." });
       return;
     }
     
@@ -86,7 +71,9 @@ export default function Overview() {
       console.error("Auth Error:", error);
       let message = "Lỗi xác thực. Vui lòng kiểm tra lại.";
       if (error.code === 'auth/api-key-not-valid') {
-        message = "LỖI CẤU HÌNH: API Key Firebase không hợp lệ. Vui lòng kiểm tra lại cấu hình dự án.";
+        message = "LỖI API KEY: Vui lòng kiểm tra API Key trong Google Cloud Console.";
+      } else if (error.code === 'auth/operation-not-allowed') {
+        message = "CHƯA BẬT: Bạn cần bật Email/Password hoặc Google Auth trong Firebase Console.";
       } else if (error.code === 'auth/user-not-found') {
         message = "Tài khoản không tồn tại.";
       } else if (error.code === 'auth/wrong-password') {
@@ -105,10 +92,16 @@ export default function Overview() {
       toast({ title: "Đăng nhập Google thành công" });
     } catch (error: any) {
       console.error("Google Auth Error:", error);
+      let message = "Không thể đăng nhập Google. Kiểm tra lại Sign-in method trong Firebase.";
+      if (error.code === 'auth/popup-blocked') {
+        message = "TRÌNH DUYỆT CHẶN POPUP: Vui lòng cho phép mở cửa sổ mới.";
+      } else if (error.code === 'auth/operation-not-allowed') {
+        message = "CHƯA BẬT GOOGLE: Hãy bật Google Provider trong Firebase Authentication.";
+      }
       toast({ 
         variant: "destructive", 
         title: "Lỗi Google Auth", 
-        description: "Không thể đăng nhập bằng Google. Vui lòng thử lại hoặc dùng Email." 
+        description: message 
       });
     } finally {
       setIsLoading(false);
@@ -147,7 +140,7 @@ export default function Overview() {
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Đăng nhập để bắt đầu quản lý
+                Sử dụng Email hoặc Google để đăng nhập
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -407,3 +400,5 @@ export default function Overview() {
     </div>
   );
 }
+
+// Cần thêm các biểu tượng bị thiếu từ lucide-react nếu cần

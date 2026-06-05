@@ -67,19 +67,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
-            // Trường hợp đăng nhập Google lần đầu chưa có hồ sơ
+            // Trường hợp đăng nhập Google lần đầu: tự động tạo profile
             const newUser: User = {
               id: firebaseUser.uid,
               name: firebaseUser.displayName || 'Người dùng mới',
               role: 'requester',
-              unit: 'Chưa xác định',
+              unit: 'Đơn vị chưa xác định',
               email: firebaseUser.email || ''
             };
             await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
             setCurrentUser(newUser);
           }
         } catch (e) {
-          console.error("Error fetching user data:", e);
+          console.error("Lỗi khi tải thông tin người dùng:", e);
         }
       } else {
         setCurrentUser(null);
@@ -112,18 +112,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const login = async (email: string, pass: string) => {
-    if (!auth) throw new Error("Firebase Auth is not initialized");
+    if (!auth) throw new Error("Hệ thống chưa khởi tạo xong.");
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const loginWithGoogle = async () => {
-    if (!auth) throw new Error("Firebase Auth is not initialized");
+    if (!auth) throw new Error("Hệ thống chưa khởi tạo xong.");
     const provider = new GoogleAuthProvider();
+    // Thêm custom parameters để đảm bảo popup hoạt động tốt
+    provider.setCustomParameters({ prompt: 'select_account' });
     await signInWithPopup(auth, provider);
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Firebase services are not initialized");
+    if (!auth || !db) throw new Error("Hệ thống chưa khởi tạo xong.");
     const res = await createUserWithEmailAndPassword(auth, email, pass);
     const newUser: User = {
       id: res.user.uid,
