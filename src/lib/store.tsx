@@ -64,14 +64,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
-            const newUser: User = {
-              id: firebaseUser.uid,
-              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Unknown',
-              role: 'requester',
-              unit: 'Chưa cập nhật',
-              email: firebaseUser.email || ''
-            };
-            setCurrentUser(newUser);
+            // Document might not exist yet during registration, wait a bit or handle it
+            console.log("User authenticated but document not found yet.");
           }
         } catch (e) {
           console.error("Error fetching user doc:", e);
@@ -105,25 +99,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const login = async (email: string, pass: string) => {
-    if (!auth) throw new Error("Firebase Auth not initialized");
+    if (!auth) throw new Error("Hệ thống xác thực chưa sẵn sàng.");
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
     if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng.");
     
-    const res = await createUserWithEmailAndPassword(auth, email, pass);
-    
-    const newUser: User = {
-      id: res.user.uid,
-      name,
-      role: 'requester',
-      unit,
-      email
-    };
-    
-    await setDoc(doc(db, 'users', res.user.uid), newUser);
-    setCurrentUser(newUser);
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, pass);
+      
+      const newUser: User = {
+        id: res.user.uid,
+        name,
+        role: 'requester',
+        unit,
+        email
+      };
+      
+      // Attempt to save profile to Firestore
+      await setDoc(doc(db, 'users', res.user.uid), newUser);
+      setCurrentUser(newUser);
+    } catch (error: any) {
+      console.error("Registration sub-error:", error);
+      throw error; // Re-throw to be handled by UI
+    }
   };
 
   const logout = async () => {

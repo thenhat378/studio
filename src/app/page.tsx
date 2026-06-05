@@ -83,15 +83,20 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
+      console.error("Auth error detail:", error);
       let message = "Có lỗi xảy ra trong quá trình xác thực.";
-      if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
-      if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
-      if (error.code === 'auth/email-already-in-use') message = "Email này đã được sử dụng.";
-      if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
-      if (error.code === 'auth/api-key-not-valid') message = "Lỗi hệ thống: API Key không hợp lệ.";
       
-      toast({ variant: "destructive", title: "Lỗi", description: message });
+      // Handle Firebase specific error codes
+      if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
+      else if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
+      else if (error.code === 'auth/email-already-in-use') message = "Email này đã được sử dụng.";
+      else if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
+      else if (error.code === 'auth/invalid-email') message = "Email không đúng định dạng.";
+      else if (error.code === 'auth/operation-not-allowed') message = "Đăng nhập bằng Email/Password chưa được bật trong Firebase Console.";
+      else if (error.code === 'auth/api-key-not-valid') message = "Lỗi cấu hình: API Key không hợp lệ. Vui lòng kiểm tra config.ts";
+      else if (error.message) message = error.message; // Use raw message for unknown errors
+      
+      toast({ variant: "destructive", title: "Lỗi xác thực", description: message });
     } finally {
       setIsLoading(false);
     }

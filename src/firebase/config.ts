@@ -2,6 +2,7 @@
 
 /**
  * Cấu hình Firebase thực tế của dự án.
+ * Các thông số này được lấy trực tiếp từ Firebase Console của bạn.
  */
 
 export const firebaseConfig = {
