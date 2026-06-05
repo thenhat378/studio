@@ -34,8 +34,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Dialog,
   DialogContent,
@@ -60,8 +58,6 @@ export default function Overview() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const dueLogo = PlaceHolderImages.find(img => img.id === 'due-logo');
 
   if (!isInitialized) return null;
 
@@ -91,21 +87,8 @@ export default function Overview() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#F0F2F5]">
         <div className="w-full max-w-[440px] space-y-8 animate-in fade-in zoom-in duration-700">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-               <div className="relative w-44 h-44 bg-white shadow-[0_15px_35px_rgba(0,0,0,0.08)] rounded-xl flex items-center justify-center p-4 transition-transform hover:scale-105 duration-500 overflow-hidden border border-slate-100">
-                  <Image 
-                    src={dueLogo?.imageUrl || "https://picsum.photos/seed/due-university-logo/400/400"}
-                    alt="DUE Logo"
-                    width={150}
-                    height={150}
-                    className="object-contain"
-                    priority
-                    data-ai-hint="university logo"
-                  />
-               </div>
-            </div>
-            <h1 className="text-2xl font-black tracking-tight text-[#0054A4] uppercase leading-tight drop-shadow-sm px-4">
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-black tracking-tight text-[#0054A4] uppercase leading-tight drop-shadow-sm px-4">
               Ứng dụng Quản lý sửa chữa
             </h1>
           </div>
