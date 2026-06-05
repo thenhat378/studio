@@ -16,12 +16,14 @@ import {
   ChevronRight,
   User,
   Building,
-  AlertCircle
+  AlertCircle,
+  CheckCircle2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Link from 'next/link';
 
 export default function Overview() {
   const { 
@@ -76,22 +78,23 @@ export default function Overview() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regData.name || !regData.phone || !regData.pass || !regData.unit) return;
+    if (!regData.name || !regData.phone || !regData.pass || !regData.unit) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ các trường." });
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
       await register(regData);
-      toast({ title: "Đăng ký thành công", description: "Tài khoản của bạn đã được khởi tạo." });
+      toast({ 
+        title: "Đăng ký thành công!", 
+        description: "Tài khoản của bạn đã được tạo và lưu vào hệ thống." 
+      });
     } catch (error: any) {
-      // Bắt lỗi Token cụ thể như trong ảnh để đưa ra gợi ý
-      const errorMsg = error.message || "";
-      const isTokenError = errorMsg.includes('app-check-token-is-invalid') || errorMsg.includes('auth/invalid-app-credential');
-      
       toast({ 
         variant: "destructive", 
-        title: "Lỗi đăng ký", 
-        description: isTokenError 
-          ? `Lỗi hệ thống Firebase (${errorMsg}). Vui lòng thử lại hoặc dùng Đăng nhập nhanh.`
-          : errorMsg
+        title: "Không thể đăng ký", 
+        description: error.message || "Đã xảy ra lỗi, vui lòng thử lại." 
       });
     } finally {
       setIsSubmitting(false);
@@ -114,7 +117,7 @@ export default function Overview() {
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-16 bg-white border-b p-0">
                 <TabsTrigger value="login" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng ký</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng ký mới</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login" className="p-10">
@@ -124,7 +127,7 @@ export default function Overview() {
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                       <Input 
-                        placeholder="0905..." 
+                        placeholder="Nhập số điện thoại..." 
                         className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
                         value={loginPhone}
                         onChange={e => setLoginPhone(e.target.value)}
@@ -169,7 +172,7 @@ export default function Overview() {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Số điện thoại</Label>
                       <Input 
-                        placeholder="0905..." 
+                        placeholder="Số điện thoại..." 
                         className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
                         value={regData.phone}
                         onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))}
@@ -180,7 +183,7 @@ export default function Overview() {
                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Mật khẩu</Label>
                       <Input 
                         type="password"
-                        placeholder="••••" 
+                        placeholder="Mật khẩu" 
                         className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
                         value={regData.pass}
                         onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))}
@@ -216,7 +219,7 @@ export default function Overview() {
                   </div>
 
                   <Button className="w-full h-14 rounded-2xl bg-[#00A651] font-black uppercase tracking-widest text-xs mt-4 shadow-xl shadow-emerald-100" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Đăng ký tài khoản"}
+                    {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐĂNG KÝ"}
                   </Button>
                 </form>
               </TabsContent>
@@ -227,7 +230,6 @@ export default function Overview() {
             <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest">
               Hệ thống quản lý nội bộ trường ĐH Kinh tế - ĐHĐN
             </p>
-            {/* Fallback buttons if someone is really stuck with Auth issues */}
             <div className="flex gap-2 opacity-30 hover:opacity-100 transition-opacity">
                <button onClick={() => login('requester', '123')} className="text-[8px] font-bold uppercase border px-2 py-1 rounded-full text-slate-400">Demo User</button>
                <button onClick={() => login('tech', '123')} className="text-[8px] font-bold uppercase border px-2 py-1 rounded-full text-slate-400">Demo Tech</button>
@@ -238,7 +240,6 @@ export default function Overview() {
     );
   }
 
-  // Dashboard logic remains same as in current project
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
