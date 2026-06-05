@@ -8,14 +8,12 @@ import {
   ChevronLeft, 
   Wrench, 
   User, 
-  Calendar, 
   CheckCircle2, 
   FileText, 
   Sparkles,
   Printer,
   ShieldAlert,
   HardDrive,
-  UserCheck,
   XCircle,
   Clock,
   Star
@@ -102,9 +100,10 @@ export default function RequestDetail() {
     );
   };
 
+  const isRequesterOrLeader = currentUser?.role === 'requester' || currentUser?.role === 'unit_leader';
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* Print Header */}
       <div className="print-only mb-8 text-center border-b pb-6">
         <h1 className="text-3xl font-bold text-primary mb-2 uppercase">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
         <p className="text-sm font-mono">Mã số phiếu: {req.id} | Ngày in: {new Date().toLocaleString('vi-VN')}</p>
@@ -134,8 +133,8 @@ export default function RequestDetail() {
                 <div className="scale-110">{getStatusBadge(req.status)}</div>
               </div>
               <div className="flex flex-col gap-1 mt-3">
-                <CardDescription className="flex items-center gap-2 text-foreground font-medium">
-                  <Clock className="h-3.5 w-3.5 text-primary" /> Thời gian báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}
+                <CardDescription className="flex items-center gap-2 text-primary font-bold">
+                  <Clock className="h-4 w-4" /> Thời gian báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -190,7 +189,7 @@ export default function RequestDetail() {
               {req.status === 'closed' && req.rating && (
                 <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6">
                   <Label className="text-xs uppercase text-amber-700 font-extrabold tracking-widest flex items-center gap-2 mb-3">
-                    <Star className="h-4 w-4 fill-amber-400" /> Đánh giá hài lòng của đơn vị
+                    <Star className="h-4 w-4 fill-amber-400" /> Đánh giá mức độ hài lòng
                   </Label>
                   <div className="flex flex-col gap-2">
                     <StarRating value={req.rating} readOnly />
@@ -210,7 +209,6 @@ export default function RequestDetail() {
             </CardContent>
           </Card>
 
-          {/* Role Actions - NO PRINT */}
           <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-accent no-print">
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2 font-bold uppercase tracking-tight">
@@ -226,14 +224,14 @@ export default function RequestDetail() {
                   </div>
                 )}
 
-                {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
+                {isRequesterOrLeader && req.status === 'verified' && (
                   <div className="space-y-6">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2">Xác nhận nghiệm thu & Đánh giá:</p>
-                      <p className="text-xs text-emerald-600 mb-4">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng về cách xử lý của kỹ thuật viên.</p>
+                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận nghiệm thu & Đánh giá chất lượng:</p>
+                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng của bạn về cách xử lý của kỹ thuật viên.</p>
                       
                       <div className="space-y-3">
-                        <Label className="text-xs font-bold text-muted-foreground uppercase">Mức độ hài lòng</Label>
+                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Bạn hài lòng như thế nào?</Label>
                         <StarRating value={rating} onChange={setRating} />
                       </div>
                     </div>
@@ -243,7 +241,7 @@ export default function RequestDetail() {
                         <CheckCircle2 className="h-5 w-5" /> Nghiệm thu & Đóng phiếu
                       </Button>
                       <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Cần sửa lại
+                        Yêu cầu sửa lại
                       </Button>
                     </div>
                   </div>
@@ -320,8 +318,7 @@ export default function RequestDetail() {
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 no-print">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-3 border-b bg-muted/5">
               <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-widest">Thông tin chung</CardTitle>
@@ -349,7 +346,6 @@ export default function RequestDetail() {
         </div>
       </div>
 
-      {/* Print Footer */}
       <div className="print-only mt-12 grid grid-cols-3 text-center gap-8">
         <div className="space-y-16"><p className="font-bold">Người yêu cầu</p><p className="text-sm">(Ký tên)</p></div>
         <div className="space-y-16"><p className="font-bold">Kỹ thuật viên</p><p className="text-sm">(Ký tên)</p></div>

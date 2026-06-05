@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, PlusCircle, Wrench, MoreHorizontal, FileText, ChevronRight } from 'lucide-react';
+import { Search, Filter, PlusCircle, Wrench, MoreHorizontal, FileText, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { 
@@ -33,8 +33,9 @@ export default function RequestsList() {
       case 'approved': return <Badge variant="outline" className="border-indigo-200 text-indigo-600 bg-indigo-50">Đã duyệt</Badge>;
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Chờ nghiệm thu</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã xong</Badge>;
+      case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã duyệt hoàn thành</Badge>;
+      case 'closed': return <Badge variant="outline" className="border-green-700 text-white bg-green-700">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -47,12 +48,14 @@ export default function RequestsList() {
           <h1 className="text-2xl font-bold text-primary">Danh sách yêu cầu sửa chữa</h1>
           <p className="text-muted-foreground">Quản lý và theo dõi trạng thái các phiếu sửa chữa</p>
         </div>
-        <Link href="/requests/new">
-          <Button className="bg-primary w-full md:w-auto">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Tạo phiếu mới
-          </Button>
-        </Link>
+        {currentUser?.role === 'requester' && (
+          <Link href="/requests/new">
+            <Button className="bg-primary w-full md:w-auto font-bold shadow-lg shadow-primary/20">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Tạo phiếu mới
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -88,17 +91,25 @@ export default function RequestsList() {
                     <span className="flex items-center gap-1">
                       <FileText className="h-3 w-3" /> {req.unit}
                     </span>
-                    <span className="font-mono text-xs opacity-70">
-                      ID: {req.id}
+                    <span className="flex items-center gap-1 text-primary font-medium">
+                      <Clock className="h-3 w-3" /> Báo lúc: {new Date(req.createdAt).toLocaleString('vi-VN')}
                     </span>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between md:justify-end gap-6 md:w-1/3">
-                  <div className="text-left md:text-right">
-                    <p className="text-xs font-medium text-muted-foreground">Ngày tạo</p>
-                    <p className="text-sm">{new Date(req.createdAt).toLocaleDateString('vi-VN')}</p>
-                  </div>
+                  {req.status === 'verified' && currentUser?.role === 'requester' ? (
+                    <Link href={`/requests/${req.id}`}>
+                      <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1 animate-pulse">
+                        <CheckCircle2 className="h-4 w-4" /> Nghiệm thu
+                      </Button>
+                    </Link>
+                  ) : (
+                    <div className="text-left md:text-right">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Trạng thái</p>
+                      <p className="text-sm font-bold text-foreground">{req.status.replace('_', ' ')}</p>
+                    </div>
+                  )}
                   
                   <div className="flex items-center gap-2">
                     <Link href={`/requests/${req.id}`}>
@@ -117,7 +128,6 @@ export default function RequestsList() {
                           <Link href={`/requests/${req.id}`}>Chi tiết</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>In phiếu (PDF)</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Xóa</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
