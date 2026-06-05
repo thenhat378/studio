@@ -6,7 +6,6 @@ import type { User, RepairRequest, Equipment, UserRole } from './types';
 import { useFirebase } from '@/firebase';
 import { 
   doc, 
-  getDoc, 
   setDoc, 
   collection, 
   onSnapshot, 
@@ -53,7 +52,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Khôi phục phiên đăng nhập từ LocalStorage
     const savedUser = localStorage.getItem('due_user');
     if (savedUser) {
       try {
@@ -71,6 +69,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
       setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
+    }, (error) => {
+      console.error("Firestore error:", error);
     });
     return () => unsub();
   }, [db]);
@@ -84,54 +84,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const login = async (phone: string, pass: string) => {
-    if (!db) return;
+    if (!db) throw new Error("Database chưa sẵn sàng");
     
-    // Tìm user trong Firestore theo số điện thoại
     const q = query(collection(db, 'users'), where('phoneNumber', '==', phone), limit(1));
     const snap = await getDocs(q);
     
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
-      // Trong phiên bản đơn giản này, chúng ta chấp nhận đăng nhập nếu tìm thấy số điện thoại
-      // Bạn có thể thêm kiểm tra mật khẩu ở đây nếu muốn (userData.password === pass)
+      // Cho phép đăng nhập nếu số điện thoại tồn tại (Dành cho demo/nội bộ)
       setCurrentUser(userData);
       localStorage.setItem('due_user', JSON.stringify(userData));
     } else {
-      throw new Error("Số điện thoại chưa được đăng ký.");
+      throw new Error("Số điện thoại này chưa được đăng ký.");
     }
   };
 
   const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
-    if (!db) return;
+    if (!db) throw new Error("Database chưa sẵn sàng");
     
-    // Kiểm tra số điện thoại đã tồn tại chưa
-    const q = query(collection(db, 'users'), where('phoneNumber', '==', data.phone), limit(1));
-    const snap = await getDocs(q);
-    
-    if (!snap.empty) {
-      throw new Error("Số điện thoại này đã được sử dụng.");
-    }
-
-    const userId = `user_${Date.now()}_${data.phone.slice(-4)}`;
+    const userId = `user_${Date.now()}`;
     const userData: User = {
       id: userId,
       name: data.name,
       role: data.role,
       unit: data.unit,
       phoneNumber: data.phone,
-      // Lưu mật khẩu trực tiếp trong Firestore cho bản demo đơn giản
-      password: data.pass 
+      password: data.pass
     };
 
-    // Lưu thẳng vào Firestore
+    // Lưu thẳng vào Firestore - KHÔNG QUA FIREBASE AUTH ĐỂ TRÁNH LỖI TOKEN
     await setDoc(doc(db, 'users', userId), userData);
     
-    // Đăng nhập ngay lập tức
     setCurrentUser(userData);
     localStorage.setItem('due_user', JSON.stringify(userData));
   };
 
-  const logout = async () => {
+  const logout = () => {
     localStorage.removeItem('due_user');
     setCurrentUser(null);
   };
