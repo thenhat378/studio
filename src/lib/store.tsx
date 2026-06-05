@@ -2,7 +2,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { User, UserRole, RepairRequest, Equipment } from './types';
+import type { User, RepairRequest, Equipment } from './types';
 import { useFirebase } from '@/firebase';
 import { 
   onAuthStateChanged, 
@@ -22,7 +22,6 @@ import {
   addDoc,
   updateDoc
 } from 'firebase/firestore';
-import { useToast } from '@/hooks/use-toast';
 
 interface AppContextType {
   currentUser: User | null;
@@ -31,8 +30,8 @@ interface AppContextType {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   requests: RepairRequest[];
-  addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => void;
-  updateRequestStatus: (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => void;
+  addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+  updateRequestStatus: (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => Promise<void>;
   equipment: Equipment[];
   users: User[];
   isInitialized: boolean;
@@ -51,29 +50,32 @@ const MOCK_EQUIPMENT: Equipment[] = [
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const { auth, db } = useFirebase();
-  const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<RepairRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Sync Auth State
   useEffect(() => {
     if (!auth || !db) return;
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        if (userDoc.exists()) {
-          setCurrentUser(userDoc.data() as User);
-        } else {
-          // Fallback if doc doesn't exist yet
-          setCurrentUser({
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName || 'Người dùng mới',
-            role: 'requester',
-            unit: 'Chưa cập nhật'
-          });
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            setCurrentUser(userDoc.data() as User);
+          } else {
+            const newUser: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || emailToName(firebaseUser.email || ''),
+              role: 'requester',
+              unit: 'Chưa cập nhật',
+              email: firebaseUser.email || ''
+            };
+            setCurrentUser(newUser);
+          }
+        } catch (e) {
+          console.error("Error fetching user doc:", e);
         }
       } else {
         setCurrentUser(null);
@@ -84,7 +86,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [auth, db]);
 
-  // Sync Requests from Firestore
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
@@ -95,7 +96,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [db]);
 
-  // Sync Users from Firestore
   useEffect(() => {
     if (!db) return;
     const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -105,13 +105,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [db]);
 
+  const emailToName = (email: string) => {
+    return email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
+  };
+
   const login = async (email: string, pass: string) => {
-    if (!auth) return;
+    if (!auth) throw new Error("Firebase Auth not initialized");
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) return;
+    if (!auth || !db) throw new Error("Firebase services not available");
     const res = await createUserWithEmailAndPassword(auth, email, pass);
     const newUser: User = {
       id: res.user.uid,
