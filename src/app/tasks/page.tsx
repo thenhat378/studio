@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Loader2 } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -19,14 +19,22 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { RepairType } from '@/lib/types';
 
 export default function TasksPage() {
   const { requests, currentUser, updateRequestStatus } = useAppStore();
   const { toast } = useToast();
   const [reportingId, setReportingId] = useState<string | null>(null);
   const [reportText, setReportText] = useState('');
+  const [repairType, setRepairType] = useState<RepairType | ''>('');
 
-  // Lọc nhiệm vụ được phân công cho kỹ thuật viên hiện tại
   const myTasks = requests.filter(r => r.technicianId === currentUser?.id);
 
   const handleStart = (id: string) => {
@@ -40,21 +48,35 @@ export default function TasksPage() {
   const handleOpenReport = (id: string) => {
     setReportingId(id);
     setReportText('');
+    setRepairType('');
   };
 
   const handleSubmitReport = () => {
-    if (!reportingId || !reportText.trim()) return;
+    if (!reportingId || !reportText.trim() || !repairType) return;
 
     updateRequestStatus(reportingId, 'completed', { 
-      technicianReport: reportText 
+      technicianReport: reportText,
+      repairType: repairType as RepairType
     });
 
+    // Mô phỏng gửi thông báo
     toast({
       title: "Đã báo cáo hoàn thành",
-      description: "Thông tin đã được gửi cho Quản lý CSVC nghiệm thu."
+      description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
     });
+    
     setReportingId(null);
     setReportText('');
+    setRepairType('');
+  };
+
+  const getRepairTypeLabel = (type?: string) => {
+    switch(type) {
+      case 'replacement': return 'Thay mới';
+      case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
+      case 'repair_only': return 'Sửa chữa không thay thế thiết bị';
+      default: return '';
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -92,9 +114,9 @@ export default function TasksPage() {
                   <p>Phòng/Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
                   <p>Thiết bị: <span className="text-foreground font-medium">{req.equipmentName}</span></p>
                 </div>
-                {req.technicianReport && (
-                  <p className="text-xs mt-2 italic text-emerald-600 bg-emerald-50 p-2 rounded line-clamp-1">
-                    Báo cáo: "{req.technicianReport}"
+                {req.repairType && (
+                  <p className="text-xs mt-2 font-bold text-primary bg-primary/5 p-2 rounded inline-block">
+                    Hình thức: {getRepairTypeLabel(req.repairType)}
                   </p>
                 )}
               </div>
@@ -122,7 +144,7 @@ export default function TasksPage() {
                     className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none" 
                     onClick={() => handleOpenReport(req.id)}
                   >
-                    <ClipboardPen className="h-4 w-4" /> Báo cáo kết quả
+                    <ClipboardPen className="h-4 w-4" /> Báo cáo công việc
                   </Button>
                 )}
               </div>
@@ -138,38 +160,56 @@ export default function TasksPage() {
         )}
       </div>
 
-      {/* Dialog Báo cáo kết quả */}
       <Dialog open={!!reportingId} onOpenChange={(open) => !open && setReportingId(null)}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 uppercase tracking-tight font-black">
               <ClipboardPen className="h-5 w-5 text-primary" />
-              Báo cáo kết quả xử lý
+              Báo cáo công việc sửa chữa
             </DialogTitle>
             <DialogDescription>
-              Mô tả chi tiết quá trình sửa chữa, các linh kiện đã thay thế (nếu có) để gửi Quản lý CSVC nghiệm thu.
+              Vui lòng chọn hình thức xử lý và mô tả chi tiết kết quả. Thông báo sẽ tự động gửi đến Người yêu cầu & Quản lý sau khi lưu.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="report">Chi tiết xử lý</Label>
+          <div className="py-4 space-y-6">
+            <div className="space-y-3">
+              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức xử lý (Listbox)</Label>
+              <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
+                <SelectTrigger className="h-12 border-primary/20">
+                  <SelectValue placeholder="Chọn hình thức..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="replacement">Thay mới</SelectItem>
+                  <SelectItem value="backup_replacement">Thay mới bằng thiết bị dự phòng</SelectItem>
+                  <SelectItem value="repair_only">Sửa chữa không thay thế thiết bị</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="report" className="text-xs font-black uppercase text-muted-foreground tracking-widest">Chi tiết xử lý</Label>
               <Textarea 
                 id="report"
-                placeholder="Ví dụ: Đã thay dây cáp HDMI mới, máy chiếu hoạt động bình thường..." 
+                placeholder="Mô tả cụ thể các bước đã thực hiện..." 
                 value={reportText}
                 onChange={(e) => setReportText(e.target.value)}
-                className="min-h-[150px]"
+                className="min-h-[120px] border-primary/20"
               />
             </div>
+            
+            <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
+               <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+               <p className="text-xs text-blue-700 font-medium">Sau khi nhấn xác nhận, hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC.</p>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setReportingId(null)}>Hủy</Button>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="h-11 px-6 rounded-xl" onClick={() => setReportingId(null)}>Hủy</Button>
             <Button 
-              className="bg-emerald-600 hover:bg-emerald-700" 
+              className="bg-emerald-600 hover:bg-emerald-700 h-11 px-8 rounded-xl font-bold" 
               onClick={handleSubmitReport} 
-              disabled={!reportText.trim()}
+              disabled={!reportText.trim() || !repairType}
             >
-              Gửi báo cáo hoàn thành
+              Gửi báo cáo & Thông báo
             </Button>
           </DialogFooter>
         </DialogContent>

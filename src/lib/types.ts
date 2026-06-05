@@ -11,6 +11,8 @@ export type RequestStatus =
   | 'closed'
   | 'rejected';
 
+export type RepairType = 'replacement' | 'backup_replacement' | 'repair_only';
+
 export interface User {
   id: string;
   name: string;
@@ -42,6 +44,7 @@ export interface RepairRequest {
     causes: string[];
     recommendedEquipment: string[];
   };
+  repairType?: RepairType;
   technicianReport?: string;
   rejectionReason?: string;
   unitFeedback?: string;

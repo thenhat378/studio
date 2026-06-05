@@ -16,7 +16,8 @@ import {
   HardDrive,
   XCircle,
   Clock,
-  Star
+  Star,
+  Bell
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { RepairType } from '@/lib/types';
 
 export default function RequestDetail() {
   const params = useParams();
@@ -41,6 +43,7 @@ export default function RequestDetail() {
   const { toast } = useToast();
   const { requests, currentUser, updateRequestStatus, users } = useAppStore();
   const [report, setReport] = useState('');
+  const [repairType, setRepairType] = useState<RepairType | ''>('');
   const [selectedTechId, setSelectedTechId] = useState('');
   const [rating, setRating] = useState<number>(5);
 
@@ -58,14 +61,31 @@ export default function RequestDetail() {
 
   const handleAction = (status: any, extra?: any) => {
     updateRequestStatus(req.id, status, extra);
-    toast({
-      title: "Cập nhật thành công",
-      description: `Phiếu #${req.id} đã chuyển sang trạng thái mới.`
-    });
+    
+    if (status === 'completed') {
+       toast({
+         title: "Đã báo cáo hoàn thành",
+         description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
+       });
+    } else {
+       toast({
+         title: "Cập nhật thành công",
+         description: `Phiếu #${req.id} đã chuyển sang trạng thái mới.`
+       });
+    }
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const getRepairTypeLabel = (type?: string) => {
+    switch(type) {
+      case 'replacement': return 'Thay mới';
+      case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
+      case 'repair_only': return 'Sửa chữa không thay thế thiết bị';
+      default: return '';
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -75,7 +95,7 @@ export default function RequestDetail() {
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
       case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge className="bg-cyan-600">CSVC đã duyệt hoàn thành</Badge>;
+      case 'verified': return <Badge className="bg-cyan-600">Đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge className="bg-green-700 text-white">Đã đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
@@ -105,7 +125,7 @@ export default function RequestDetail() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="print-only mb-8 text-center border-b pb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2 uppercase">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
+        <h1 className="text-3xl font-bold text-primary mb-2 uppercase tracking-tighter">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
         <p className="text-sm font-mono">Mã số phiếu: {req.id} | Ngày in: {new Date().toLocaleString('vi-VN')}</p>
       </div>
 
@@ -176,11 +196,16 @@ export default function RequestDetail() {
               )}
 
               {req.technicianReport && (
-                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6">
-                  <Label className="text-xs uppercase text-emerald-700 font-extrabold tracking-widest flex items-center gap-2 mb-3">
-                    <Wrench className="h-4 w-4" /> Báo cáo kỹ thuật
-                  </Label>
-                  <p className="text-sm text-emerald-900 leading-relaxed font-medium">
+                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xs uppercase text-emerald-700 font-extrabold tracking-widest flex items-center gap-2">
+                      <Wrench className="h-4 w-4" /> Báo cáo công việc kỹ thuật
+                    </Label>
+                    {req.repairType && (
+                      <Badge className="bg-emerald-600 text-white font-bold">{getRepairTypeLabel(req.repairType)}</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-emerald-900 leading-relaxed font-medium bg-white/50 p-4 rounded-xl border border-emerald-100">
                     {req.technicianReport}
                   </p>
                 </div>
@@ -291,11 +316,37 @@ export default function RequestDetail() {
                 )}
                 
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
-                  <div className="space-y-4">
-                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Báo cáo kết quả:</Label>
-                    <Textarea placeholder="Mô tả các bước đã xử lý..." className="min-h-[120px]" value={report} onChange={e => setReport(e.target.value)} />
-                    <Button className="bg-emerald-600 w-full h-12 text-md font-bold" disabled={!report.trim()} onClick={() => handleAction('completed', { technicianReport: report })}>
-                      Gửi báo cáo hoàn thành
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức xử lý (Listbox)</Label>
+                      <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
+                        <SelectTrigger className="h-12 border-primary/20">
+                          <SelectValue placeholder="Chọn hình thức..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="replacement">Thay mới</SelectItem>
+                          <SelectItem value="backup_replacement">Thay mới bằng thiết bị dự phòng</SelectItem>
+                          <SelectItem value="repair_only">Sửa chữa không thay thế thiết bị</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Chi tiết xử lý</Label>
+                      <Textarea placeholder="Mô tả các bước đã xử lý..." className="min-h-[120px] border-primary/20" value={report} onChange={e => setReport(e.target.value)} />
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
+                       <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn gửi báo cáo.</p>
+                    </div>
+
+                    <Button 
+                      className="bg-emerald-600 w-full h-14 text-md font-bold gap-2" 
+                      disabled={!report.trim() || !repairType} 
+                      onClick={() => handleAction('completed', { technicianReport: report, repairType })}
+                    >
+                      <CheckCircle2 className="h-5 w-5" /> Gửi báo cáo & Thông báo hoàn thành
                     </Button>
                   </div>
                 )}
