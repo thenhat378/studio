@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -10,22 +10,33 @@ import {
   ShieldCheck,
   Package,
   Menu,
-  FileText,
   User
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { currentUser, logout, isInitialized } = useAppStore();
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Chuyển hướng về trang chủ (nơi chứa form đăng nhập) ngay khi đăng xuất
+  useEffect(() => {
+    if (isInitialized && !currentUser && pathname !== '/') {
+      router.push('/');
+    }
+  }, [currentUser, isInitialized, pathname, router]);
 
   if (!isInitialized) return null;
-  if (!currentUser) return <>{children}</>;
+
+  // Nếu chưa đăng nhập, chỉ hiển thị nội dung (trang chủ sẽ hiển thị form login)
+  if (!currentUser) {
+    return <div className="min-h-screen bg-slate-50/50">{children}</div>;
+  }
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -49,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
       </div>
       <div className="flex-1 px-4 space-y-2">
-        <p className="text-[10px] font-black uppercase text-muted-foreground px-3 mb-2 tracking-widest">Main Navigation</p>
+        <p className="text-[10px] font-black uppercase text-muted-foreground px-3 mb-2 tracking-widest text-center">Điều hướng hệ thống</p>
         {filteredNav.map((item) => (
           <Link key={item.name} href={item.href}>
             <Button
@@ -87,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="text-[10px] text-primary font-black uppercase tracking-tighter truncate opacity-80">{currentUser.role.replace('_', ' ')}</span>
           </div>
         </div>
-        <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 h-11 rounded-xl font-bold" onClick={logout}>
+        <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 h-11 rounded-xl font-bold" onClick={() => logout()}>
           <LogOut className="mr-3 h-5 w-5" />
           Đăng xuất
         </Button>
