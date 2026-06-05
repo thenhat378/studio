@@ -195,19 +195,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db || !currentUser) return;
     
     try {
-      // Xóa tất cả phiếu yêu cầu
+      // 1. Lấy tất cả các phiếu yêu cầu và tạo danh sách các tác vụ xóa
       const requestSnap = await getDocs(collection(db, 'requests'));
-      for (const docSnap of requestSnap.docs) {
-        await deleteDoc(doc(db, 'requests', docSnap.id));
-      }
+      const deleteRequestPromises = requestSnap.docs.map(docSnap => deleteDoc(doc(db, 'requests', docSnap.id)));
       
-      // Xóa tất cả người dùng NGOẠI TRỪ tài khoản Admin hiện tại
+      // 2. Lấy tất cả người dùng và lọc bỏ tài khoản Admin hiện tại
       const userSnap = await getDocs(collection(db, 'users'));
-      for (const docSnap of userSnap.docs) {
-        if (docSnap.id !== currentUser.id) {
-          await deleteDoc(doc(db, 'users', docSnap.id));
-        }
-      }
+      const deleteUserPromises = userSnap.docs
+        .filter(docSnap => docSnap.id !== currentUser.id)
+        .map(docSnap => deleteDoc(doc(db, 'users', docSnap.id)));
+      
+      // 3. Thực thi tất cả các tác vụ xóa đồng thời
+      await Promise.all([...deleteRequestPromises, ...deleteUserPromises]);
       
       // Thành công - bảng thiết bị được giữ nguyên theo yêu cầu
     } catch (error) {

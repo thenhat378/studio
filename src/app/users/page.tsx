@@ -8,6 +8,7 @@ import { Users, Phone, Building, Shield, RefreshCcw, Loader2 } from 'lucide-reac
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 export default function UserManagementPage() {
   const { users, currentUser, resetSystem } = useAppStore();
@@ -23,7 +24,7 @@ export default function UserManagementPage() {
   }
 
   const handleReset = async () => {
-    if (confirm("XÁC NHẬN: Bạn muốn xóa toàn bộ Phiếu yêu cầu và các tài khoản người dùng khác? (Danh mục Thiết bị và tài khoản Admin của bạn sẽ được GIỮ LẠI).")) {
+    if (confirm("XÁC NHẬN LÀM SẠCH: Bạn có chắc chắn muốn xóa toàn bộ Phiếu yêu cầu và các tài khoản người dùng khác? \n\n- Danh mục Thiết bị sẽ được GIỮ LẠI.\n- Tài khoản Admin của bạn sẽ được GIỮ LẠI.")) {
       setIsResetting(true);
       try {
         await resetSystem();
@@ -32,6 +33,7 @@ export default function UserManagementPage() {
           description: "Phiếu yêu cầu và các tài khoản người dùng khác đã được xóa thành công." 
         });
       } catch (error) {
+        console.error(error);
         toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu. Vui lòng thử lại." });
       } finally {
         setIsResetting(false);
@@ -128,9 +130,4 @@ export default function UserManagementPage() {
       )}
     </div>
   );
-}
-
-// Helper function to concatenate classes (defined if not already available in utils)
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
