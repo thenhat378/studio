@@ -91,7 +91,6 @@ export default function Overview() {
               <Wrench className="h-12 w-12 text-primary" />
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-primary">Quản lý sửa chữa</h1>
-            <p className="text-muted-foreground text-lg">Hệ thống quản lý yêu cầu thông minh</p>
           </div>
 
           <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-sm">

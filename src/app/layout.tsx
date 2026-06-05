@@ -7,7 +7,7 @@ import { AppProvider } from '@/lib/store';
 
 export const metadata: Metadata = {
   title: 'Ứng dụng Quản lý sửa chữa',
-  description: 'Hệ thống quản lý yêu cầu sửa chữa thông minh',
+  description: 'Hệ thống hỗ trợ quản lý quy trình sửa chữa thiết bị cơ sở vật chất',
 };
 
 export default function RootLayout({
