@@ -74,7 +74,8 @@ export default function Overview() {
   });
   const [forgotPassValidation, setForgotPassValidation] = useState({
     length: false,
-    special: false
+    special: false,
+    match: false
   });
 
   // Password validation states
@@ -94,9 +95,10 @@ export default function Overview() {
   useEffect(() => {
     setForgotPassValidation({
       length: forgotData.newPass.length >= 8,
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(forgotData.newPass)
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(forgotData.newPass),
+      match: forgotData.newPass !== '' && forgotData.newPass === forgotData.confirmPass
     });
-  }, [forgotData.newPass]);
+  }, [forgotData.newPass, forgotData.confirmPass]);
 
   if (!isInitialized) {
     return (
@@ -170,7 +172,7 @@ export default function Overview() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (forgotData.newPass !== forgotData.confirmPass) {
+    if (!forgotPassValidation.match) {
       toast({ variant: "destructive", title: "Lỗi", description: "Mật khẩu xác nhận không khớp." });
       return;
     }
@@ -390,16 +392,6 @@ export default function Overview() {
                   onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))}
                   required
                 />
-                <div className="flex gap-4 mt-2">
-                  <div className="flex items-center gap-1">
-                    {forgotPassValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                    <span className="text-[9px] font-bold uppercase text-slate-400">8+ ký tự</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {forgotPassValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                    <span className="text-[9px] font-bold uppercase text-slate-400">Ký tự đặc biệt</span>
-                  </div>
-                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Xác nhận mật khẩu mới</Label>
@@ -411,11 +403,32 @@ export default function Overview() {
                   onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))}
                   required
                 />
+                
+                {/* Validation indicators inside dialog */}
+                <div className="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    {forgotPassValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {forgotPassValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {forgotPassValidation.match ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.match ? "text-emerald-600" : "text-slate-400")}>Mật khẩu xác nhận khớp</span>
+                  </div>
+                </div>
               </div>
               <DialogFooter className="pt-4">
                 <Button 
-                  className="w-full h-14 rounded-2xl bg-primary font-black uppercase tracking-widest text-xs"
-                  disabled={isSubmitting || !forgotPassValidation.length || !forgotPassValidation.special || forgotData.newPass !== forgotData.confirmPass}
+                  className={cn(
+                    "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl",
+                    (forgotPassValidation.length && forgotPassValidation.special && forgotPassValidation.match && forgotData.phone) 
+                      ? "bg-primary text-white shadow-blue-100 opacity-100" 
+                      : "bg-slate-100 text-slate-400 shadow-none opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={isSubmitting || !forgotPassValidation.length || !forgotPassValidation.special || !forgotPassValidation.match || !forgotData.phone}
                 >
                   {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐỔI MẬT KHẨU"}
                 </Button>
