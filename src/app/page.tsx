@@ -23,7 +23,8 @@ import {
   Mail,
   Star,
   BarChart3,
-  Users
+  Users,
+  Key
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -88,69 +89,72 @@ export default function Overview() {
 
   if (!currentUser) {
     return (
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-slate-50/50">
-        <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="text-center space-y-6">
+      <div className="flex min-h-screen items-center justify-center p-4 bg-[#F8F9FA]">
+        <div className="w-full max-w-[400px] space-y-6 animate-in fade-in zoom-in duration-500">
+          <div className="text-center space-y-4">
             <div className="flex justify-center">
-               <div className="relative w-40 h-40 p-4 bg-white rounded-full shadow-2xl flex items-center justify-center group overflow-hidden border border-white/20">
+               <div className="relative w-32 h-32 bg-white flex items-center justify-center overflow-hidden">
                   {dueLogo && (
-                    <Image 
-                      src={dueLogo.imageUrl}
-                      alt={dueLogo.description}
-                      width={200}
-                      height={200}
-                      className="object-contain mix-blend-multiply scale-110 group-hover:scale-125 transition-transform duration-700"
-                      data-ai-hint={dueLogo.imageHint}
-                    />
+                    <div className="relative w-full h-full border-[1.5px] border-slate-200 rounded-[10%] p-2 flex items-center justify-center">
+                       <Image 
+                        src={dueLogo.imageUrl}
+                        alt={dueLogo.description}
+                        width={100}
+                        height={100}
+                        className="object-contain"
+                        data-ai-hint={dueLogo.imageHint}
+                      />
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent"></div>
                </div>
             </div>
-            <h1 className="text-3xl font-black tracking-tighter text-primary uppercase drop-shadow-sm">Ứng dụng Quản lý sửa chữa</h1>
+            <h1 className="text-2xl font-black tracking-tight text-[#0054A4] uppercase leading-tight">
+              Ứng dụng Quản lý sửa chữa
+            </h1>
           </div>
 
-          <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden rounded-3xl">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl font-bold tracking-tight">Đăng nhập</CardTitle>
-              <CardDescription>Vui lòng nhập thông tin tài khoản</CardDescription>
+          <Card className="border-none shadow-xl bg-white overflow-hidden rounded-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
+            <CardHeader className="text-center pt-8 pb-2">
+              <CardTitle className="text-xl font-bold text-slate-800">Đăng nhập</CardTitle>
+              <CardDescription className="text-slate-400 text-xs font-medium">Vui lòng nhập thông tin tài khoản</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 pt-4">
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Tên đăng nhập</Label>
+            <CardContent className="space-y-4 pt-4 px-8 pb-10">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="username" className="text-[10px] font-bold uppercase tracking-wider text-slate-400 ml-0.5">Tên đăng nhập</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input 
                       id="username" 
                       placeholder="Username hoặc Email" 
-                      className="pl-10 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white transition-all"
+                      className="pl-10 h-11 rounded-lg bg-slate-50 border-slate-100 focus:bg-white transition-all text-sm"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Mật khẩu</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-[10px] font-bold uppercase tracking-wider text-slate-400 ml-0.5">Mật khẩu</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input 
                       id="password" 
                       type="password" 
                       placeholder="••••••••" 
-                      className="pl-10 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white transition-all"
+                      className="pl-10 h-11 rounded-lg bg-slate-50 border-slate-100 focus:bg-white transition-all text-sm"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  <div className="flex justify-end pt-1">
+                  <div className="flex justify-end pt-0.5">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="link" className="px-0 font-bold text-xs text-primary h-auto py-0 hover:text-[#F58220]">
+                        <Button variant="link" className="px-0 font-bold text-[10px] text-primary h-auto py-0 hover:text-[#F58220]">
                           Quên mật khẩu?
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="rounded-3xl">
+                      <DialogContent className="rounded-2xl">
                         <DialogHeader>
                           <DialogTitle>Khôi phục mật khẩu</DialogTitle>
                           <DialogDescription>
@@ -173,39 +177,36 @@ export default function Overview() {
                     </Dialog>
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all uppercase tracking-widest text-xs" disabled={isLoading}>
+                <Button type="submit" className="w-full h-11 font-bold rounded-lg bg-primary hover:bg-primary/90 transition-all uppercase tracking-widest text-[11px]" disabled={isLoading}>
                   {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
                 </Button>
               </form>
 
-              <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-slate-100"></span>
-                </div>
+              <div className="relative my-6">
                 <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-                  <span className="bg-white px-3 text-muted-foreground/60">Truy cập nhanh Demo</span>
+                  <span className="bg-white px-3 text-slate-400">Truy cập nhanh Demo</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                <Button onClick={() => login('requester')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-primary/30 hover:bg-primary/5 transition-all font-bold">
-                  <User className="h-3.5 w-3.5 text-[#0054A4]" /> Người yêu cầu
+              <div className="grid grid-cols-2 gap-2">
+                <Button onClick={() => login('requester')} variant="outline" size="sm" className="justify-start text-[9px] h-10 px-3 gap-2 rounded-lg border-slate-100 bg-slate-50/50 hover:bg-white transition-all font-bold">
+                  <User className="h-3.5 w-3.5 text-primary" /> Người yêu cầu
                 </Button>
-                <Button onClick={() => login('unit_leader')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-[#F58220]/30 hover:bg-[#F58220]/5 transition-all font-bold">
+                <Button onClick={() => login('unit_leader')} variant="outline" size="sm" className="justify-start text-[9px] h-10 px-3 gap-2 rounded-lg border-slate-100 bg-slate-50/50 hover:bg-white transition-all font-bold">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#F58220]" /> Lãnh đạo đơn vị
                 </Button>
-                <Button onClick={() => login('csvc_manager')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-primary/30 hover:bg-primary/5 transition-all font-bold">
+                <Button onClick={() => login('csvc_manager')} variant="outline" size="sm" className="justify-start text-[9px] h-10 px-3 gap-2 rounded-lg border-slate-100 bg-slate-50/50 hover:bg-white transition-all font-bold">
                   <ClipboardList className="h-3.5 w-3.5 text-primary/80" /> Quản lý CSVC
                 </Button>
-                <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-[#00A651]/30 hover:bg-[#00A651]/5 transition-all font-bold">
-                  <Wrench className="h-3.5 w-3.5 text-[#00A651]" /> Kỹ thuật viên
+                <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[9px] h-10 px-3 gap-2 rounded-lg border-slate-100 bg-slate-50/50 hover:bg-white transition-all font-bold">
+                  <Key className="h-3.5 w-3.5 text-[#00A651]" /> Kỹ thuật viên
                 </Button>
               </div>
             </CardContent>
           </Card>
           
-          <div className="text-center space-y-1">
-            <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">
+          <div className="text-center">
+            <p className="text-[10px] font-medium text-slate-400">
               © 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất
             </p>
           </div>
