@@ -8,6 +8,7 @@ export type RequestStatus =
   | 'in_progress' 
   | 'completed' 
   | 'verified' 
+  | 'closed'
   | 'rejected';
 
 export interface User {
@@ -43,4 +44,5 @@ export interface RepairRequest {
   };
   technicianReport?: string;
   rejectionReason?: string;
+  unitFeedback?: string;
 }

@@ -15,7 +15,8 @@ import {
   Printer,
   ShieldAlert,
   HardDrive,
-  UserCheck
+  UserCheck,
+  XCircle
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -57,18 +58,19 @@ export default function RequestDetail() {
     updateRequestStatus(req.id, status, extra);
     toast({
       title: "Cập nhật thành công",
-      description: `Phiếu đã chuyển sang trạng thái: ${status}`
+      description: `Phiếu đã chuyển sang trạng thái mới.`
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'pending_approval': return <Badge className="bg-rose-500">Chờ phê duyệt</Badge>;
+      case 'pending_approval': return <Badge className="bg-rose-500">Chờ lãnh đạo duyệt</Badge>;
       case 'approved': return <Badge className="bg-indigo-500">Đã phê duyệt</Badge>;
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
       case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge className="bg-green-600">Đã nghiệm thu</Badge>;
+      case 'verified': return <Badge className="bg-cyan-600">CSVC đã nghiệm thu kỹ thuật</Badge>;
+      case 'closed': return <Badge className="bg-green-700">Đã nghiệm thu & Đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -153,15 +155,33 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col gap-4">
-                {/* Lãnh đạo duyệt */}
+                {/* Lãnh đạo đơn vị - Phê duyệt đầu vào */}
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                   <div className="flex gap-3">
                     <Button className="bg-primary" onClick={() => handleAction('approved')}>Phê duyệt</Button>
-                    <Button variant="destructive" onClick={() => handleAction('rejected', { rejectionReason: 'Không phù hợp mục tiêu đơn vị.' })}>Từ chối</Button>
+                    <Button variant="destructive" onClick={() => handleAction('rejected', { rejectionReason: 'Yêu cầu không phù hợp hoặc không cần thiết.' })}>Từ chối</Button>
                   </div>
                 )}
 
-                {/* Quản lý CSVC Phân công */}
+                {/* Lãnh đạo đơn vị - Nghiệm thu cuối cùng */}
+                {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                      <p className="text-sm text-emerald-800 font-medium mb-1">Xác nhận từ đơn vị yêu cầu:</p>
+                      <p className="text-xs text-emerald-600">Vui lòng kiểm tra thực tế thiết bị đã được sửa chữa. Nhấn "Xác nhận nghiệm thu" nếu đã đạt yêu cầu để kết thúc quy trình.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button className="bg-primary hover:bg-primary/90 gap-2" onClick={() => handleAction('closed')}>
+                        <CheckCircle2 className="h-4 w-4" /> Xác nhận nghiệm thu & Đóng phiếu
+                      </Button>
+                      <Button variant="outline" className="text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
+                        <XCircle className="h-4 w-4 mr-2" /> Vẫn chưa đạt yêu cầu
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Quản lý CSVC - Phân công */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold">Chọn kỹ thuật viên phụ trách:</Label>
@@ -178,71 +198,54 @@ export default function RequestDetail() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <Button 
-                        className="bg-primary gap-2" 
-                        disabled={!selectedTechId}
-                        onClick={() => {
-                          const tech = technicians.find(t => t.id === selectedTechId);
-                          handleAction('assigned', { 
-                            technicianId: tech?.id, 
-                            technicianName: tech?.name 
-                          });
-                        }}
-                      >
+                      <Button className="bg-primary gap-2" disabled={!selectedTechId} onClick={() => {
+                        const tech = technicians.find(t => t.id === selectedTechId);
+                        handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
+                      }}>
                         <UserCheck className="h-4 w-4" /> Giao việc
                       </Button>
                     </div>
                   </div>
                 )}
 
-                {/* Quản lý CSVC Nghiệm thu kỹ thuật */}
+                {/* Quản lý CSVC - Nghiệm thu kỹ thuật */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                   <div className="space-y-3">
-                    <p className="text-sm font-medium">Bạn cần kiểm tra kết quả sửa chữa của kỹ thuật viên trước khi hoàn tất phiếu.</p>
+                    <p className="text-sm font-medium">Kỹ thuật viên đã báo cáo hoàn thành. Bạn cần kiểm tra chuyên môn trước khi gửi Đơn vị nghiệm thu.</p>
                     <div className="flex gap-3">
                       <Button className="bg-emerald-600 gap-2" onClick={() => handleAction('verified')}>
-                        <CheckCircle2 className="h-4 w-4" /> Duyệt kết quả & Nghiệm thu
+                        <CheckCircle2 className="h-4 w-4" /> Duyệt kỹ thuật & Gửi Đơn vị
                       </Button>
                       <Button variant="outline" className="text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Yêu cầu kỹ thuật kiểm tra lại
+                        Yêu cầu sửa lại
                       </Button>
                     </div>
                   </div>
                 )}
 
-                {/* Kỹ thuật viên báo cáo */}
+                {/* Kỹ thuật viên - Báo cáo */}
                 {currentUser?.role === 'technician' && req.status === 'assigned' && (
                   <Button className="bg-amber-500" onClick={() => handleAction('in_progress')}>Bắt đầu thực hiện</Button>
                 )}
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-3">
                     <Label>Báo cáo kết quả xử lý:</Label>
-                    <Textarea 
-                      placeholder="Ghi chú các linh kiện đã thay thế, kết quả kiểm tra..." 
-                      className="min-h-[100px]"
-                      value={report}
-                      onChange={e => setReport(e.target.value)}
-                    />
-                    <Button 
-                      className="bg-emerald-600 w-full" 
-                      disabled={!report.trim()}
-                      onClick={() => handleAction('completed', { technicianReport: report })}
-                    >
-                      Báo cáo hoàn thành (Gửi Quản lý CSVC)
+                    <Textarea placeholder="Ghi chú chi tiết kết quả..." className="min-h-[100px]" value={report} onChange={e => setReport(e.target.value)} />
+                    <Button className="bg-emerald-600 w-full" disabled={!report.trim()} onClick={() => handleAction('completed', { technicianReport: report })}>
+                      Gửi báo cáo hoàn thành
                     </Button>
                   </div>
                 )}
 
-                {/* Người yêu cầu xác nhận cuối cùng (Nếu cần) */}
-                {currentUser?.role === 'requester' && req.status === 'verified' && (
+                {req.status === 'closed' && (
                    <div className="p-4 bg-green-50 rounded-lg text-green-700 text-sm flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5" /> Phiếu đã được Quản lý CSVC nghiệm thu và đóng lại.
+                      <CheckCircle2 className="h-5 w-5" /> Quy trình sửa chữa đã hoàn tất và đóng lại.
                    </div>
                 )}
 
                 <div className="text-sm text-muted-foreground italic">
-                  {!['pending_approval', 'approved', 'assigned', 'in_progress', 'completed'].includes(req.status) && 
-                   req.status !== 'rejected' && req.status !== 'verified' && "Trạng thái này chưa yêu cầu thao tác từ bạn."}
+                  {!['pending_approval', 'approved', 'assigned', 'in_progress', 'completed', 'verified'].includes(req.status) && 
+                   req.status !== 'rejected' && req.status !== 'closed' && "Trạng thái này hiện không yêu cầu thao tác từ bạn."}
                 </div>
               </div>
             </CardContent>
