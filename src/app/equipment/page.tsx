@@ -101,11 +101,11 @@ export default function EquipmentCatalog() {
   };
 
   const handleReset = async () => {
-    if (confirm("CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu (Yêu cầu, Thiết bị, Người dùng). Hệ thống sẽ sạch hoàn toàn để bạn kiểm thử lại. Bạn sẽ bị đăng xuất. Tiếp tục?")) {
+    if (confirm("CẢNH BÁO: Hành động này sẽ xóa toàn bộ Phiếu yêu cầu và tất cả Tài khoản người dùng (Danh mục Thiết bị sẽ được GIỮ LẠI). Bạn sẽ bị đăng xuất. Tiếp tục?")) {
       setIsResetting(true);
       try {
         await resetSystem();
-        toast({ title: "Đã làm sạch hệ thống", description: "Vui lòng đăng ký lại tài khoản Admin để bắt đầu." });
+        toast({ title: "Đã Reset dữ liệu đăng ký", description: "Danh mục thiết bị vẫn được giữ nguyên. Vui lòng đăng ký lại tài khoản." });
         router.push('/');
       } catch (error) {
         toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu." });
@@ -119,7 +119,6 @@ export default function EquipmentCatalog() {
     return (
       <div className="text-center py-20">
         <h2 className="text-xl font-black text-rose-500 uppercase">Quyền truy cập bị từ chối</h2>
-        <p className="text-sm font-bold text-slate-400 mt-2">Chỉ Quản trị viên mới có thể quản lý danh mục thiết bị gốc.</p>
       </div>
     );
   }
@@ -137,7 +136,7 @@ export default function EquipmentCatalog() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReset} className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 text-rose-500 border-rose-100 hover:bg-rose-50">
             {isResetting ? <Loader2 className="animate-spin" /> : <RefreshCcw className="h-5 w-5" />}
-            Reset toàn bộ hệ thống
+            Reset phiếu & người dùng
           </Button>
           <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-blue-100">
             <Plus className="h-5 w-5" />

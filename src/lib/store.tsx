@@ -41,7 +41,6 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Hàm phụ để làm sạch object, xóa các trường undefined trước khi gửi lên Firestore
 const cleanObject = (obj: any) => {
   if (obj === null || typeof obj !== 'object') return obj;
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -196,14 +195,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) return;
     const batch = writeBatch(db);
     
+    // Xóa tất cả phiếu yêu cầu
     const requestSnap = await getDocs(collection(db, 'requests'));
     requestSnap.forEach(doc => batch.delete(doc.ref));
     
-    const equipSnap = await getDocs(collection(db, 'equipment'));
-    equipSnap.forEach(doc => batch.delete(doc.ref));
-
+    // Xóa tất cả người dùng
     const userSnap = await getDocs(collection(db, 'users'));
     userSnap.forEach(doc => batch.delete(doc.ref));
+
+    // GIỮ LẠI danh mục thiết bị (không xóa bảng equipment theo yêu cầu)
 
     await batch.commit();
     logout();

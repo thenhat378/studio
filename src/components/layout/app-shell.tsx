@@ -12,7 +12,8 @@ import {
   Package,
   Menu,
   Bell,
-  Search
+  Search,
+  Users
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { name: 'Quản lý', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
     { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['admin'] },
+    { name: 'Người dùng', href: '/users', icon: Users, roles: ['admin'] },
   ];
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
