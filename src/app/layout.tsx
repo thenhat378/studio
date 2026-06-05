@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/lib/store';
 
 export const metadata: Metadata = {
-  title: 'FixFlow Pro - Quản lý sửa chữa',
+  title: 'Ứng dụng Quản lý sửa chữa',
   description: 'Hệ thống quản lý yêu cầu sửa chữa thông minh',
 };
 

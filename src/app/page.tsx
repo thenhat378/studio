@@ -90,8 +90,8 @@ export default function Overview() {
             <div className="inline-flex p-4 bg-primary/10 rounded-3xl mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
               <Wrench className="h-12 w-12 text-primary" />
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-primary">FixFlow Pro</h1>
-            <p className="text-muted-foreground text-lg">Hệ thống quản lý sửa chữa thông minh</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-primary">Quản lý sửa chữa</h1>
+            <p className="text-muted-foreground text-lg">Hệ thống quản lý yêu cầu thông minh</p>
           </div>
 
           <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-sm">

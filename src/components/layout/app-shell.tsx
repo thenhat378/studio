@@ -53,11 +53,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const SidebarContent = () => (
     <div className="flex h-full flex-col gap-6 no-print">
       <div className="flex h-16 items-center px-6 border-b">
-        <Link href="/" className="flex items-center gap-3 font-black text-2xl text-primary tracking-tighter">
+        <Link href="/" className="flex items-center gap-3 font-black text-xl text-primary tracking-tighter">
           <div className="p-2 bg-primary rounded-xl">
-            <Wrench className="h-6 w-6 text-white" />
+            <Wrench className="h-5 w-5 text-white" />
           </div>
-          <span>FixFlow Pro</span>
+          <span className="leading-tight">Quản lý sửa chữa</span>
         </Link>
       </div>
       <div className="flex-1 px-4 space-y-2">
@@ -128,8 +128,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
           <div className="flex-1 md:hidden">
-            <Link href="/" className="font-black text-xl text-primary flex items-center gap-2">
-               <Wrench className="h-6 w-6 p-1 bg-primary text-white rounded-lg" /> FixFlow
+            <Link href="/" className="font-black text-lg text-primary flex items-center gap-2">
+               <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" /> Quản lý sửa chữa
             </Link>
           </div>
           <div className="ml-auto flex items-center gap-2 md:gap-4">
