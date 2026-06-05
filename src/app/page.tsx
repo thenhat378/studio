@@ -87,13 +87,13 @@ export default function Overview() {
       console.error("Auth error details:", error);
       let message = error.message || "Có lỗi xảy ra trong quá trình xác thực.";
       
-      // Friendly messages for common Firebase errors
+      // Chuyển đổi mã lỗi Firebase sang tiếng Việt thân thiện
       if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
       if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
       if (error.code === 'auth/email-already-in-use') message = "Email này đã được đăng ký sử dụng.";
       if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
       if (error.code === 'auth/invalid-email') message = "Định dạng Email không hợp lệ.";
-      if (error.code === 'auth/operation-not-allowed') message = "Vui lòng BẬT 'Email/Password' trong Firebase Console.";
+      if (error.code === 'auth/api-key-not-valid') message = "Cấu hình Firebase không hợp lệ (API Key). Vui lòng kiểm tra config.ts.";
       
       toast({ 
         variant: "destructive", 
@@ -137,7 +137,7 @@ export default function Overview() {
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'Đăng ký để gửi yêu cầu sửa chữa'}
+                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'ĐĂNG KÝ ĐỂ GỬI YÊU CẦU SỬA CHỮA'}
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -400,7 +400,7 @@ export default function Overview() {
             </Link>
           ))}
           {recentRequests.length === 0 && (
-            <div className="text-center py-20 bg-white rounded-[2.5rem] card-shadow">
+            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
                <ClipboardList className="h-12 w-12 text-slate-200 mx-auto mb-4" />
                <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Không có dữ liệu</p>
             </div>
