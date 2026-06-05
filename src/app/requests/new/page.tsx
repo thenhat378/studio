@@ -216,7 +216,7 @@ export default function NewRequest() {
 
               <div className="space-y-3 pt-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
-                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Mở máy ảnh)
+                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Đính kèm minh chứng hình ảnh)
                 </Label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {images.map((img, idx) => (
@@ -233,7 +233,7 @@ export default function NewRequest() {
                   ))}
                   <label className="aspect-square rounded-2xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors bg-slate-50/50">
                     <Camera className="h-8 w-8 text-primary/60" />
-                    <span className="text-[9px] font-black text-primary/60 uppercase">Chụp ảnh</span>
+                    <span className="text-[9px] font-black text-primary/60 uppercase text-center px-1">Mở máy ảnh</span>
                     <input 
                       type="file" 
                       multiple 
