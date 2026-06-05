@@ -228,16 +228,7 @@ export default function Overview() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center px-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400">Mật khẩu</Label>
-                      <button 
-                        type="button" 
-                        onClick={() => setIsForgotOpen(true)}
-                        className="text-[10px] font-black text-primary uppercase hover:underline"
-                      >
-                        Quên mật khẩu?
-                      </button>
-                    </div>
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu</Label>
                     <div className="relative">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                       <Input 
@@ -248,6 +239,15 @@ export default function Overview() {
                         onChange={e => setLoginPass(e.target.value)}
                         required
                       />
+                    </div>
+                    <div className="flex justify-end px-2">
+                      <button 
+                        type="button" 
+                        onClick={() => setIsForgotOpen(true)}
+                        className="text-[10px] font-black text-primary uppercase hover:underline tracking-widest"
+                      >
+                        Quên mật khẩu?
+                      </button>
                     </div>
                   </div>
                   <Button className="w-full h-16 rounded-[1.8rem] bg-[#0054A4] font-black uppercase tracking-widest text-xs shadow-2xl shadow-blue-100 mt-4 transition-transform active:scale-95" disabled={isSubmitting}>
