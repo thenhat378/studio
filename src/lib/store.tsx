@@ -41,6 +41,19 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Hàm phụ để làm sạch object, xóa các trường undefined
+const cleanObject = (obj: any) => {
+  const newObj = { ...obj };
+  Object.keys(newObj).forEach(key => {
+    if (newObj[key] === undefined) {
+      delete newObj[key];
+    } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
+      newObj[key] = cleanObject(newObj[key]);
+    }
+  });
+  return newObj;
+};
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const { db } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -69,7 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const unsub = onSnapshot(q, (snapshot) => {
       setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
     }, (error) => {
-      console.error("Firestore error:", error);
+      console.error("Firestore error (requests):", error);
     });
     return () => unsub();
   }, [db]);
@@ -98,7 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
-      if (userData.password === pass || pass === '123') { 
+      if (userData.password === pass) { 
         setCurrentUser(userData);
         localStorage.setItem('due_user', JSON.stringify(userData));
       } else {
@@ -128,7 +141,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       password: data.pass
     };
 
-    await setDoc(doc(db, 'users', userId), userData);
+    await setDoc(doc(db, 'users', userId), cleanObject(userData));
   };
 
   const resetPassword = async (phone: string, newPass: string) => {
@@ -146,28 +159,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    const cleanData = JSON.parse(JSON.stringify(req));
-    await addDoc(collection(db, 'requests'), {
-      ...cleanData,
+    const rawData = {
+      ...req,
       createdAt: new Date().toISOString(),
       status: 'pending_approval'
-    });
+    };
+    await addDoc(collection(db, 'requests'), cleanObject(rawData));
   };
 
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
-    const cleanExtra = extra ? JSON.parse(JSON.stringify(extra)) : {};
-    await updateDoc(doc(db, 'requests', id), { status, ...cleanExtra });
+    const updateData: any = { status };
+    if (extra) {
+      Object.assign(updateData, extra);
+    }
+    await updateDoc(doc(db, 'requests', id), cleanObject(updateData));
   };
 
   const addEquipment = async (data: Omit<Equipment, 'id'>) => {
     if (!db) return;
-    await addDoc(collection(db, 'equipment'), data);
+    await addDoc(collection(db, 'equipment'), cleanObject(data));
   };
 
   const updateEquipment = async (id: string, data: Partial<Equipment>) => {
     if (!db) return;
-    await updateDoc(doc(db, 'equipment', id), data);
+    await updateDoc(doc(db, 'equipment', id), cleanObject(data));
   };
 
   const deleteEquipment = async (id: string) => {
@@ -179,20 +195,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) return;
     const batch = writeBatch(db);
     
-    // Xóa tất cả yêu cầu
     const requestSnap = await getDocs(collection(db, 'requests'));
     requestSnap.forEach(doc => batch.delete(doc.ref));
     
-    // Xóa tất cả thiết bị
     const equipSnap = await getDocs(collection(db, 'equipment'));
     equipSnap.forEach(doc => batch.delete(doc.ref));
 
-    // Xóa tất cả người dùng (Để đăng ký lại từ đầu)
     const userSnap = await getDocs(collection(db, 'users'));
     userSnap.forEach(doc => batch.delete(doc.ref));
 
     await batch.commit();
-    logout(); // Đăng xuất để người dùng đăng ký lại
+    logout();
   };
 
   return (

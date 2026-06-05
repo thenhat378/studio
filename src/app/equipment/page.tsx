@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from 'react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore } from '@/lib/store.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -101,11 +101,11 @@ export default function EquipmentCatalog() {
   };
 
   const handleReset = async () => {
-    if (confirm("CẢNH BÁO CỰC ĐỘ: Hành động này sẽ xóa TOÀN BỘ dữ liệu (Yêu cầu, Thiết bị, Người dùng) để làm sạch hệ thống. Bạn sẽ bị đăng xuất và phải đăng ký lại từ đầu. Tiếp tục?")) {
+    if (confirm("CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu (Yêu cầu, Thiết bị, Người dùng). Hệ thống sẽ sạch hoàn toàn để bạn kiểm thử lại. Bạn sẽ bị đăng xuất. Tiếp tục?")) {
       setIsResetting(true);
       try {
         await resetSystem();
-        toast({ title: "Đã làm sạch hệ thống", description: "Vui lòng đăng ký tài khoản mới để bắt đầu." });
+        toast({ title: "Đã làm sạch hệ thống", description: "Vui lòng đăng ký lại tài khoản Admin để bắt đầu." });
         router.push('/');
       } catch (error) {
         toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu." });
@@ -119,7 +119,7 @@ export default function EquipmentCatalog() {
     return (
       <div className="text-center py-20">
         <h2 className="text-xl font-black text-rose-500 uppercase">Quyền truy cập bị từ chối</h2>
-        <p className="text-sm font-bold text-slate-400 mt-2">Chỉ Quản trị viên mới có thể truy cập trang này.</p>
+        <p className="text-sm font-bold text-slate-400 mt-2">Chỉ Quản trị viên mới có thể quản lý danh mục thiết bị gốc.</p>
       </div>
     );
   }
@@ -130,18 +130,18 @@ export default function EquipmentCatalog() {
         <div>
           <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
             <Package className="h-7 w-7 text-primary" />
-            Danh mục thiết bị
+            Quản lý danh mục thiết bị
           </h1>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Quản trị viên quản lý danh mục gốc</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò Admin: Thiết lập dữ liệu gốc cho hệ thống</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReset} className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 text-rose-500 border-rose-100 hover:bg-rose-50">
             {isResetting ? <Loader2 className="animate-spin" /> : <RefreshCcw className="h-5 w-5" />}
-            Xóa sạch hệ thống (Reset)
+            Reset toàn bộ hệ thống
           </Button>
           <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-blue-100">
             <Plus className="h-5 w-5" />
-            Thêm thiết bị mới
+            Thêm thiết bị
           </Button>
         </div>
       </div>
@@ -190,11 +190,10 @@ export default function EquipmentCatalog() {
       {filteredEquipment.length === 0 && (
         <div className="text-center py-32 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100">
            <Package className="h-20 w-20 text-slate-100 mx-auto mb-6" />
-           <p className="text-xs font-black text-slate-300 uppercase tracking-[0.2em]">Danh mục đang trống</p>
+           <p className="text-xs font-black text-slate-300 uppercase tracking-[0.2em]">Chưa có thiết bị nào trong danh mục</p>
         </div>
       )}
 
-      {/* Dialog Thêm/Sửa */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="rounded-[3rem] p-10 border-none shadow-2xl">
           <DialogHeader>
@@ -206,7 +205,7 @@ export default function EquipmentCatalog() {
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Tên thiết bị</Label>
               <Input 
-                placeholder="Nhập tên thiết bị..." 
+                placeholder="Nhập tên thiết bị (Ví dụ: Máy chiếu Panasonic)" 
                 className="h-14 rounded-2xl bg-slate-50 border-none font-bold"
                 value={formData.name}
                 onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -220,7 +219,7 @@ export default function EquipmentCatalog() {
                 onValueChange={val => setFormData(prev => ({ ...prev, category: val }))}
               >
                 <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold">
-                  <SelectValue placeholder="Chọn nhóm..." />
+                  <SelectValue placeholder="Chọn nhóm phân loại..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-none shadow-xl">
                   {categories.map(cat => (
@@ -231,7 +230,7 @@ export default function EquipmentCatalog() {
             </div>
             <DialogFooter className="pt-6">
               <Button type="submit" className="w-full bg-primary h-16 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-blue-100" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="animate-spin" /> : 'Xác nhận lưu'}
+                {isSubmitting ? <Loader2 className="animate-spin" /> : 'Lưu thông tin'}
               </Button>
             </DialogFooter>
           </form>
@@ -240,4 +239,3 @@ export default function EquipmentCatalog() {
     </div>
   );
 }
-
