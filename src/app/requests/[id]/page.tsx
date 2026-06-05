@@ -110,7 +110,10 @@ export default function RequestDetail() {
       </div>
 
       {/* Official Print View - Only shown on print */}
-      <div className="print-only p-8 space-y-8 bg-white text-black font-serif">
+      <div 
+        className="print-only p-8 space-y-8 bg-white text-black" 
+        style={{ fontFamily: "'Times New Roman', Times, serif" }}
+      >
         <div className="flex justify-between items-start pb-4">
           <div className="text-center space-y-0.5">
             <p className="text-[11px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
@@ -150,7 +153,7 @@ export default function RequestDetail() {
             <p className="font-normal italic text-[10px]">(Ký và ghi rõ họ tên)</p>
           </div>
           <div className="space-y-20">
-            <p>BỘ PHẬN KỸ THUẬT</p>
+            <p>PHÒNG CƠ SỞ VẬT CHẤT</p>
             <p className="font-normal italic text-[10px]">(Ký và ghi rõ họ tên)</p>
           </div>
           <div className="space-y-20">
