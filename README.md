@@ -4,50 +4,34 @@
 
 ## 🚀 Hướng dẫn chi tiết cách đưa App lên điện thoại (Deploy)
 
-Để ứng dụng chạy được trên điện thoại, bạn cần thực hiện 3 giai đoạn chính sau đây:
+### Giai đoạn 1: Đưa mã nguồn lên GitHub (Đã hoàn thành ✅)
+Bạn đã thực hiện xong việc đẩy code lên GitHub. Bây giờ code của bạn đã an toàn trên đám mây.
 
-### Giai đoạn 0: Tải mã nguồn về máy tính
-Trước khi thực hiện các bước bên dưới, bạn cần có mã nguồn này trên máy tính của mình:
-1. Tìm nút **Download Project** hoặc **Export** trên giao diện này để tải toàn bộ code về.
-2. Giải nén tệp tin vừa tải về vào một thư mục trên máy tính (ví dụ: ổ `D:\RepairApp`). Đây chính là **"Thư mục dự án"**.
+### Giai đoạn 2: Kết nối với Firebase App Hosting (Đang thực hiện 🕒)
+Đây là bước quan trọng để biến code trên GitHub thành một trang web có địa chỉ `https://...` để bạn có thể truy cập từ điện thoại.
 
-### Giai đoạn 1: Đưa mã nguồn lên GitHub (Lưu trữ code)
-Đây là bước đưa toàn bộ tệp tin của app từ máy tính của bạn lên trang web GitHub.
-
-1. **Tạo tài khoản GitHub**: Truy cập [github.com](https://github.com/) và đăng ký.
-2. **Tạo "Kho lưu trữ" (Repository) mới**:
-   - Nhấn nút **New** (màu xanh).
-   - **Repository name**: Đặt tên là `fixflow-due`.
-   - Chọn **Public**.
-   - Nhấn **Create repository**.
-3. **Đẩy code lên GitHub**:
-   - Mở thư mục dự án trên máy tính của bạn.
-   - Mở cửa sổ **Terminal** (hoặc Command Prompt/Git Bash) ngay tại thư mục đó.
-   - Chạy lần lượt các lệnh sau:
-     ```bash
-     git init
-     git add .
-     git commit -m "Phát hành bản đầu tiên"
-     git branch -M main
-     git remote add origin <Dán-đường-link-GitHub-của-bạn-vào-đây>
-     git push -u origin main
-     ```
-
-### Giai đoạn 2: Kết nối với Firebase App Hosting (Đưa app lên mạng)
-1. **Truy cập Firebase**: Vào [console.firebase.google.com](https://console.firebase.google.com/).
-2. **Tạo dự án**: Nhấn **Add project**, đặt tên và nhấn **Continue**.
+1. **Vào Firebase Console**: Truy cập [console.firebase.google.com](https://console.firebase.google.com/).
+2. **Tạo dự án**: Nhấn **Add project**, đặt tên (ví dụ: `fixflow-due`) và nhấn **Continue**.
 3. **Thiết lập App Hosting**:
-   - Menu trái: **Build** -> **App Hosting**.
-   - Nhấn **Get Started** -> Chọn **Connect to GitHub**.
-   - Chọn tài khoản GitHub và chọn đúng kho lưu trữ `fixflow-due`.
+   - Ở menu bên trái, tìm mục **Build** -> **App Hosting**.
+   - Nhấn **Get Started**.
+4. **Kết nối GitHub**:
+   - Firebase sẽ yêu cầu bạn kết nối với tài khoản GitHub.
+   - Sau khi kết nối, hãy chọn đúng kho lưu trữ (Repository) tên là `fixflow-due` mà bạn vừa tạo.
+5. **Cấu hình và Triển khai**:
+   - Giữ các cài đặt mặc định.
    - Nhấn **Finish and Deploy**.
-4. **Đợi hoàn tất**: Sau vài phút, Firebase sẽ cấp cho bạn một đường link (ví dụ: `https://fixflow-due.apphosting.app`).
+6. **Đợi hoàn tất**: Firebase sẽ mất khoảng 3-5 phút để xây dựng ứng dụng lần đầu. Khi xong, bạn sẽ thấy một đường link (ví dụ: `https://fixflow-due.apphosting.app`).
 
-### Giai đoạn 3: Cài đặt vào điện thoại (Biến web thành App)
-Mở điện thoại và truy cập vào đường link bạn nhận được ở Giai đoạn 2:
+### Giai đoạn 3: Cài đặt vào điện thoại (Bước cuối cùng 📱)
+Mở điện thoại của bạn, dùng trình duyệt để truy cập vào đường link bạn nhận được ở bước trên:
 
-- **Trên iPhone (Safari)**: Nhấn biểu tượng **Chia sẻ** (ô vuông mũi tên lên) -> Chọn **"Thêm vào màn hình chính"**.
-- **Trên Android (Chrome)**: Nhấn **3 chấm** -> Chọn **"Cài đặt ứng dụng"**.
+- **Trên iPhone (Safari)**: 
+  1. Nhấn biểu tượng **Chia sẻ** (hình ô vuông có mũi tên lên ở dưới cùng).
+  2. Cuộn xuống và chọn **"Thêm vào màn hình chính" (Add to Home Screen)**.
+- **Trên Android (Chrome)**: 
+  1. Nhấn vào dấu **3 chấm** ở góc trên bên phải.
+  2. Chọn **"Cài đặt ứng dụng"** hoặc **"Thêm vào màn hình chính"**.
 
 ---
 
