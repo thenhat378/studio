@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { name: 'Duyệt', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
     { name: 'Quản lý', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
-    { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['csvc_manager'] },
+    { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['admin'] },
   ];
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
@@ -130,7 +130,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div>
                       <p className="font-black text-lg">{currentUser.name}</p>
                       <p className="text-[10px] font-black text-primary uppercase">
-                        {currentUser.role === 'unit_leader' ? 'Lãnh đạo đơn vị' : currentUser.role === 'csvc_manager' ? 'Quản lý CSVC' : 'Nhân viên'}
+                        {currentUser.role === 'unit_leader' ? 'Lãnh đạo đơn vị' : 
+                         currentUser.role === 'csvc_manager' ? 'Quản lý CSVC' : 
+                         currentUser.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}
                       </p>
                     </div>
                   </div>

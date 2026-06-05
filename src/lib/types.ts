@@ -1,5 +1,5 @@
 
-export type UserRole = 'requester' | 'unit_leader' | 'csvc_manager' | 'technician';
+export type UserRole = 'requester' | 'unit_leader' | 'csvc_manager' | 'technician' | 'admin';
 
 export type RequestStatus = 
   | 'pending_approval' 

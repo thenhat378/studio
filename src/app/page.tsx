@@ -20,7 +20,8 @@ import {
   X,
   Info,
   Wrench,
-  ChevronRight
+  ChevronRight,
+  ShieldAlert
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -200,6 +201,7 @@ export default function Overview() {
       case 'unit_leader': return 'Lãnh đạo đơn vị';
       case 'csvc_manager': return 'Quản lý CSVC';
       case 'technician': return 'Nhân viên';
+      case 'admin': return 'Quản trị viên';
       default: return role;
     }
   };
@@ -358,6 +360,7 @@ export default function Overview() {
                         <SelectItem value="unit_leader">Lãnh đạo đơn vị</SelectItem>
                         <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
                         <SelectItem value="technician">Nhân viên (Kỹ thuật)</SelectItem>
+                        <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
