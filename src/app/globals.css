@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,15 +11,12 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    /* Màu Blue từ chữ E */
     --primary: 210 100% 33%;
     --primary-foreground: 210 40% 98%;
-    /* Màu Green từ chữ U */
     --secondary: 149 100% 33%;
     --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215 16% 47%;
-    /* Màu Orange từ chữ D */
     --accent: 28 92% 54%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
@@ -57,8 +55,21 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
+    -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
 }
 
 @media print {
@@ -71,18 +82,27 @@
   body {
     background: white !important;
   }
-  .max-w-4xl {
+  .max-w-4xl, .max-w-3xl, .max-w-5xl {
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
-  .shadow-sm {
+  .shadow-sm, .shadow-lg, .shadow-xl, .shadow-2xl {
     box-shadow: none !important;
-    border: 1px solid #eee !important;
+    border: 1px solid #ddd !important;
   }
 }
 
 .print-only {
   display: none;
+}
+
+/* Mobile optimizations */
+input, select, textarea {
+  @apply !text-base md:!text-sm; /* Prevent iOS auto-zoom */
+}
+
+.rounded-mobile {
+  @apply rounded-2xl md:rounded-3xl;
 }

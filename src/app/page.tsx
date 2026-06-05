@@ -75,7 +75,6 @@ export default function Overview() {
     
     setIsLoading(true);
     setTimeout(() => {
-      // Logic đăng nhập demo dựa trên username
       if (username === 'requester') login('requester');
       else if (username === 'leader') login('unit_leader');
       else if (username === 'manager') login('csvc_manager');
@@ -101,123 +100,93 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-[#F0F2F5]">
-        <div className="w-full max-w-[440px] space-y-8 animate-in fade-in zoom-in duration-700">
+        <div className="w-full max-w-[400px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-black tracking-tight text-[#0054A4] uppercase leading-tight drop-shadow-sm px-4">
-              Ứng dụng Quản lý sửa chữa
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#0054A4] uppercase leading-tight drop-shadow-sm px-4">
+              Quản lý sửa chữa DUE
             </h1>
           </div>
 
-          <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] bg-white overflow-hidden rounded-[2.5rem] relative">
+          <Card className="border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] bg-white overflow-hidden rounded-[2rem] relative">
             <div className="absolute top-0 left-0 w-full h-[6px] bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
-            <CardHeader className="text-center pt-10 pb-2">
-              <CardTitle className="text-2xl font-bold text-slate-800">Đăng nhập</CardTitle>
+            <CardHeader className="text-center pt-8 pb-2">
+              <CardTitle className="text-xl font-bold text-slate-800">Đăng nhập hệ thống</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 pt-6 px-10 pb-12">
-              <form onSubmit={handleLogin} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-sm font-semibold text-slate-600 ml-1">Tên đăng nhập</Label>
+            <CardContent className="space-y-5 pt-4 px-6 md:px-10 pb-10">
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="username" className="text-xs font-bold text-slate-600 ml-1">Tài khoản</Label>
                   <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-[#0054A4] transition-colors" />
                     <Input 
                       id="username" 
-                      placeholder="Nhập tên đăng nhập" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-base border-2 hover:border-slate-100 placeholder:text-slate-400"
+                      placeholder="requester, leader, manager, tech" 
+                      className="pl-12 h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-sm border-2 hover:border-slate-100"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-semibold text-slate-600 ml-1">Mật khẩu</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-xs font-bold text-slate-600 ml-1">Mật khẩu</Label>
                   <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-[#0054A4] transition-colors" />
                     <Input 
                       id="password" 
                       type="password" 
                       placeholder="••••••••" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-base border-2 hover:border-slate-100 placeholder:text-slate-400"
+                      className="pl-12 h-12 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#0054A4]/10 transition-all text-sm border-2 hover:border-slate-100"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  <div className="flex justify-between items-center pt-1">
+                  <div className="flex justify-between items-center pt-1 px-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="link" className="px-0 font-bold text-xs text-[#0054A4]/60 h-auto py-0 hover:text-[#0054A4] transition-colors flex items-center gap-1">
-                          <Smartphone className="h-3 w-3" /> Cài đặt App
+                        <Button variant="link" className="px-0 font-bold text-[10px] text-[#0054A4]/60 h-auto py-0 hover:text-[#0054A4]">
+                          <Smartphone className="h-3 w-3 mr-1" /> Cài đặt App
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="rounded-[2rem] border-none shadow-2xl max-w-sm">
+                      <DialogContent className="rounded-3xl border-none shadow-2xl max-w-[90vw] mx-auto">
                         <DialogHeader>
-                          <DialogTitle className="text-xl font-black text-[#0054A4] flex items-center gap-2">
-                            <Smartphone className="h-6 w-6" /> Cài đặt ứng dụng
+                          <DialogTitle className="text-lg font-black text-[#0054A4] flex items-center gap-2">
+                            <Smartphone className="h-5 w-5" /> Cài đặt ứng dụng
                           </DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-6 py-4">
-                          <div className="space-y-3">
+                        <div className="space-y-4 py-2">
+                          <div className="space-y-2">
                             <p className="text-sm font-bold flex items-center gap-2 text-slate-700">
-                              <Apple className="h-4 w-4" /> Trên iPhone (Safari):
+                              <Apple className="h-4 w-4" /> iPhone (Safari):
                             </p>
-                            <ol className="text-xs space-y-2 text-slate-500 list-decimal pl-4 font-medium">
-                              <li>Nhấn biểu tượng <b>Chia sẻ</b> (ô vuông mũi tên lên).</li>
+                            <ol className="text-xs space-y-1 text-slate-500 list-decimal pl-4">
+                              <li>Bấm biểu tượng <b>Chia sẻ</b> ở dưới cùng.</li>
                               <li>Chọn <b>"Thêm vào màn hình chính"</b>.</li>
-                              <li>Nhấn <b>"Thêm"</b> để hoàn tất.</li>
                             </ol>
                           </div>
-                          <div className="space-y-3">
+                          <div className="space-y-2">
                             <p className="text-sm font-bold flex items-center gap-2 text-slate-700">
-                              <Smartphone className="h-4 w-4" /> Trên Android (Chrome):
+                              <Smartphone className="h-4 w-4" /> Android (Chrome):
                             </p>
-                            <ol className="text-xs space-y-2 text-slate-500 list-decimal pl-4 font-medium">
-                              <li>Nhấn dấu <b>3 chấm</b> ở góc trên bên phải.</li>
-                              <li>Chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào MH chính"</b>.</li>
+                            <ol className="text-xs space-y-1 text-slate-500 list-decimal pl-4">
+                              <li>Bấm dấu <b>3 chấm</b> ở góc trên.</li>
+                              <li>Chọn <b>"Cài đặt ứng dụng"</b>.</li>
                             </ol>
                           </div>
                         </div>
                       </DialogContent>
                     </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="link" className="px-0 font-bold text-xs text-[#0054A4] h-auto py-0 hover:text-[#F58220] transition-colors">
-                          Quên mật khẩu?
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="rounded-[2rem] border-none shadow-2xl">
-                        <DialogHeader>
-                          <DialogTitle className="text-xl font-black text-[#0054A4]">Khôi phục mật khẩu</DialogTitle>
-                          <DialogDescription className="font-medium">
-                            Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-6 space-y-3">
-                          <Label htmlFor="reset-email" className="text-xs font-bold text-slate-500">Email công tác</Label>
-                          <div className="relative mt-2">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                            <Input id="reset-email" placeholder="email@due.udn.vn" className="pl-12 h-14 rounded-2xl bg-slate-50" />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button className="w-full h-14 font-black rounded-2xl bg-[#0054A4] shadow-lg shadow-[#0054A4]/20 uppercase tracking-widest" onClick={() => toast({ title: "Đã gửi yêu cầu", description: "Vui lòng kiểm tra email của bạn." })}>
-                            Gửi mã khôi phục
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <Button variant="link" className="px-0 font-bold text-[10px] text-[#0054A4] h-auto py-0">Quên mật khẩu?</Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-[#0054A4] hover:bg-[#003d7a] transition-all uppercase tracking-[0.15em] text-sm shadow-xl shadow-[#0054A4]/20" disabled={isLoading}>
-                  {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
+                <Button type="submit" className="w-full h-12 font-black rounded-xl bg-[#0054A4] hover:bg-[#003d7a] transition-all uppercase tracking-widest text-xs shadow-lg shadow-[#0054A4]/20" disabled={isLoading}>
+                  {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                 </Button>
               </form>
             </CardContent>
           </Card>
           
-          <div className="text-center mt-auto py-4">
-            <p className="text-[10px] font-bold text-slate-400 tracking-[0.05em] leading-relaxed max-w-[300px] mx-auto opacity-70">
-              © 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất
-            </p>
+          <div className="text-center opacity-50">
+            <p className="text-[10px] font-bold text-slate-400">© 2026 Quản lý sửa chữa DUE • v1.0</p>
           </div>
         </div>
       </div>
@@ -232,13 +201,13 @@ export default function Overview() {
   });
 
   const stats = [
-    { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-[#0054A4]', bg: 'bg-[#0054A4]/10' },
+    { label: 'Tổng số', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-[#0054A4]', bg: 'bg-[#0054A4]/10' },
     { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-[#F58220]', bg: 'bg-[#F58220]/10' },
-    { label: 'Chờ phê duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-[#00A651]', bg: 'bg-[#00A651]/10' },
+    { label: 'Chờ duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: 'Xong', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-[#00A651]', bg: 'bg-[#00A651]/10' },
   ];
 
-  const recentRequests = roleFilteredRequests.slice(0, 6);
+  const recentRequests = roleFilteredRequests.slice(0, 5);
 
   const technicians = users.filter(u => u.role === 'technician');
   const techPerformance = technicians.map(tech => {
@@ -246,127 +215,69 @@ export default function Overview() {
     const completedCount = techReqs.filter(r => r.status === 'closed').length;
     const inProgressCount = techReqs.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length;
     const ratings = techReqs.filter(r => r.rating !== undefined).map(r => r.rating as number);
-    const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : 'N/A';
+    const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0';
 
-    return {
-      id: tech.id,
-      name: tech.name,
-      completed: completedCount,
-      inProgress: inProgressCount,
-      avgRating,
-      total: techReqs.length
-    };
+    return { id: tech.id, name: tech.name, completed: completedCount, inProgress: inProgressCount, avgRating, total: techReqs.length };
   });
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'pending_approval': return <Badge variant="outline" className="border-rose-200 text-rose-600 bg-rose-50">Chờ duyệt</Badge>;
-      case 'approved': return <Badge variant="outline" className="border-[#0054A4]/20 text-[#0054A4] bg-[#0054A4]/5">Đã duyệt</Badge>;
-      case 'assigned': return <Badge variant="outline" className="border-[#0054A4]/20 text-[#0054A4] bg-[#0054A4]/5">Đã phân công</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="border-[#F58220]/20 text-[#F58220] bg-[#F58220]/5">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="border-[#00A651]/20 text-[#00A651] bg-[#00A651]/5">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-[#00A651]/20 text-[#00A651] bg-[#00A651]/5">Đã duyệt hoàn thành</Badge>;
-      case 'closed': return <Badge variant="outline" className="border-[#00A651]/30 text-[#00A651] bg-[#00A651]/10">Đã đóng</Badge>;
-      case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
-      default: return <Badge variant="outline">{status}</Badge>;
+      case 'pending_approval': return <Badge variant="outline" className="text-rose-600 bg-rose-50 text-[10px]">Chờ duyệt</Badge>;
+      case 'closed': return <Badge variant="outline" className="text-[#00A651] bg-[#00A651]/10 text-[10px]">Đã đóng</Badge>;
+      default: return <Badge variant="outline" className="text-slate-500 text-[10px]">Đang xử lý</Badge>;
     }
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#0054A4]">Chào buổi sáng, {currentUser.name}!</h1>
-          <p className="text-muted-foreground mt-2 text-lg font-medium">
-            Vai trò: <span className="font-bold text-foreground uppercase tracking-wider">{currentUser.role.replace('_', ' ')}</span>
-            {currentUser.unit && <span className="mx-2 opacity-30">|</span>}
-            {currentUser.unit && <span className="text-slate-500 font-bold">Đơn vị: {currentUser.unit}</span>}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {currentUser.role === 'requester' && (
-             <Link href="/requests/new">
-              <Button size="lg" className="bg-[#0054A4] shadow-lg shadow-[#0054A4]/20 gap-2 font-bold rounded-xl h-14 px-8">
-                <ClipboardList className="h-5 w-5" /> Tạo yêu cầu mới
-              </Button>
-             </Link>
-          )}
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-xl md:text-2xl font-black text-[#0054A4]">Chào, {currentUser.name}!</h1>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <Badge className="bg-primary hover:bg-primary px-2 py-0.5 rounded-md text-[10px]">{currentUser.role.replace('_', ' ')}</Badge>
+          {currentUser.unit && <span className="text-slate-400">Đơn vị: {currentUser.unit}</span>}
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats - 2 columns on mobile */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {stats.map((stat) => (
-          <Card key={stat.label} className="border-none shadow-sm hover:shadow-md transition-all duration-300 rounded-3xl group overflow-hidden bg-white">
-            <CardContent className="p-7">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.label}</p>
-                  <p className="text-3xl font-black text-slate-800">{stat.value}</p>
-                </div>
-                <div className={cn("p-4 rounded-2xl transition-transform group-hover:scale-110", stat.bg)}>
-                  <stat.icon className={cn("h-7 w-7", stat.color)} />
-                </div>
+          <Card key={stat.label} className="border-none shadow-sm rounded-2xl bg-white">
+            <CardContent className="p-4 md:p-6 flex flex-col items-center text-center">
+              <div className={cn("p-2 md:p-3 rounded-xl mb-2", stat.bg)}>
+                <stat.icon className={cn("h-5 w-5 md:h-6 md:w-6", stat.color)} />
               </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+              <p className="text-xl md:text-2xl font-black text-slate-800">{stat.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {currentUser.role === 'csvc_manager' && (
-        <Card className="border-none shadow-xl overflow-hidden rounded-[2.5rem] border-t-4 border-t-[#F58220]">
-          <CardHeader className="flex flex-row items-center justify-between bg-white/50 backdrop-blur-sm px-8 py-7">
-            <div>
-              <CardTitle className="text-2xl flex items-center gap-3 font-black tracking-tight text-[#0054A4]">
-                <BarChart3 className="h-7 w-7 text-[#F58220]" />
-                Hiệu suất xử lý công việc
-              </CardTitle>
-              <CardDescription className="font-bold text-slate-400 uppercase tracking-widest text-[11px] mt-1">Cơ sở đánh giá năng suất và chất lượng phục vụ</CardDescription>
-            </div>
-            <div className="p-4 bg-[#F58220]/10 rounded-2xl shadow-inner">
-               <Users className="h-7 w-7 text-[#F58220]" />
-            </div>
+        <Card className="border-none shadow-sm rounded-2xl overflow-hidden border-t-4 border-t-[#F58220]">
+          <CardHeader className="px-6 py-4">
+            <CardTitle className="text-base md:text-lg flex items-center gap-2 font-black text-[#0054A4]">
+              <BarChart3 className="h-5 w-5 text-[#F58220]" />
+              Hiệu suất kỹ thuật
+            </CardTitle>
           </CardHeader>
-          <CardContent className="p-0 border-t">
+          <CardContent className="p-0 overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50/50">
-                  <TableHead className="font-black uppercase text-[10px] tracking-[0.2em] px-8 h-14">Kỹ thuật viên</TableHead>
-                  <TableHead className="text-center font-black uppercase text-[10px] tracking-[0.2em]">Đang xử lý</TableHead>
-                  <TableHead className="text-center font-black uppercase text-[10px] tracking-[0.2em]">Đã hoàn thành</TableHead>
-                  <TableHead className="text-center font-black uppercase text-[10px] tracking-[0.2em]">Đánh giá (Sao)</TableHead>
-                  <TableHead className="text-right font-black uppercase text-[10px] tracking-[0.2em] px-8">Tỷ lệ</TableHead>
+              <TableHeader className="bg-slate-50">
+                <TableRow>
+                  <TableHead className="text-[10px] font-black uppercase px-6">Tên</TableHead>
+                  <TableHead className="text-center text-[10px] font-black uppercase">Xong</TableHead>
+                  <TableHead className="text-center text-[10px] font-black uppercase">Sao</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {techPerformance.map((tech) => (
-                  <TableRow key={tech.id} className="hover:bg-[#0054A4]/[0.02] transition-colors border-b-slate-50">
-                    <TableCell className="font-bold flex items-center gap-4 px-8 py-6">
-                      <div className="h-11 w-11 rounded-2xl bg-[#0054A4]/10 flex items-center justify-center text-[#0054A4] font-black text-base shadow-sm">
-                        {tech.name.charAt(0)}
-                      </div>
-                      <span className="text-slate-700 font-bold">{tech.name}</span>
-                    </TableCell>
+                  <TableRow key={tech.id} className="text-xs">
+                    <TableCell className="font-bold px-6">{tech.name}</TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-[#F58220]/10 text-[#F58220] hover:bg-[#F58220]/20 font-black px-4 py-1.5 rounded-lg border-none">
-                        {tech.inProgress} phiếu
-                      </Badge>
+                      <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-none font-bold">{tech.completed}</Badge>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-[#00A651]/10 text-[#00A651] hover:bg-[#00A651]/20 font-black px-4 py-1.5 rounded-lg border-none">
-                        {tech.completed} phiếu
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-2 font-black text-amber-500 bg-amber-50 w-fit mx-auto px-4 py-1.5 rounded-xl border border-amber-100/50 shadow-sm">
-                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                        {tech.avgRating}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right px-8">
-                      <span className="text-xl font-black text-[#0054A4]">
-                        {tech.total > 0 ? Math.round((tech.completed / tech.total) * 100) : 0}%
-                      </span>
-                    </TableCell>
+                    <TableCell className="text-center font-black text-amber-500">{tech.avgRating} ★</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -375,56 +286,52 @@ export default function Overview() {
         </Card>
       )}
 
-      <Card className="border-none shadow-sm overflow-hidden rounded-[2.5rem] bg-white">
-        <CardHeader className="flex flex-row items-center justify-between border-b bg-white/50 px-8 py-6">
-          <div>
-            <CardTitle className="text-2xl font-black text-[#0054A4] tracking-tight">Cập nhật mới nhất</CardTitle>
-            <CardDescription className="font-bold text-slate-400 uppercase tracking-widest text-[11px] mt-1">Các hoạt động sửa chữa liên quan đến bạn</CardDescription>
-          </div>
+      <Card className="border-none shadow-sm rounded-2xl bg-white overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-4">
+          <CardTitle className="text-base md:text-lg font-black text-[#0054A4]">Yêu cầu gần đây</CardTitle>
           <Link href="/requests">
-            <Button variant="ghost" className="text-[#0054A4] font-black text-xs gap-2 hover:bg-[#0054A4]/5 uppercase tracking-[0.2em]">
-              Xem toàn bộ <ChevronRight className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="sm" className="text-[10px] font-bold text-[#0054A4] uppercase">Tất cả <ChevronRight className="h-3 w-3 ml-1" /></Button>
           </Link>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-slate-50">
             {recentRequests.map((req) => (
               <Link key={req.id} href={`/requests/${req.id}`}>
-                <div className="flex items-center justify-between p-7 hover:bg-[#0054A4]/[0.02] transition-all cursor-pointer group">
-                  <div className="flex gap-6 items-center min-w-0">
-                    <div className="h-16 w-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-white group-hover:shadow-lg transition-all border border-slate-100">
-                      <HardDrive className="h-8 w-8 text-[#0054A4]/30 group-hover:text-[#0054A4] transition-colors" />
+                <div className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3">
+                  <div className="flex gap-3 items-center min-w-0">
+                    <div className="h-10 w-10 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                      <HardDrive className="h-5 w-5 text-[#0054A4]/50" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-black text-xl truncate text-slate-700 group-hover:text-[#0054A4] transition-colors tracking-tight">{req.title}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2 font-black uppercase tracking-[0.15em]">
-                        <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] px-3 py-1 rounded-lg border-none">{req.equipmentName}</Badge>
-                        <span className="opacity-30">|</span>
-                        <span className="truncate">{req.unit}</span>
-                      </div>
+                      <p className="font-bold text-sm truncate text-slate-800">{req.title}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{req.unit} • {req.equipmentName}</p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0 flex flex-col items-end gap-3 ml-6">
+                  <div className="shrink-0 flex flex-col items-end gap-1">
                     {getStatusBadge(req.status)}
-                    <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.25em]">
-                      {new Date(req.createdAt).toLocaleDateString('vi-VN')}
-                    </p>
+                    <p className="text-[9px] font-bold text-slate-300">{new Date(req.createdAt).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
               </Link>
             ))}
             {recentRequests.length === 0 && (
-              <div className="text-center py-24">
-                <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                  <ClipboardList className="h-10 w-10 text-slate-200" />
-                </div>
-                <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">Không có dữ liệu yêu cầu</p>
+              <div className="text-center py-10">
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">Không có dữ liệu</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
+
+      {currentUser.role === 'requester' && (
+        <div className="fixed bottom-6 right-6 z-40 md:hidden">
+          <Link href="/requests/new">
+            <Button size="icon" className="h-14 w-14 rounded-full bg-[#0054A4] shadow-2xl shadow-[#0054A4]/50">
+              <PlusCircle className="h-7 w-7" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
