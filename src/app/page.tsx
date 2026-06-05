@@ -22,7 +22,9 @@ import {
   BarChart3,
   ArrowUpRight,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Phone,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -30,56 +32,80 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { useFirebase } from '@/firebase';
+import { RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
 
 export default function Overview() {
   const { 
     currentUser, 
     loginAsTestAccount,
-    register, 
+    sendOtp,
+    verifyOtp,
     requests, 
     users, 
     isInitialized 
   } = useAppStore();
   
+  const { auth } = useFirebase();
   const { toast } = useToast();
   
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [authMethod, setAuthMethod] = useState<'phone' | 'test'>('phone');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otp, setOtp] = useState('');
   const [fullName, setFullName] = useState('');
   const [unit, setUnit] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
+
+  useEffect(() => {
+    if (auth && !recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+      setRecaptchaVerifier(verifier);
+    }
+  }, [auth, recaptchaVerifier]);
 
   if (!isInitialized) return null;
 
-  const handleSimpleAuth = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    if (!phoneNumber || !recaptchaVerifier) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập số điện thoại (định dạng +84...)" });
+      return;
+    }
     
+    setIsLoading(true);
     try {
-      if (authMode === 'register') {
-        if (!fullName || !unit || !email) {
-          toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Họ tên, Đơn vị và Email." });
-          setIsLoading(false);
-          return;
-        }
-        await register(email, password || '123456', fullName, unit);
-        toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
-      } else {
-        // Đăng nhập đơn giản hóa - ưu tiên tìm trong list users hiện có
-        const existingUser = users.find(u => u.email === email);
-        if (existingUser) {
-          loginAsTestAccount(existingUser.role, existingUser);
-          toast({ title: "Đăng nhập thành công" });
-        } else {
-          toast({ variant: "destructive", title: "Thông báo", description: "Không tìm thấy tài khoản. Vui lòng dùng nút Đăng nhập nhanh bên dưới." });
-        }
-      }
-    } catch (error) {
-      toast({ variant: "destructive", title: "Thông báo", description: "Đã có lỗi xảy ra. Vui lòng sử dụng Đăng nhập nhanh." });
+      const formattedPhone = phoneNumber.startsWith('0') ? `+84${phoneNumber.slice(1)}` : phoneNumber;
+      const result = await sendOtp(formattedPhone, recaptchaVerifier);
+      setConfirmationResult(result);
+      setShowOtpInput(true);
+      toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn điện thoại." });
+    } catch (error: any) {
+      console.error(error);
+      toast({ variant: "destructive", title: "Lỗi gửi mã", description: error.message || "Không thể gửi OTP lúc này." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || !confirmationResult) return;
+
+    setIsLoading(true);
+    try {
+      await verifyOtp(confirmationResult, otp, { name: fullName, unit });
+      toast({ title: "Đăng nhập thành công", description: "Chào mừng bạn quay trở lại!" });
+    } catch (error: any) {
+      console.error(error);
+      toast({ variant: "destructive", title: "Lỗi xác thực", description: error.message || "Mã OTP không chính xác hoặc đã hết hạn." });
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +114,7 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
+        <div id="recaptcha-container"></div>
         <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-4">
              <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-4">
@@ -101,62 +128,80 @@ export default function Overview() {
           <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-xl font-black text-slate-800">
-                {authMode === 'login' ? 'Đăng nhập hệ thống' : 'Đăng ký tài khoản'}
+                {showOtpInput ? 'Xác thực mã OTP' : 'Đăng nhập điện thoại'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <form onSubmit={handleSimpleAuth} className="space-y-4">
-                {authMode === 'register' && (
-                  <>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên</Label>
+              {!showOtpInput ? (
+                <form onSubmit={handleSendOtp} className="space-y-4">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Số điện thoại</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input 
-                        placeholder="Nguyễn Văn A" 
-                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="+84 9xx xxx xxx" 
+                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm pl-11"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                       />
                     </div>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị</Label>
-                      <Input 
-                        placeholder="Phòng Hành chính" 
-                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
-                        value={unit}
-                        onChange={(e) => setUnit(e.target.value)}
-                      />
-                    </div>
-                  </>
-                )}
+                  </div>
 
-                <div className="space-y-1">
-                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Email</Label>
-                  <Input 
-                    placeholder="example@due.edu.vn" 
-                    className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên (Dành cho user mới)</Label>
+                    <Input 
+                      placeholder="Nguyễn Văn A" 
+                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                    />
+                  </div>
 
-                <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
-                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Vào hệ thống" : "Tạo tài khoản")}
-                </Button>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị (Dành cho user mới)</Label>
+                    <Input 
+                      placeholder="Khoa Quản trị" 
+                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                    />
+                  </div>
 
-                <div className="text-center">
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto text-[10px] font-black text-primary uppercase"
-                    onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-                  >
-                    {authMode === 'login' ? 'Hoặc Đăng ký tài khoản mới' : 'Đã có tài khoản? Đăng nhập'}
+                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
+                    {isLoading ? "Đang gửi..." : "Gửi mã xác nhận"}
                   </Button>
-                </div>
-              </form>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Nhập mã 6 số</Label>
+                    <Input 
+                      placeholder="123456" 
+                      className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm text-center tracking-[1rem]"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      maxLength={6}
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full h-12 font-black rounded-xl bg-emerald-600 uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
+                    {isLoading ? "Đang xác thực..." : "Xác nhận & Đăng nhập"}
+                  </Button>
+
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="w-full text-[10px] font-black uppercase text-slate-400"
+                    onClick={() => setShowOtpInput(false)}
+                  >
+                    Quay lại nhập số điện thoại
+                  </Button>
+                </form>
+              )}
 
               <div className="relative flex items-center gap-4 py-2">
                 <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Đăng nhập nhanh</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc dùng thử</span>
                 <div className="h-px bg-slate-100 flex-1"></div>
               </div>
 
@@ -181,7 +226,7 @@ export default function Overview() {
     );
   }
 
-  // Dashboard View (giữ nguyên logic cũ)
+  // Dashboard View
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;

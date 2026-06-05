@@ -19,6 +19,7 @@ export interface User {
   role: UserRole;
   unit?: string;
   email?: string;
+  phoneNumber?: string;
 }
 
 export interface Equipment {

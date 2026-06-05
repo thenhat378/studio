@@ -9,6 +9,9 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  ConfirmationResult
 } from 'firebase/auth';
 import { 
   doc, 
@@ -27,6 +30,8 @@ interface AppContextType {
   login: (email: string, pass: string) => Promise<void>;
   loginAsTestAccount: (role: UserRole, customUser?: User) => void;
   register: (email: string, pass: string, name: string, unit: string) => Promise<void>;
+  sendOtp: (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => Promise<ConfirmationResult>;
+  verifyOtp: (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => Promise<void>;
   logout: () => Promise<void>;
   requests: RepairRequest[];
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
@@ -55,7 +60,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Ưu tiên LocalStorage để giữ phiên làm việc khi Firebase Auth bị lỗi dịch vụ
     const storedUser = localStorage.getItem('app_user_session');
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
@@ -74,9 +78,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const userData = userDoc.data() as User;
             setCurrentUser(userData);
             localStorage.setItem('app_user_session', JSON.stringify(userData));
+          } else {
+            // Trường hợp user có trong Auth nhưng chưa có trong Firestore (đang đăng ký bằng phone)
+            // Không set currentUser ngay để tránh lỗi thiếu thông tin name/unit
           }
         } catch (e) {
           console.error("Firestore user load error:", e);
+        }
+      } else {
+        // Clear session if not logged in via Firebase
+        if (!localStorage.getItem('is_test_mode')) {
+           setCurrentUser(null);
+           localStorage.removeItem('app_user_session');
         }
       }
       setIsInitialized(true);
@@ -106,6 +119,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, pass: string) => {
     if (!auth) throw new Error("Auth service unavailable");
+    localStorage.removeItem('is_test_mode');
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
@@ -118,33 +132,53 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     const user = customUser || testUsers[role];
     setCurrentUser(user);
+    localStorage.setItem('is_test_mode', 'true');
     localStorage.setItem('app_user_session', JSON.stringify(user));
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    const userId = 'user-' + Math.random().toString(36).substr(2, 9);
-    const newUser: User = { id: userId, name, role: 'requester', unit, email };
-    
-    // Thử tạo bằng Auth nếu được, nếu không thì lưu thẳng vào Firestore
-    if (auth && db) {
-      try {
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        const finalUser = { ...newUser, id: res.user.uid };
-        await setDoc(doc(db, 'users', res.user.uid), finalUser);
-        setCurrentUser(finalUser);
-        localStorage.setItem('app_user_session', JSON.stringify(finalUser));
-        return;
-      } catch (e) {
-        console.warn("Auth Registration failed, falling back to direct Firestore:", e);
-      }
-    }
-
-    // Fallback: Lưu trực tiếp vào Firestore (nếu Rules cho phép) hoặc ít nhất là LocalStorage
-    if (db) {
-      await setDoc(doc(db, 'users', userId), newUser);
-    }
+    if (!auth || !db) throw new Error("Firebase not initialized");
+    localStorage.removeItem('is_test_mode');
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    const newUser: User = { id: res.user.uid, name, role: 'requester', unit, email };
+    await setDoc(doc(db, 'users', res.user.uid), newUser);
     setCurrentUser(newUser);
     localStorage.setItem('app_user_session', JSON.stringify(newUser));
+  };
+
+  const sendOtp = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
+    if (!auth) throw new Error("Auth service unavailable");
+    return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+  };
+
+  const verifyOtp = async (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => {
+    if (!db) throw new Error("Firestore not initialized");
+    const result = await confirmationResult.confirm(otp);
+    const user = result.user;
+    
+    // Kiểm tra xem user đã tồn tại trong Firestore chưa
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    
+    if (userDoc.exists()) {
+      const existingUser = userDoc.data() as User;
+      setCurrentUser(existingUser);
+      localStorage.setItem('app_user_session', JSON.stringify(existingUser));
+    } else if (userData) {
+      // Nếu là user mới đăng ký bằng phone
+      const newUser: User = { 
+        id: user.uid, 
+        name: userData.name, 
+        unit: userData.unit, 
+        role: 'requester', 
+        phoneNumber: user.phoneNumber || '' 
+      };
+      await setDoc(doc(db, 'users', user.uid), newUser);
+      setCurrentUser(newUser);
+      localStorage.setItem('app_user_session', JSON.stringify(newUser));
+    } else {
+      throw new Error("Vui lòng nhập đầy đủ thông tin Họ tên và Đơn vị để hoàn tất đăng ký.");
+    }
+    localStorage.removeItem('is_test_mode');
   };
 
   const logout = async () => {
@@ -152,6 +186,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       try { await signOut(auth); } catch(e) {}
     }
     setCurrentUser(null);
+    localStorage.removeItem('is_test_mode');
     localStorage.removeItem('app_user_session');
   };
 
@@ -178,6 +213,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       login,
       loginAsTestAccount,
       register,
+      sendOtp,
+      verifyOtp,
       logout,
       requests,
       addRequest,
