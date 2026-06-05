@@ -1,0 +1,48 @@
+
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Thông tin người dùng trong hệ thống",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["requester", "unit_leader", "csvc_manager", "technician"] },
+        "unit": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "password": { "type": "string" }
+      },
+      "required": ["id", "name", "role", "phoneNumber"]
+    },
+    "RepairRequest": {
+      "title": "Repair Request",
+      "description": "Phiếu yêu cầu sửa chữa thiết bị",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "equipmentId": { "type": "string" },
+        "equipmentName": { "type": "string" },
+        "status": { "type": "string" },
+        "requesterId": { "type": "string" },
+        "unit": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Lưu trữ thông tin người dùng"
+    },
+    "/requests/{requestId}": {
+      "schema": "RepairRequest",
+      "description": "Lưu trữ các phiếu yêu cầu sửa chữa"
+    }
+  }
+}
