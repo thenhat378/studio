@@ -44,10 +44,10 @@ export default function UserManagementPage() {
   const getRoleLabel = (role: string) => {
     switch(role) {
       case 'admin': return 'Quản trị viên';
-      case 'csvc_manager': return 'Quản lý CSVC';
-      case 'unit_leader': return 'Lãnh đạo đơn vị';
-      case 'technician': return 'Kỹ thuật viên';
-      case 'requester': return 'Nhân viên';
+      case 'csvc_manager': return 'Phó Trưởng phòng CSVC';
+      case 'unit_leader': return 'Phó Trưởng đơn vị';
+      case 'technician': return 'Nhân viên kỹ thuật';
+      case 'requester': return 'Nhân viên / Giảng viên';
       default: return role;
     }
   };

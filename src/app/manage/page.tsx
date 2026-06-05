@@ -53,7 +53,7 @@ export default function ManagementPage() {
       toast({
         variant: "destructive",
         title: "Thông báo",
-        description: "Vui lòng chọn nhân viên trước khi giao việc."
+        description: "Vui lòng chọn nhân viên kỹ thuật trước khi giao việc."
       });
       return;
     }
@@ -68,7 +68,7 @@ export default function ManagementPage() {
 
     toast({
       title: "Đã phân công",
-      description: `Phiếu đã được giao cho nhân viên: ${tech.name}`
+      description: `Phiếu đã được giao cho kỹ thuật viên: ${tech.name}`
     });
     
     const newSelections = { ...selectedTechs };
@@ -80,7 +80,7 @@ export default function ManagementPage() {
     updateRequestStatus(id, 'verified', { csvcManagerApproved: true });
     toast({
       title: "Đã duyệt hoàn thành kỹ thuật",
-      description: "Yêu cầu đã được chuyển cho đơn vị sử dụng để nghiệm thu cuối cùng."
+      description: "Yêu cầu đã được chuyển cho đơn vị sử dụng để nghiệm thu."
     });
   };
 
@@ -103,9 +103,9 @@ export default function ManagementPage() {
         <div>
           <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
             <ClipboardList className="h-7 w-7 text-primary" />
-            Điều phối & Quản lý
+            Điều phối & Quản lý CSVC
           </h1>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Hệ thống giám sát thực hiện và đánh giá nhân sự</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Phó Trưởng phòng CSVC giám sát thực hiện và điều phối</p>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export default function ManagementPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="verify" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Duyệt hoàn thành
+            Duyệt kỹ thuật
             {pendingVerification.length > 0 && (
               <Badge className="bg-cyan-500 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[9px] border-none text-white">
                 {pendingVerification.length}
@@ -154,7 +154,7 @@ export default function ManagementPage() {
                       onValueChange={(val) => setSelectedTechs(prev => ({ ...prev, [req.id]: val }))}
                     >
                       <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs">
-                        <SelectValue placeholder="Chọn nhân viên..." />
+                        <SelectValue placeholder="Chọn kỹ thuật viên..." />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-none shadow-2xl">
                         {technicians.map(t => (
@@ -188,7 +188,7 @@ export default function ManagementPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200 text-[9px] font-black uppercase">Nhân viên báo xong</Badge>
+                    <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200 text-[9px] font-black uppercase">Kỹ thuật báo xong</Badge>
                   </div>
                   <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
                     <p>Thực hiện: <span className="text-slate-800">{req.technicianName}</span></p>
@@ -206,7 +206,7 @@ export default function ManagementPage() {
                     className="bg-emerald-600 hover:bg-emerald-700 h-12 rounded-xl text-white font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none shadow-lg shadow-emerald-100"
                     onClick={() => handleVerify(req.id)}
                   >
-                    <ShieldCheck className="h-4 w-4" /> Duyệt hoàn thành
+                    <ShieldCheck className="h-4 w-4" /> Duyệt kỹ thuật
                   </Button>
                 </div>
               </CardContent>
@@ -214,7 +214,7 @@ export default function ManagementPage() {
           ))}
           {pendingVerification.length === 0 && (
             <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ duyệt hoàn thành</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ duyệt kỹ thuật</p>
             </div>
           )}
         </TabsContent>
@@ -236,7 +236,7 @@ export default function ManagementPage() {
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nhân viên thực hiện</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kỹ thuật thực hiện</p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
                              <User className="h-3.5 w-3.5 text-primary" /> {req.technicianName}
                           </div>
@@ -252,7 +252,7 @@ export default function ManagementPage() {
                           <div className="text-[11px] font-bold text-slate-700">{req.unit}</div>
                        </div>
                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đánh giá hài lòng</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đánh giá</p>
                           <Badge className={cn(
                             "text-[9px] font-black uppercase px-2 py-0.5 border-none",
                             (req.rating || 0) >= 4 ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
@@ -275,7 +275,7 @@ export default function ManagementPage() {
           {historyRequests.length === 0 && (
             <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
               <History className="h-16 w-16 text-slate-100 mx-auto mb-6" />
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có dữ liệu lịch sử đánh giá</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có dữ liệu lịch sử</p>
             </div>
           )}
         </TabsContent>

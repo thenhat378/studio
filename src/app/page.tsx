@@ -198,9 +198,9 @@ export default function Overview() {
   const getRoleLabel = (role: UserRole) => {
     switch(role) {
       case 'requester': return 'Nhân viên';
-      case 'unit_leader': return 'Lãnh đạo đơn vị';
-      case 'csvc_manager': return 'Quản lý CSVC';
-      case 'technician': return 'Nhân viên';
+      case 'unit_leader': return 'Phó Trưởng đơn vị';
+      case 'csvc_manager': return 'Phó Trưởng phòng CSVC';
+      case 'technician': return 'Nhân viên kỹ thuật';
       case 'admin': return 'Quản trị viên';
       default: return role;
     }
@@ -339,9 +339,9 @@ export default function Overview() {
                   )}
 
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Đơn vị / Khoa</Label>
+                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Đơn vị / Khoa / Phòng</Label>
                     <Input 
-                      placeholder="Phòng QLCL, Khoa CNTT..." 
+                      placeholder="Phòng CSVC, Khoa CNTT..." 
                       className="h-14 rounded-2xl bg-white/50 border-white/50 focus:bg-white/80 transition-all font-bold text-slate-700"
                       value={regData.unit}
                       onChange={e => setRegData(prev => ({...prev, unit: e.target.value}))}
@@ -350,16 +350,16 @@ export default function Overview() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Vai trò</Label>
+                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Vai trò / Chức danh</Label>
                     <Select value={regData.role} onValueChange={(val: any) => setRegData(prev => ({...prev, role: val}))}>
                       <SelectTrigger className="h-14 rounded-2xl bg-white/50 border-white/50 focus:bg-white/80 transition-all font-bold text-slate-700">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-2xl border-none shadow-2xl backdrop-blur-xl bg-white/90">
-                        <SelectItem value="requester">Nhân viên</SelectItem>
-                        <SelectItem value="unit_leader">Lãnh đạo đơn vị</SelectItem>
-                        <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
-                        <SelectItem value="technician">Nhân viên (Kỹ thuật)</SelectItem>
+                        <SelectItem value="requester">Nhân viên / Giảng viên</SelectItem>
+                        <SelectItem value="unit_leader">Phó Trưởng đơn vị</SelectItem>
+                        <SelectItem value="csvc_manager">Phó Trưởng phòng CSVC</SelectItem>
+                        <SelectItem value="technician">Nhân viên kỹ thuật</SelectItem>
                         <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
                       </SelectContent>
                     </Select>

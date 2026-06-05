@@ -46,7 +46,7 @@ export default function ApprovalsPage() {
     updateRequestStatus(id, 'approved');
     toast({
       title: "Đã phê duyệt",
-      description: "Yêu cầu đã được chuyển cho Quản lý CSVC để phân công."
+      description: "Yêu cầu đã được chuyển cho Phòng CSVC để điều phối."
     });
   };
 
@@ -61,7 +61,7 @@ export default function ApprovalsPage() {
     updateRequestStatus(ratingId, 'closed', { rating: currentRating });
     toast({
       title: "Đã nghiệm thu",
-      description: "Đã xác nhận hoàn thành & Đóng phiếu yêu cầu. Kỹ thuật viên có thể thực hiện in phiếu."
+      description: "Đã xác nhận hoàn thành & Đóng phiếu yêu cầu."
     });
     setRatingId(null);
   };
@@ -85,9 +85,9 @@ export default function ApprovalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-accent" />
-            Xét duyệt & Nghiệm thu ({currentUser?.unit})
+            Nghiệm thu tại đơn vị ({currentUser?.unit})
           </h1>
-          <p className="text-muted-foreground">Quản lý vòng đời phiếu yêu cầu tại đơn vị của bạn</p>
+          <p className="text-muted-foreground">Phó Trưởng đơn vị quản lý vòng đời phiếu yêu cầu</p>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ export default function ApprovalsPage() {
                     <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[9px] font-black uppercase">CSVC báo xong</Badge>
                   </div>
                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
-                    Phòng CSVC đã duyệt hoàn thành. Lãnh đạo vui lòng xác nhận và đóng phiếu.
+                    Phòng CSVC đã duyệt hoàn thành. Phó Trưởng đơn vị vui lòng nghiệm thu & đóng phiếu.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">

@@ -41,8 +41,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: 'Trang chủ', href: '/', icon: LayoutDashboard },
     { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
-    { name: 'Duyệt', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
-    { name: 'Quản lý', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
+    { name: 'Duyệt đơn vị', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
+    { name: 'Điều phối CSVC', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
     { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['admin'] },
     { name: 'Người dùng', href: '/users', icon: Users, roles: ['admin'] },
@@ -50,6 +50,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
   const bottomNavItems = filteredNav.slice(0, 4);
+
+  const getRoleDisplayName = (role: string) => {
+    switch(role) {
+      case 'admin': return 'Quản trị viên';
+      case 'csvc_manager': return 'Phó Trưởng phòng CSVC';
+      case 'unit_leader': return 'Phó Trưởng đơn vị';
+      case 'technician': return 'Nhân viên kỹ thuật';
+      default: return 'Nhân viên / Giảng viên';
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-[#F4F7FE]">
@@ -132,9 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div>
                       <p className="font-black text-lg">{currentUser.name}</p>
                       <p className="text-[10px] font-black text-primary uppercase">
-                        {currentUser.role === 'unit_leader' ? 'Lãnh đạo đơn vị' : 
-                         currentUser.role === 'csvc_manager' ? 'Quản lý CSVC' : 
-                         currentUser.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}
+                        {getRoleDisplayName(currentUser.role)}
                       </p>
                     </div>
                   </div>

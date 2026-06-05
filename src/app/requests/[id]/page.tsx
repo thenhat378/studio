@@ -271,15 +271,15 @@ export default function RequestDetail() {
           </CardHeader>
           <CardContent className="p-8">
             <div className="space-y-4">
-              {/* 1. Lãnh đạo đơn vị phê duyệt bước đầu */}
+              {/* 1. Phó Trưởng đơn vị phê duyệt bước đầu */}
               {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                 <div className="flex flex-col gap-3">
-                  <Button className="w-full bg-[#00A651] h-14 font-black rounded-2xl text-white shadow-lg active:scale-95 transition-transform" onClick={() => handleAction('approved')}>PHÊ DUYỆT YÊU CẦU</Button>
+                  <Button className="w-full bg-[#00A651] h-14 font-black rounded-2xl text-white shadow-lg active:scale-95 transition-transform" onClick={() => handleAction('approved')}>XÁC NHẬN PHÊ DUYỆT</Button>
                   <Button variant="ghost" className="w-full text-rose-500 font-black h-12 rounded-2xl uppercase text-[10px] tracking-widest" onClick={() => handleAction('rejected', { rejectionReason: 'Từ chối tại đơn vị.' })}>TỪ CHỐI</Button>
                 </div>
               )}
 
-              {/* 2. Quản lý CSVC phân công */}
+              {/* 2. Phó Trưởng phòng CSVC phân công */}
               {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -300,17 +300,17 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* 3. Quản lý CSVC duyệt hoàn thành kỹ thuật */}
+              {/* 3. Phó Trưởng phòng CSVC duyệt hoàn thành kỹ thuật */}
               {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                 <div className="space-y-4">
                    <div className="bg-blue-50 p-5 rounded-3xl flex items-start gap-4 border border-blue-100">
                       <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
                       <p className="text-[11px] font-bold text-blue-700 leading-relaxed">
-                        Kỹ thuật đã báo cáo xong. Vui lòng kiểm tra và duyệt để chuyển về cho Đơn vị sử dụng nghiệm thu.
+                        Kỹ thuật đã báo cáo xong. Vui lòng kiểm tra và duyệt kỹ thuật để chuyển về đơn vị sử dụng nghiệm thu.
                       </p>
                    </div>
                    <Button className="w-full bg-emerald-600 h-14 font-black rounded-2xl text-white shadow-lg" onClick={() => handleAction('verified', { csvcManagerApproved: true })}>
-                     DUYỆT HOÀN THÀNH KỸ THUẬT
+                     XÁC NHẬN KẾT QUẢ KỸ THUẬT
                    </Button>
                 </div>
               )}
@@ -356,11 +356,11 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* 6. Lãnh đạo đơn vị nghiệm thu & Đóng phiếu */}
+              {/* 6. Phó Trưởng đơn vị nghiệm thu & Đóng phiếu */}
               {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
                 <div className="space-y-5">
                   <div className="flex flex-col items-center gap-4 py-6 bg-slate-50 rounded-[2rem] border border-slate-100">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Đánh giá chất lượng phục vụ</Label>
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Đánh giá chất lượng dịch vụ</Label>
                     <div className="flex gap-3">
                       {[1,2,3,4,5].map(s => (
                         <Star 
@@ -380,14 +380,14 @@ export default function RequestDetail() {
                     disabled={!req.requesterConfirmed} 
                     onClick={() => handleAction('closed', { rating })}
                   >
-                    XÁC NHẬN & ĐÓNG PHIẾU
+                    NGHIỆM THU & ĐÓNG PHIẾU
                   </Button>
                   
                   {!req.requesterConfirmed && (
                     <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100 flex items-center gap-3">
                        <Info className="h-4 w-4 text-rose-500 shrink-0" />
                        <p className="text-[10px] text-rose-600 font-bold leading-relaxed">
-                         Đang chờ Người yêu cầu xác nhận hài lòng trước khi Đóng phiếu.
+                         Đang chờ Người yêu cầu xác nhận hài lòng trước khi nghiệm thu.
                        </p>
                     </div>
                   )}
