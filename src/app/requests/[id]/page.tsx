@@ -17,10 +17,11 @@ import {
   XCircle,
   Clock,
   Star,
-  Bell
+  Bell,
+  Play
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -63,21 +64,16 @@ export default function RequestDetail() {
   const handleAction = (status: any, extra?: any) => {
     updateRequestStatus(req.id, status, extra);
     
-    if (status === 'closed') {
-       toast({
-         title: "Đã xác nhận hoàn thành",
-         description: "Cảm ơn bạn đã phản hồi. Phiếu yêu cầu hiện đã được đóng."
-       });
-    } else if (status === 'completed') {
+    if (status === 'completed') {
        toast({
          title: "Đã báo cáo hoàn thành",
          description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
        });
-    } else if (status === 'verified') {
-      toast({
-        title: "Đã duyệt hoàn thành",
-        description: "Báo cáo kỹ thuật đã được chấp nhận. Chờ nghiệm thu từ đơn vị."
-      });
+    } else if (status === 'closed') {
+       toast({
+         title: "Đã xác nhận hoàn thành",
+         description: "Phiếu yêu cầu hiện đã được đóng và nghiệm thu."
+       });
     } else {
        toast({
          title: "Cập nhật thành công",
@@ -177,35 +173,6 @@ export default function RequestDetail() {
                 </div>
               </div>
 
-              {req.aiSuggestions && (
-                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 space-y-4 no-print">
-                  <div className="flex items-center gap-2 text-primary font-bold">
-                    <Sparkles className="h-5 w-5" /> Phân tích FixFlow AI
-                  </div>
-                  <Separator className="bg-primary/10" />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Nguyên nhân dự đoán</p>
-                      <ul className="space-y-1.5">
-                        {req.aiSuggestions.causes.map((c, i) => (
-                          <li key={i} className="text-sm flex items-center gap-2 font-medium">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-accent" /> {c}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Vật tư gợi ý</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {req.aiSuggestions.recommendedEquipment.map((eq, i) => (
-                          <Badge key={i} variant="secondary" className="bg-white/50 border-primary/10">{eq}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {req.technicianReport && (
                 <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 space-y-4">
                   <div className="flex justify-between items-center">
@@ -227,19 +194,7 @@ export default function RequestDetail() {
                   <Label className="text-xs uppercase text-amber-700 font-extrabold tracking-widest flex items-center gap-2 mb-3">
                     <Star className="h-4 w-4 fill-amber-400" /> Đánh giá mức độ hài lòng
                   </Label>
-                  <div className="flex flex-col gap-2">
-                    <StarRating value={req.rating} readOnly />
-                    <p className="text-sm font-medium text-amber-900">
-                      Mức độ: {req.rating}/5 sao
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {req.rejectionReason && (
-                <div className="bg-rose-50 border border-rose-100 rounded-2xl p-6">
-                  <Label className="text-xs uppercase text-rose-700 font-extrabold mb-3 block tracking-widest">Lý do từ chối</Label>
-                  <p className="text-sm text-rose-900 italic font-medium">"{req.rejectionReason}"</p>
+                  <StarRating value={req.rating} readOnly />
                 </div>
               )}
             </CardContent>
@@ -258,85 +213,15 @@ export default function RequestDetail() {
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                   <div className="flex gap-3">
                     <Button className="bg-primary flex-1 h-12 text-md font-bold" onClick={() => handleAction('approved')}>Phê duyệt yêu cầu</Button>
-                    <Button variant="destructive" className="flex-1 h-12 text-md font-bold" onClick={() => handleAction('rejected', { rejectionReason: 'Yêu cầu không phù hợp hoặc không nằm trong danh mục CSVC quản lý.' })}>Từ chối</Button>
+                    <Button variant="destructive" className="flex-1 h-12 text-md font-bold" onClick={() => handleAction('rejected', { rejectionReason: 'Yêu cầu không phù hợp.' })}>Từ chối</Button>
                   </div>
                 )}
 
-                {/* NGƯỜI YÊU CẦU HOẶC LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH */}
-                {isRequesterOrLeader && req.status === 'verified' && (
-                  <div className="space-y-6">
-                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận hoàn thành & Đánh giá:</p>
-                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra và đánh giá kết quả sửa chữa để đóng phiếu.</p>
-                      
-                      <div className="space-y-3">
-                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng</Label>
-                        <StarRating value={rating} onChange={setRating} />
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <Button className="bg-primary flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('closed', { rating })}>
-                        <CheckCircle2 className="h-5 w-5" /> Xác nhận hoàn thành & Đóng phiếu
-                      </Button>
-                      <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Yêu cầu làm lại
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* QUẢN LÝ CSVC PHÂN CÔNG */}
-                {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
-                  <div className="space-y-4">
-                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Giao việc cho kỹ thuật:</Label>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex-1">
-                        <Select onValueChange={setSelectedTechId} value={selectedTechId}>
-                          <SelectTrigger className="h-12">
-                            <SelectValue placeholder="Chọn kỹ thuật viên..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {technicians.map(t => (
-                              <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button className="bg-primary h-12 px-8 font-bold" disabled={!selectedTechId} onClick={() => {
-                        const tech = technicians.find(t => t.id === selectedTechId);
-                        handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
-                      }}>
-                        Phân công
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* QUẢN LÝ CSVC DUYỆT HOÀN THÀNH */}
-                {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
-                  <div className="flex gap-3">
-                    <Button className="bg-emerald-600 flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
-                      <CheckCircle2 className="h-5 w-5" /> Duyệt hoàn thành
-                    </Button>
-                    <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                      Yêu cầu làm lại
-                    </Button>
-                  </div>
-                )}
-
-                {/* KỸ THUẬT VIÊN BẮT ĐẦU */}
-                {currentUser?.role === 'technician' && req.status === 'assigned' && (
-                  <Button className="bg-amber-500 h-14 text-lg font-bold" onClick={() => handleAction('in_progress')}>
-                    Bắt đầu sửa chữa
-                  </Button>
-                )}
-                
                 {/* KỸ THUẬT VIÊN BÁO CÁO HOÀN THÀNH */}
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
-                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức xử lý</Label>
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức sửa chữa (Listbox)</Label>
                       <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                         <SelectTrigger className="h-12 border-primary/20">
                           <SelectValue placeholder="Chọn hình thức..." />
@@ -354,33 +239,54 @@ export default function RequestDetail() {
                       <Textarea placeholder="Mô tả các bước đã xử lý..." className="min-h-[120px] border-primary/20" value={report} onChange={e => setReport(e.target.value)} />
                     </div>
 
-                    <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
-                       <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ gửi thông báo tự động cho Người yêu cầu và Quản lý CSVC ngay sau khi bạn nhấn báo cáo.</p>
-                    </div>
-
                     <Button 
                       className="bg-emerald-600 w-full h-14 text-md font-bold gap-2" 
                       disabled={!report.trim() || !repairType} 
                       onClick={() => handleAction('completed', { technicianReport: report, repairType })}
                     >
-                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành & Gửi thông báo
+                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành
+                    </Button>
+                    <p className="text-[10px] text-center text-muted-foreground italic">Lưu ý: Hệ thống sẽ tự động gửi thông báo cho Người yêu cầu và Quản lý PCSVC.</p>
+                  </div>
+                )}
+                
+                {currentUser?.role === 'technician' && req.status === 'assigned' && (
+                   <Button className="bg-amber-500 h-14 text-lg font-bold gap-2" onClick={() => handleAction('in_progress')}>
+                     <Play className="h-5 w-5" /> Bắt đầu sửa chữa
+                   </Button>
+                )}
+
+                {/* NGƯỜI YÊU CẦU / LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH */}
+                {isRequesterOrLeader && req.status === 'verified' && (
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng của bạn</Label>
+                      <StarRating value={rating} onChange={setRating} />
+                    </div>
+                    <Button className="bg-primary w-full h-14 text-md font-bold gap-2" onClick={() => handleAction('closed', { rating })}>
+                      <CheckCircle2 className="h-5 w-5" /> Xác nhận hoàn thành & Đóng phiếu
                     </Button>
                   </div>
                 )}
 
-                {req.status === 'closed' && (
-                   <div className="p-6 bg-green-50 rounded-2xl text-green-700 font-bold flex flex-col items-center gap-2 border border-green-200">
-                      <CheckCircle2 className="h-10 w-10 text-green-500 mb-2" />
-                      Yêu cầu đã được đóng và nghiệm thu hoàn tất.
-                   </div>
+                {/* QUẢN LÝ CSVC PHÂN CÔNG / DUYỆT HOÀN THÀNH */}
+                {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
+                  <div className="flex flex-col gap-3">
+                    <Select onValueChange={setSelectedTechId} value={selectedTechId}>
+                      <SelectTrigger className="h-12"><SelectValue placeholder="Chọn kỹ thuật viên..." /></SelectTrigger>
+                      <SelectContent>{technicians.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Button className="bg-primary h-12 font-bold" disabled={!selectedTechId} onClick={() => {
+                      const tech = technicians.find(t => t.id === selectedTechId);
+                      handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
+                    }}>Phân công kỹ thuật viên</Button>
+                  </div>
                 )}
 
-                {req.status === 'rejected' && (
-                   <div className="p-6 bg-rose-50 rounded-2xl text-rose-700 font-bold flex flex-col items-center gap-2 border border-rose-200">
-                      <XCircle className="h-10 w-10 text-rose-500 mb-2" />
-                      Yêu cầu đã bị từ chối phê duyệt.
-                   </div>
+                {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
+                  <Button className="bg-emerald-600 h-14 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
+                    <CheckCircle2 className="h-5 w-5" /> Duyệt hoàn thành
+                  </Button>
                 )}
               </div>
             </CardContent>
@@ -390,35 +296,15 @@ export default function RequestDetail() {
         <div className="space-y-6 no-print">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-3 border-b bg-muted/5">
-              <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-widest">Thông tin chung</CardTitle>
+              <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-widest">Thông tin</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-5 pt-5">
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-muted rounded-xl"><User className="h-5 w-5 text-muted-foreground" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Người yêu cầu</p><p className="text-sm font-bold">{req.requesterName}</p></div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-muted rounded-xl"><FileText className="h-5 w-5 text-muted-foreground" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Đơn vị</p><p className="text-sm font-bold">{req.unit}</p></div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-muted rounded-xl"><HardDrive className="h-5 w-5 text-muted-foreground" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Thiết bị</p><p className="text-sm font-bold">{req.equipmentName}</p></div>
-              </div>
-              <Separator className="bg-muted/30" />
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-primary/5 rounded-xl"><Wrench className="h-5 w-5 text-primary" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-primary tracking-wider">Kỹ thuật viên</p><p className="text-sm font-bold">{req.technicianName || 'Chưa phân công'}</p></div>
-              </div>
+            <CardContent className="space-y-5 pt-5 text-sm font-medium">
+              <div className="flex flex-col gap-1"><p className="text-[10px] uppercase text-muted-foreground">Người yêu cầu</p><p>{req.requesterName} ({req.unit})</p></div>
+              <div className="flex flex-col gap-1"><p className="text-[10px] uppercase text-muted-foreground">Thiết bị</p><p>{req.equipmentName}</p></div>
+              <div className="flex flex-col gap-1"><p className="text-[10px] uppercase text-muted-foreground">Kỹ thuật viên</p><p>{req.technicianName || 'Chưa phân công'}</p></div>
             </CardContent>
           </Card>
         </div>
-      </div>
-
-      <div className="print-only mt-12 grid grid-cols-3 text-center gap-8">
-        <div className="space-y-16"><p className="font-bold">Người yêu cầu</p><p className="text-sm">(Ký tên)</p></div>
-        <div className="space-y-16"><p className="font-bold">Kỹ thuật viên</p><p className="text-sm">(Ký tên)</p></div>
-        <div className="space-y-16"><p className="font-bold">Xác nhận đơn vị</p><p className="text-sm">(Ký tên, đóng dấu)</p></div>
       </div>
     </div>
   );

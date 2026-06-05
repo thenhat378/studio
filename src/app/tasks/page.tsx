@@ -5,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -67,21 +67,12 @@ export default function TasksPage() {
     setReportingId(null);
   };
 
-  const getRepairTypeLabel = (type?: string) => {
-    switch(type) {
-      case 'replacement': return 'Thay mới';
-      case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
-      case 'repair_only': return 'Sửa chữa không thay thế thiết bị';
-      default: return '';
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã báo cáo hoàn thành</Badge>;
-      case 'verified': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã duyệt kỹ thuật</Badge>;
+      case 'verified': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -109,7 +100,7 @@ export default function TasksPage() {
                   {getStatusBadge(req.status)}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-2">
-                  <p>Phòng/Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
+                  <p>Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
                   <p>Thiết bị: <span className="text-foreground font-medium">{req.equipmentName}</span></p>
                 </div>
               </div>
@@ -159,13 +150,10 @@ export default function TasksPage() {
               <ClipboardPen className="h-5 w-5 text-primary" />
               Báo cáo hoàn thành công việc
             </DialogTitle>
-            <DialogDescription>
-              Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn gửi báo cáo.
-            </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-6">
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức xử lý</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức sửa chữa (Listbox)</Label>
               <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                 <SelectTrigger className="h-12 border-primary/20">
                   <SelectValue placeholder="Chọn hình thức..." />
@@ -191,7 +179,7 @@ export default function TasksPage() {
             
             <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-               <p className="text-xs text-blue-700 font-medium font-bold">Lưu ý: Sau khi nhấn xác nhận, thông báo sẽ được gửi đi tức thì.</p>
+               <p className="text-xs text-blue-700 font-bold">Lưu ý: Sau khi gửi, thông báo sẽ tự động gửi tới Người yêu cầu và Quản lý PCSVC.</p>
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -201,7 +189,7 @@ export default function TasksPage() {
               onClick={handleSubmitReport} 
               disabled={!reportText.trim() || !repairType}
             >
-              Gửi báo cáo hoàn thành
+              Báo cáo hoàn thành
             </Button>
           </DialogFooter>
         </DialogContent>
