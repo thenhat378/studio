@@ -7,23 +7,17 @@ import { Button } from '@/components/ui/button';
 import { 
   ChevronLeft, 
   Wrench, 
-  User, 
   CheckCircle2, 
-  FileText, 
-  Sparkles,
-  Printer,
-  ShieldAlert,
-  HardDrive,
-  XCircle,
-  Clock,
-  Star,
-  Bell,
-  Play,
-  ClipboardPen
+  Printer, 
+  ShieldAlert, 
+  Clock, 
+  Star, 
+  Bell, 
+  Play, 
+  ClipboardPen 
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
@@ -215,7 +209,7 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col gap-4">
-                {/* LÃNH ĐẠO PHÊ DUYỆT */}
+                {/* LÃNH ĐẠO PHÊ DUYỆT BAN ĐẦU */}
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                   <div className="flex gap-3">
                     <Button className="bg-primary flex-1 h-12 text-md font-bold" onClick={() => handleAction('approved')}>Phê duyệt yêu cầu</Button>
@@ -265,7 +259,7 @@ export default function RequestDetail() {
                    </Button>
                 )}
 
-                {/* NGƯỜI YÊU CẦU / LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH */}
+                {/* NGƯỜI YÊU CẦU / LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH (NGHIỆM THU) */}
                 {isRequesterOrLeader && req.status === 'verified' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
