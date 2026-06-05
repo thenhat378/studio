@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -6,8 +7,7 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle,
-  CardDescription,
-  CardFooter
+  CardDescription
 } from '@/components/ui/card';
 import { 
   ClipboardList, 
@@ -61,9 +61,8 @@ export default function Dashboard() {
     }
     
     setIsLoading(true);
-    // Trong bản demo này, chúng ta giả định bất kỳ user/pass nào cũng hợp lệ 
-    // và mặc định vào vai trò 'requester' trừ khi sử dụng nút đăng nhập nhanh.
     setTimeout(() => {
+      // Demo logic: mapping roles based on dummy input or just defaulting to requester
       login('requester');
       setIsLoading(false);
       toast({
@@ -158,7 +157,7 @@ export default function Dashboard() {
                   <span className="w-full border-t border-muted"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-muted-foreground font-medium">Hoặc đăng nhập nhanh (Demo)</span>
+                  <span className="bg-white px-2 text-muted-foreground font-medium">Đăng nhập nhanh (Demo)</span>
                 </div>
               </div>
 
@@ -233,8 +232,8 @@ export default function Dashboard() {
       case 'approved': return <Badge variant="outline" className="border-indigo-200 text-indigo-600 bg-indigo-50">Đã duyệt</Badge>;
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Chờ nghiệm thu</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã xong</Badge>;
+      case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">CSVC đã xong</Badge>;
       case 'closed': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
@@ -247,7 +246,7 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-primary">Chào buổi sáng, {currentUser.name}!</h1>
           <p className="text-muted-foreground mt-2 text-lg">
-            Bạn đang đăng nhập với vai trò <span className="font-bold text-foreground uppercase">{currentUser.role.replace('_', ' ')}</span>
+            Vai trò: <span className="font-bold text-foreground uppercase">{currentUser.role.replace('_', ' ')}</span>
             {currentUser.unit && ` • Đơn vị: ${currentUser.unit}`}
           </p>
         </div>

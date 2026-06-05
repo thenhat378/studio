@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -82,7 +83,7 @@ export default function RequestDetail() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* Print Only Header */}
+      {/* Print Header */}
       <div className="print-only mb-8 text-center border-b pb-6">
         <h1 className="text-3xl font-bold text-primary mb-2">FIXFLOW PRO - PHIẾU YÊU CẦU SỬA CHỮA</h1>
         <p className="text-sm font-mono">Mã số phiếu: {req.id} | Ngày in: {new Date().toLocaleString('vi-VN')}</p>
@@ -117,7 +118,7 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="space-y-8 pt-6">
               <div>
-                <Label className="text-xs uppercase text-muted-foreground font-extrabold tracking-widest mb-3 block">Mô tả sự cố từ người dùng</Label>
+                <Label className="text-xs uppercase text-muted-foreground font-extrabold tracking-widest mb-3 block">Mô tả sự cố</Label>
                 <div className="bg-accent/5 p-5 rounded-2xl border border-accent/10 leading-relaxed italic text-foreground/80">
                   "{req.description}"
                 </div>
@@ -126,7 +127,7 @@ export default function RequestDetail() {
               {req.aiSuggestions && (
                 <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 space-y-4">
                   <div className="flex items-center gap-2 text-primary font-bold">
-                    <Sparkles className="h-5 w-5" /> Phân tích thông minh từ FixFlow AI
+                    <Sparkles className="h-5 w-5" /> Phân tích FixFlow AI
                   </div>
                   <Separator className="bg-primary/10" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -155,7 +156,7 @@ export default function RequestDetail() {
               {req.technicianReport && (
                 <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6">
                   <Label className="text-xs uppercase text-emerald-700 font-extrabold tracking-widest flex items-center gap-2 mb-3">
-                    <Wrench className="h-4 w-4" /> Báo cáo kỹ thuật chi tiết
+                    <Wrench className="h-4 w-4" /> Báo cáo kỹ thuật
                   </Label>
                   <p className="text-sm text-emerald-900 leading-relaxed font-medium">
                     {req.technicianReport}
@@ -165,23 +166,22 @@ export default function RequestDetail() {
 
               {req.rejectionReason && (
                 <div className="bg-rose-50 border border-rose-100 rounded-2xl p-6">
-                  <Label className="text-xs uppercase text-rose-700 font-extrabold mb-3 block tracking-widest">Lý do từ chối phê duyệt</Label>
+                  <Label className="text-xs uppercase text-rose-700 font-extrabold mb-3 block tracking-widest">Lý do từ chối</Label>
                   <p className="text-sm text-rose-900 italic font-medium">"{req.rejectionReason}"</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Role Actions Container - NO PRINT */}
+          {/* Role Actions - NO PRINT */}
           <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-accent no-print">
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2 font-bold uppercase tracking-tight">
-                 <ShieldAlert className="h-5 w-5 text-accent" /> Thao tác xử lý nghiệp vụ
+                 <ShieldAlert className="h-5 w-5 text-accent" /> Thao tác xử lý
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col gap-4">
-                {/* Lãnh đạo đơn vị - Phê duyệt đầu vào */}
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                   <div className="flex gap-3">
                     <Button className="bg-primary flex-1 h-12 text-md font-bold" onClick={() => handleAction('approved')}>Duyệt phiếu</Button>
@@ -189,33 +189,31 @@ export default function RequestDetail() {
                   </div>
                 )}
 
-                {/* Lãnh đạo đơn vị - Nghiệm thu cuối cùng */}
                 {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
                   <div className="space-y-4">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2">Xác nhận hài lòng từ đơn vị:</p>
-                      <p className="text-xs text-emerald-600 leading-relaxed">Vui lòng kiểm tra thiết bị. Nếu đã hoạt động tốt, hãy xác nhận để kết thúc toàn bộ quy trình.</p>
+                      <p className="text-sm text-emerald-800 font-bold mb-2">Xác nhận đơn vị:</p>
+                      <p className="text-xs text-emerald-600">Vui lòng kiểm tra thiết bị. Nếu đã hoạt động tốt, hãy xác nhận để kết thúc toàn bộ quy trình.</p>
                     </div>
                     <div className="flex gap-3">
                       <Button className="bg-primary flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('closed')}>
                         <CheckCircle2 className="h-5 w-5" /> Xác nhận & Đóng phiếu
                       </Button>
                       <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Cần xử lý lại
+                        Cần sửa lại
                       </Button>
                     </div>
                   </div>
                 )}
 
-                {/* Quản lý CSVC - Phân công */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                   <div className="space-y-4">
-                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Phân công kỹ thuật viên phụ trách:</Label>
+                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Phân công kỹ thuật:</Label>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <div className="flex-1">
                         <Select onValueChange={setSelectedTechId} value={selectedTechId}>
-                          <SelectTrigger className="h-12 border-primary/20">
-                            <SelectValue placeholder="Chọn nhân viên kỹ thuật..." />
+                          <SelectTrigger className="h-12">
+                            <SelectValue placeholder="Chọn kỹ thuật viên..." />
                           </SelectTrigger>
                           <SelectContent>
                             {technicians.map(t => (
@@ -224,44 +222,37 @@ export default function RequestDetail() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <Button className="bg-primary h-12 px-8 font-bold gap-2" disabled={!selectedTechId} onClick={() => {
+                      <Button className="bg-primary h-12 px-8 font-bold" disabled={!selectedTechId} onClick={() => {
                         const tech = technicians.find(t => t.id === selectedTechId);
                         handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
                       }}>
-                        <UserCheck className="h-5 w-5" /> Giao việc ngay
+                        Giao việc
                       </Button>
                     </div>
                   </div>
                 )}
 
-                {/* Quản lý CSVC - Nghiệm thu kỹ thuật */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
-                  <div className="space-y-4">
-                    <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
-                      <p className="text-sm text-indigo-800 font-bold mb-1">Kiểm tra chuyên môn:</p>
-                      <p className="text-xs text-indigo-600">Xác nhận kết quả xử lý của kỹ thuật viên trước khi chuyển về cho đơn vị yêu cầu nghiệm thu cuối cùng.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <Button className="bg-emerald-600 flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
-                        <CheckCircle2 className="h-5 w-5" /> Duyệt kỹ thuật
-                      </Button>
-                      <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Yêu cầu làm lại
-                      </Button>
-                    </div>
+                  <div className="flex gap-3">
+                    <Button className="bg-emerald-600 flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
+                      <CheckCircle2 className="h-5 w-5" /> Duyệt kỹ thuật
+                    </Button>
+                    <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
+                      Yêu cầu làm lại
+                    </Button>
                   </div>
                 )}
 
-                {/* Kỹ thuật viên - Báo cáo */}
                 {currentUser?.role === 'technician' && req.status === 'assigned' && (
-                  <Button className="bg-amber-500 h-14 text-lg font-bold shadow-lg shadow-amber-200" onClick={() => handleAction('in_progress')}>
-                    Bắt đầu thực hiện sửa chữa
+                  <Button className="bg-amber-500 h-14 text-lg font-bold" onClick={() => handleAction('in_progress')}>
+                    Bắt đầu sửa chữa
                   </Button>
                 )}
+                
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-4">
-                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Báo cáo kết quả xử lý:</Label>
-                    <Textarea placeholder="Mô tả các bước đã xử lý, linh kiện thay thế..." className="min-h-[120px] border-amber-200" value={report} onChange={e => setReport(e.target.value)} />
+                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Báo cáo kết quả:</Label>
+                    <Textarea placeholder="Mô tả các bước đã xử lý..." className="min-h-[120px]" value={report} onChange={e => setReport(e.target.value)} />
                     <Button className="bg-emerald-600 w-full h-12 text-md font-bold" disabled={!report.trim()} onClick={() => handleAction('completed', { technicianReport: report })}>
                       Gửi báo cáo hoàn thành
                     </Button>
@@ -271,14 +262,14 @@ export default function RequestDetail() {
                 {req.status === 'closed' && (
                    <div className="p-6 bg-green-50 rounded-2xl text-green-700 font-bold flex flex-col items-center gap-2 border border-green-200">
                       <CheckCircle2 className="h-10 w-10 text-green-500 mb-2" />
-                      Quy trình sửa chữa đã hoàn tất và đóng phiếu lưu trữ.
+                      Yêu cầu đã hoàn tất.
                    </div>
                 )}
 
                 {req.status === 'rejected' && (
                    <div className="p-6 bg-rose-50 rounded-2xl text-rose-700 font-bold flex flex-col items-center gap-2 border border-rose-200">
                       <XCircle className="h-10 w-10 text-rose-500 mb-2" />
-                      Yêu cầu này đã bị từ chối phê duyệt.
+                      Yêu cầu đã bị từ chối.
                    </div>
                 )}
               </div>
@@ -286,11 +277,11 @@ export default function RequestDetail() {
           </Card>
         </div>
 
-        {/* Sidebar Info */}
+        {/* Sidebar */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-3 border-b bg-muted/5">
-              <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-widest">Thông tin phối hợp</CardTitle>
+              <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-widest">Thông tin chung</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5 pt-5">
               <div className="flex items-center gap-4">
@@ -299,7 +290,7 @@ export default function RequestDetail() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="p-2.5 bg-muted rounded-xl"><FileText className="h-5 w-5 text-muted-foreground" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Đơn vị yêu cầu</p><p className="text-sm font-bold">{req.unit}</p></div>
+                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Đơn vị</p><p className="text-sm font-bold">{req.unit}</p></div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="p-2.5 bg-muted rounded-xl"><HardDrive className="h-5 w-5 text-muted-foreground" /></div>
@@ -308,21 +299,8 @@ export default function RequestDetail() {
               <Separator className="bg-muted/30" />
               <div className="flex items-center gap-4">
                 <div className="p-2.5 bg-primary/5 rounded-xl"><Wrench className="h-5 w-5 text-primary" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-primary tracking-wider">Nhân viên kỹ thuật</p><p className="text-sm font-bold text-foreground">{req.technicianName || 'Chưa phân công'}</p></div>
+                <div><p className="text-[10px] uppercase font-bold text-primary tracking-wider">Kỹ thuật viên</p><p className="text-sm font-bold">{req.technicianName || 'Chưa phân công'}</p></div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-muted rounded-xl"><Calendar className="h-5 w-5 text-muted-foreground" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Ngày khởi tạo</p><p className="text-sm font-bold font-mono">{new Date(req.createdAt).toLocaleDateString('vi-VN')}</p></div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm bg-primary/5 no-print">
-            <CardContent className="p-5">
-              <h4 className="text-xs font-black uppercase mb-3 text-primary tracking-widest">Lưu ý</h4>
-              <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                Tất cả các bước xử lý đều được lưu nhật ký hệ thống. Vui lòng thực hiện đúng quy trình bàn giao và nghiệm thu thiết bị.
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -330,18 +308,9 @@ export default function RequestDetail() {
 
       {/* Print Footer */}
       <div className="print-only mt-12 grid grid-cols-3 text-center gap-8">
-        <div className="space-y-16">
-          <p className="font-bold">Người yêu cầu</p>
-          <p className="text-sm">(Ký, ghi rõ họ tên)</p>
-        </div>
-        <div className="space-y-16">
-          <p className="font-bold">Nhân viên kỹ thuật</p>
-          <p className="text-sm">(Ký, ghi rõ họ tên)</p>
-        </div>
-        <div className="space-y-16">
-          <p className="font-bold">Xác nhận đơn vị</p>
-          <p className="text-sm">(Ký, đóng dấu)</p>
-        </div>
+        <div className="space-y-16"><p className="font-bold">Người yêu cầu</p><p className="text-sm">(Ký tên)</p></div>
+        <div className="space-y-16"><p className="font-bold">Kỹ thuật viên</p><p className="text-sm">(Ký tên)</p></div>
+        <div className="space-y-16"><p className="font-bold">Xác nhận đơn vị</p><p className="text-sm">(Ký tên, đóng dấu)</p></div>
       </div>
     </div>
   );
