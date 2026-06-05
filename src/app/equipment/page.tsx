@@ -2,18 +2,17 @@
 "use client"
 
 import { useState } from 'react';
-import { useAppStore } from '@/lib/store.tsx';
+import { useAppStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Package, Edit, Trash2, Filter, Loader2, RefreshCcw } from 'lucide-react';
+import { Search, Plus, Package, Edit, Trash2, Loader2, RefreshCcw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -146,16 +145,14 @@ export default function EquipmentCatalog() {
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-          <Input 
-            placeholder="Tìm theo tên thiết bị hoặc danh mục..." 
-            className="pl-12 h-14 bg-white border-none shadow-sm rounded-2xl font-bold text-sm"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+        <Input 
+          placeholder="Tìm theo tên thiết bị hoặc danh mục..." 
+          className="pl-12 h-14 bg-white border-none shadow-sm rounded-2xl font-bold text-sm"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -41,13 +41,14 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Hàm phụ để làm sạch object, xóa các trường undefined
+// Hàm phụ để làm sạch object, xóa các trường undefined trước khi gửi lên Firestore
 const cleanObject = (obj: any) => {
-  const newObj = { ...obj };
+  if (obj === null || typeof obj !== 'object') return obj;
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
   Object.keys(newObj).forEach(key => {
     if (newObj[key] === undefined) {
       delete newObj[key];
-    } else if (typeof newObj[key] === 'object' && newObj[key] !== null) {
+    } else if (typeof newObj[key] === 'object') {
       newObj[key] = cleanObject(newObj[key]);
     }
   });
