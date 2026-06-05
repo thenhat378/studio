@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-16 items-center px-6 border-b shrink-0">
           <Link href="/" className="flex items-center gap-2 font-black text-sm text-primary tracking-tighter uppercase">
             <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" />
-            <span>Requisition DUE</span>
+            <span>Requisition Form DUE</span>
           </Link>
         </div>
         <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">

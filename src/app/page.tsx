@@ -207,8 +207,8 @@ export default function Overview() {
         <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-3">
             <h1 className="text-5xl font-black tracking-tighter drop-shadow-sm">
-              <span className="text-accent">D</span><span className="text-secondary">u</span><span className="text-primary">e</span>
-              <span className="text-slate-800 ml-2">Requisition</span>
+              <span className="text-slate-800 mr-2">Requisition Form</span>
+              <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
             </h1>
             <p className="text-sm font-bold text-slate-500 max-w-[80%] mx-auto">
               Phiếu yêu cầu cấp phát sửa chữa thiết bị
