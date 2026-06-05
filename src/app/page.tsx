@@ -1,29 +1,17 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ClipboardList, 
   CheckCircle2, 
   Clock, 
   AlertCircle,
   ChevronRight,
-  User,
   Wrench,
   PlusCircle,
-  Sparkles,
   HardDrive,
-  ArrowUpRight,
-  ShieldCheck,
-  UserCheck,
   Phone,
-  Info,
   Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,7 +24,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import { RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Overview() {
   const { 
@@ -58,27 +45,37 @@ export default function Overview() {
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const [authErrorCode, setAuthErrorCode] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
   
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
+  // Quản lý vòng đời Recaptcha triệt để
   useEffect(() => {
-    if (auth && !recaptchaRef.current && !showOtpInput && !currentUser) {
-      try {
-        const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'normal',
-          callback: () => {
-            console.log("Recaptcha verified");
-            setAuthErrorCode(null);
-          },
-        });
-        recaptchaRef.current = verifier;
-        verifier.render();
-      } catch (e) {
-        console.error("Recaptcha init error:", e);
+    if (auth && !currentUser && !showOtpInput) {
+      const container = document.getElementById('recaptcha-container');
+      if (container && !recaptchaRef.current) {
+        try {
+          const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            size: 'normal',
+            callback: () => {
+              console.log("Recaptcha verified");
+            },
+            'expired-callback': () => {
+              console.log("Recaptcha expired");
+              if (recaptchaRef.current) {
+                recaptchaRef.current.clear();
+                recaptchaRef.current = null;
+              }
+            }
+          });
+          recaptchaRef.current = verifier;
+          verifier.render();
+        } catch (e) {
+          console.error("Recaptcha initialization error:", e);
+        }
       }
     }
+
     return () => {
       if (recaptchaRef.current) {
         try {
@@ -87,14 +84,12 @@ export default function Overview() {
         } catch (e) {}
       }
     };
-  }, [auth, showOtpInput, currentUser]);
+  }, [auth, currentUser, showOtpInput]);
 
   if (!isInitialized) return null;
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAuthErrorCode(null);
-    
     if (!phoneNumber || !fullName || !unit) {
       toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ thông tin." });
       return;
@@ -109,19 +104,21 @@ export default function Overview() {
         formattedPhone = `+84${formattedPhone}`;
       }
 
-      const result = await sendOtp(formattedPhone, recaptchaRef.current!);
+      if (!recaptchaRef.current) {
+         throw new Error("Trình xác thực chưa sẵn sàng. Thử lại sau giây lát.");
+      }
+
+      const result = await sendOtp(formattedPhone, recaptchaRef.current);
       setConfirmationResult(result);
       setShowOtpInput(true);
-      toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn." });
+      toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn SMS." });
     } catch (error: any) {
       console.error("Auth error:", error);
-      setAuthErrorCode(error.code);
-      setShowFallback(true); // Hiển thị nút đăng nhập dự phòng khi lỗi
-      
+      setShowFallback(true);
       toast({ 
         variant: "destructive", 
         title: "Lỗi cấu hình xác thực", 
-        description: "Không thể gửi OTP do giới hạn tên miền hoặc API Key. Bạn có thể dùng 'Đăng nhập trực tiếp' bên dưới." 
+        description: `Mã lỗi: ${error.code}. Bạn có thể sử dụng nút Đăng nhập trực tiếp bên dưới.`
       });
     } finally {
       setIsLoading(false);
@@ -135,7 +132,7 @@ export default function Overview() {
     setIsLoading(true);
     try {
       await verifyOtp(confirmationResult, otp, { name: fullName, unit });
-      toast({ title: "Thành công", description: "Chào mừng bạn!" });
+      toast({ title: "Thành công", description: "Chào mừng bạn quay lại!" });
     } catch (error: any) {
       toast({ variant: "destructive", title: "Lỗi mã OTP", description: "Mã không đúng hoặc đã hết hạn." });
     } finally {
@@ -144,21 +141,20 @@ export default function Overview() {
   };
 
   const handleFallbackLogin = () => {
-    // Đăng nhập trực tiếp không cần OTP nếu cấu hình Firebase đang lỗi
     loginAsTestAccount('requester', {
-      id: `fallback-${Date.now()}`,
-      name: fullName || 'Người dùng mới',
+      id: `user-${Date.now()}`,
+      name: fullName || 'Thành viên mới',
       unit: unit || 'Đơn vị chưa xác định',
       role: 'requester',
       phoneNumber: phoneNumber
     });
-    toast({ title: "Đăng nhập dự phòng", description: "Bạn đã vào hệ thống thành công." });
+    toast({ title: "Đăng nhập trực tiếp", description: "Đã vào hệ thống thành công (Chế độ dự phòng)." });
   };
 
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[400px] space-y-6">
+        <div className="w-full max-w-[400px] space-y-6 animate-in fade-in zoom-in duration-500">
           <div className="text-center space-y-2">
              <div className="inline-flex p-4 bg-white rounded-[2rem] shadow-xl mb-2">
                 <Wrench className="h-8 w-8 text-primary" />
@@ -168,8 +164,8 @@ export default function Overview() {
 
           <Card className="border-none shadow-2xl bg-white rounded-[2.5rem] overflow-hidden">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-lg font-black text-slate-800">
-                {showOtpInput ? 'Nhập mã xác nhận' : 'Đăng ký & Đăng nhập'}
+              <CardTitle className="text-lg font-black text-slate-800 uppercase">
+                {showOtpInput ? 'Xác nhận OTP' : 'Tham gia hệ thống'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
@@ -192,7 +188,7 @@ export default function Overview() {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Họ và tên</Label>
                       <Input 
-                        placeholder="Nguyễn Văn A" 
+                        placeholder="Nhập tên của bạn..." 
                         className="h-12 rounded-xl bg-slate-50 border-none font-bold"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
@@ -200,9 +196,9 @@ export default function Overview() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Đơn vị</Label>
+                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Đơn vị công tác</Label>
                       <Input 
-                        placeholder="Khoa / Phòng ban" 
+                        placeholder="Khoa / Phòng / Trung tâm" 
                         className="h-12 rounded-xl bg-slate-50 border-none font-bold"
                         value={unit}
                         onChange={(e) => setUnit(e.target.value)}
@@ -211,32 +207,32 @@ export default function Overview() {
                     </div>
                   </div>
 
-                  <div className="flex justify-center scale-90 origin-top">
+                  <div className="flex justify-center my-4 overflow-hidden rounded-xl">
                     <div id="recaptcha-container"></div>
                   </div>
 
                   <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary shadow-lg uppercase text-[10px] tracking-widest" disabled={isLoading}>
-                    {isLoading ? "Đang xử lý..." : "Nhận mã OTP qua SMS"}
+                    {isLoading ? "Đang xử lý..." : "Gửi mã OTP qua SMS"}
                   </Button>
 
                   {showFallback && (
                     <Button 
                       type="button" 
                       variant="outline" 
-                      className="w-full h-12 font-black rounded-xl border-emerald-500 text-emerald-600 uppercase text-[10px] tracking-widest gap-2"
+                      className="w-full h-12 font-black rounded-xl border-emerald-500 text-emerald-600 uppercase text-[10px] tracking-widest gap-2 shadow-sm"
                       onClick={handleFallbackLogin}
                     >
-                      <Lock className="h-4 w-4" /> Đăng nhập trực tiếp (Dự phòng)
+                      <Lock className="h-4 w-4" /> Đăng nhập trực tiếp ngay
                     </Button>
                   )}
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-bold text-slate-400 uppercase text-center block">Nhập 6 số từ tin nhắn</Label>
+                    <Label className="text-[10px] font-bold text-slate-400 uppercase text-center block mb-2">Nhập 6 số từ tin nhắn điện thoại</Label>
                     <Input 
-                      placeholder="123456" 
-                      className="h-14 rounded-xl bg-slate-50 border-none font-black text-xl text-center tracking-[0.5rem]"
+                      placeholder="000000" 
+                      className="h-14 rounded-xl bg-slate-50 border-none font-black text-2xl text-center tracking-[0.5rem]"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       maxLength={6}
@@ -244,15 +240,15 @@ export default function Overview() {
                     />
                   </div>
                   <Button type="submit" className="w-full h-12 font-black rounded-xl bg-emerald-600 shadow-lg uppercase text-[10px]" disabled={isLoading}>
-                    Xác nhận mã OTP
+                    {isLoading ? "Đang xác thực..." : "Xác nhận & Vào hệ thống"}
                   </Button>
-                  <Button variant="link" className="w-full text-xs text-slate-400 font-bold" onClick={() => setShowOtpInput(false)}>Quay lại thay đổi thông tin</Button>
+                  <Button variant="link" className="w-full text-xs text-slate-400 font-bold" onClick={() => setShowOtpInput(false)}>Thay đổi thông tin đăng ký</Button>
                 </form>
               )}
 
               <div className="relative py-2 flex items-center gap-3">
                 <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase">Hoặc dùng thử</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase">Hoặc trải nghiệm nhanh</span>
                 <div className="h-px bg-slate-100 flex-1"></div>
               </div>
 
@@ -264,6 +260,7 @@ export default function Overview() {
               </div>
             </CardContent>
           </Card>
+          <p className="text-center text-[9px] text-slate-400 font-bold uppercase tracking-widest">© 2026 Hệ thống quản lý sửa chữa DUE</p>
         </div>
       </div>
     );
@@ -290,8 +287,9 @@ export default function Overview() {
             <div>
               <p className="text-[10px] font-black uppercase opacity-60 mb-1">DUE Requisition</p>
               <h1 className="text-xl font-black">Chào, {currentUser.name.split(' ').pop()}!</h1>
+              <p className="text-[9px] font-bold opacity-80 mt-1">{currentUser.unit}</p>
             </div>
-            <Badge className="bg-white/20 border-none font-black text-[9px]">{currentUser.role.replace('_', ' ')}</Badge>
+            <Badge className="bg-white/20 border-none font-black text-[9px] uppercase tracking-tighter">{currentUser.role.replace('_', ' ')}</Badge>
          </div>
       </div>
 
@@ -330,8 +328,8 @@ export default function Overview() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
-           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Gần đây</h3>
-           <Link href="/requests" className="text-[10px] font-black text-primary uppercase">Xem thêm</Link>
+           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Hoạt động gần đây</h3>
+           <Link href="/requests" className="text-[10px] font-black text-primary uppercase">Xem tất cả</Link>
         </div>
         
         <div className="space-y-3">
@@ -353,6 +351,11 @@ export default function Overview() {
               </Card>
             </Link>
           ))}
+          {roleFilteredRequests.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-[2rem] border-2 border-dashed">
+               <p className="text-[10px] font-black text-slate-300 uppercase">Chưa có dữ liệu hoạt động</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

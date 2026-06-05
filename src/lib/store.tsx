@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -7,7 +6,6 @@ import { useFirebase } from '@/firebase';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
   signOut,
   signInWithPhoneNumber,
   RecaptchaVerifier,
@@ -29,7 +27,6 @@ interface AppContextType {
   currentUser: User | null;
   login: (email: string, pass: string) => Promise<void>;
   loginAsTestAccount: (role: UserRole, customUser?: User) => void;
-  register: (email: string, pass: string, name: string, unit: string) => Promise<void>;
   sendOtp: (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => Promise<ConfirmationResult>;
   verifyOtp: (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -132,25 +129,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('app_user_session', JSON.stringify(user));
   };
 
-  const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Firebase not initialized");
-    localStorage.removeItem('is_test_mode');
-    const res = await createUserWithEmailAndPassword(auth, email, pass);
-    const newUser: User = { id: res.user.uid, name, role: 'requester', unit, email };
-    await setDoc(doc(db, 'users', res.user.uid), newUser);
-    setCurrentUser(newUser);
-    localStorage.setItem('app_user_session', JSON.stringify(newUser));
-  };
-
   const sendOtp = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
-    if (!auth) throw new Error("Auth service unavailable");
-    // Đảm bảo recaptcha được render trước khi gửi
-    await recaptchaVerifier.render();
+    if (!auth) throw new Error("Dịch vụ xác thực không khả dụng.");
     return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
   };
 
   const verifyOtp = async (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => {
-    if (!db) throw new Error("Firestore not initialized");
+    if (!db) throw new Error("Firestore chưa được khởi tạo.");
     const result = await confirmationResult.confirm(otp);
     const user = result.user;
     
@@ -208,16 +193,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       currentUser,
       login,
       loginAsTestAccount,
-      register,
-      sendOtp,
-      verifyOtp,
       logout,
       requests,
       addRequest,
       updateRequestStatus,
       equipment: MOCK_EQUIPMENT,
       users,
-      isInitialized
+      isInitialized,
+      sendOtp,
+      verifyOtp
     }}>
       {children}
     </AppContext.Provider>

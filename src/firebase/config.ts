@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Cấu hình Firebase chính thức từ người dùng.
- * Các thông số này được sử dụng để kết nối ứng dụng với dự án Firebase của bạn.
+ * Cấu hình Firebase chính thức.
+ * Đảm bảo các thông số này khớp chính xác với Firebase Console của bạn.
  */
 
 export const firebaseConfig = {
