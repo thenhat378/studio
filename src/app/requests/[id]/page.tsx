@@ -42,6 +42,7 @@ export default function RequestDetail() {
   const router = useRouter();
   const { toast } = useToast();
   const { requests, currentUser, updateRequestStatus, users } = useAppStore();
+  
   const [report, setReport] = useState('');
   const [repairType, setRepairType] = useState<RepairType | ''>('');
   const [selectedTechId, setSelectedTechId] = useState('');
@@ -72,6 +73,11 @@ export default function RequestDetail() {
          title: "Đã báo cáo hoàn thành",
          description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
        });
+    } else if (status === 'verified') {
+      toast({
+        title: "Đã duyệt hoàn thành",
+        description: "Báo cáo kỹ thuật đã được chấp nhận. Chờ nghiệm thu từ đơn vị."
+      });
     } else {
        toast({
          title: "Cập nhật thành công",
@@ -99,7 +105,7 @@ export default function RequestDetail() {
       case 'approved': return <Badge className="bg-indigo-500">Đã phê duyệt</Badge>;
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
-      case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã xong</Badge>;
+      case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã báo xong</Badge>;
       case 'verified': return <Badge className="bg-cyan-600">Đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge className="bg-green-700 text-white">Đã đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
@@ -248,21 +254,23 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col gap-4">
+                {/* LÃNH ĐẠO PHÊ DUYỆT */}
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                   <div className="flex gap-3">
-                    <Button className="bg-primary flex-1 h-12 text-md font-bold" onClick={() => handleAction('approved')}>Duyệt phiếu</Button>
+                    <Button className="bg-primary flex-1 h-12 text-md font-bold" onClick={() => handleAction('approved')}>Phê duyệt yêu cầu</Button>
                     <Button variant="destructive" className="flex-1 h-12 text-md font-bold" onClick={() => handleAction('rejected', { rejectionReason: 'Yêu cầu không phù hợp hoặc không nằm trong danh mục CSVC quản lý.' })}>Từ chối</Button>
                   </div>
                 )}
 
+                {/* NGƯỜI YÊU CẦU HOẶC LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH */}
                 {isRequesterOrLeader && req.status === 'verified' && (
                   <div className="space-y-6">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận hoàn thành & Đánh giá chất lượng:</p>
-                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng của bạn về kết quả sửa chữa.</p>
+                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận hoàn thành & Đánh giá:</p>
+                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra và đánh giá kết quả sửa chữa để đóng phiếu.</p>
                       
                       <div className="space-y-3">
-                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Mức độ hài lòng</Label>
+                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng</Label>
                         <StarRating value={rating} onChange={setRating} />
                       </div>
                     </div>
@@ -272,15 +280,16 @@ export default function RequestDetail() {
                         <CheckCircle2 className="h-5 w-5" /> Xác nhận hoàn thành & Đóng phiếu
                       </Button>
                       <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                        Yêu cầu sửa lại
+                        Yêu cầu làm lại
                       </Button>
                     </div>
                   </div>
                 )}
 
+                {/* QUẢN LÝ CSVC PHÂN CÔNG */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                   <div className="space-y-4">
-                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Phân công kỹ thuật:</Label>
+                    <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Giao việc cho kỹ thuật:</Label>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <div className="flex-1">
                         <Select onValueChange={setSelectedTechId} value={selectedTechId}>
@@ -298,12 +307,13 @@ export default function RequestDetail() {
                         const tech = technicians.find(t => t.id === selectedTechId);
                         handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
                       }}>
-                        Giao việc
+                        Phân công
                       </Button>
                     </div>
                   </div>
                 )}
 
+                {/* QUẢN LÝ CSVC DUYỆT HOÀN THÀNH */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                   <div className="flex gap-3">
                     <Button className="bg-emerald-600 flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
@@ -315,12 +325,14 @@ export default function RequestDetail() {
                   </div>
                 )}
 
+                {/* KỸ THUẬT VIÊN BẮT ĐẦU */}
                 {currentUser?.role === 'technician' && req.status === 'assigned' && (
                   <Button className="bg-amber-500 h-14 text-lg font-bold" onClick={() => handleAction('in_progress')}>
                     Bắt đầu sửa chữa
                   </Button>
                 )}
                 
+                {/* KỸ THUẬT VIÊN BÁO CÁO HOÀN THÀNH */}
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
@@ -344,7 +356,7 @@ export default function RequestDetail() {
 
                     <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                        <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn báo cáo hoàn thành.</p>
+                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ gửi thông báo tự động cho Người yêu cầu và Quản lý CSVC ngay sau khi bạn nhấn báo cáo.</p>
                     </div>
 
                     <Button 
@@ -352,7 +364,7 @@ export default function RequestDetail() {
                       disabled={!report.trim() || !repairType} 
                       onClick={() => handleAction('completed', { technicianReport: report, repairType })}
                     >
-                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành & Thông báo các bên
+                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành & Gửi thông báo
                     </Button>
                   </div>
                 )}
@@ -360,14 +372,14 @@ export default function RequestDetail() {
                 {req.status === 'closed' && (
                    <div className="p-6 bg-green-50 rounded-2xl text-green-700 font-bold flex flex-col items-center gap-2 border border-green-200">
                       <CheckCircle2 className="h-10 w-10 text-green-500 mb-2" />
-                      Yêu cầu đã hoàn tất và được nghiệm thu.
+                      Yêu cầu đã được đóng và nghiệm thu hoàn tất.
                    </div>
                 )}
 
                 {req.status === 'rejected' && (
                    <div className="p-6 bg-rose-50 rounded-2xl text-rose-700 font-bold flex flex-col items-center gap-2 border border-rose-200">
                       <XCircle className="h-10 w-10 text-rose-500 mb-2" />
-                      Yêu cầu đã bị từ chối.
+                      Yêu cầu đã bị từ chối phê duyệt.
                    </div>
                 )}
               </div>

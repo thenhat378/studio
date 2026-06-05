@@ -34,8 +34,8 @@ export default function RequestsList() {
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã duyệt hoàn thành</Badge>;
-      case 'closed': return <Badge variant="outline" className="border-green-700 text-white bg-green-700">Đã đóng</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã duyệt kỹ thuật</Badge>;
+      case 'closed': return <Badge variant="outline" className="border-green-700 text-white bg-green-700">Đã hoàn tất</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -45,8 +45,8 @@ export default function RequestsList() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Danh sách yêu cầu sửa chữa</h1>
-          <p className="text-muted-foreground">Quản lý và theo dõi trạng thái các phiếu sửa chữa</p>
+          <h1 className="text-2xl font-bold text-primary">Theo dõi yêu cầu sửa chữa</h1>
+          <p className="text-muted-foreground">Quản lý và xem tiến độ xử lý các sự cố</p>
         </div>
         {currentUser?.role === 'requester' && (
           <Link href="/requests/new">
@@ -62,15 +62,15 @@ export default function RequestsList() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Tìm kiếm theo tiêu đề hoặc thiết bị..." 
+            placeholder="Tìm theo tiêu đề, thiết bị..." 
             className="pl-9 h-11"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="h-11 px-4 border-primary/20 hover:bg-primary/5">
-          <Filter className="mr-2 h-4 w-4 text-primary" />
-          Bộ lọc
+        <Button variant="outline" className="h-11 px-4">
+          <Filter className="mr-2 h-4 w-4" />
+          Lọc
         </Button>
       </div>
 
@@ -85,49 +85,36 @@ export default function RequestsList() {
                     {getStatusBadge(req.status)}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Wrench className="h-3 w-3" /> {req.equipmentName}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FileText className="h-3 w-3" /> {req.unit}
-                    </span>
-                    <span className="flex items-center gap-1 text-primary font-medium">
-                      <Clock className="h-3 w-3" /> Báo lúc: {new Date(req.createdAt).toLocaleString('vi-VN')}
-                    </span>
+                    <span className="flex items-center gap-1"><Wrench className="h-3 w-3" /> {req.equipmentName}</span>
+                    <span className="flex items-center gap-1 text-primary font-bold"><Clock className="h-3 w-3" /> Báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between md:justify-end gap-6 md:w-1/3">
-                  {req.status === 'verified' && currentUser?.role === 'requester' ? (
+                  {req.status === 'verified' && (currentUser?.role === 'requester' || currentUser?.role === 'unit_leader') ? (
                     <Link href={`/requests/${req.id}`}>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1 animate-pulse font-bold px-4">
+                      <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1 font-bold px-4">
                         <CheckCircle2 className="h-4 w-4" /> Xác nhận hoàn thành
                       </Button>
                     </Link>
                   ) : (
-                    <div className="text-left md:text-right">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Trạng thái</p>
-                      <p className="text-sm font-bold text-foreground">{req.status.replace('_', ' ')}</p>
+                    <div className="hidden sm:block text-right">
+                      <p className="text-xs font-medium text-muted-foreground uppercase">Mã phiếu</p>
+                      <p className="text-sm font-bold">{req.id}</p>
                     </div>
                   )}
                   
                   <div className="flex items-center gap-2">
                     <Link href={`/requests/${req.id}`}>
-                      <Button variant="secondary" size="sm" className="hidden md:flex">
-                        Chi tiết
-                      </Button>
+                      <Button variant="secondary" size="sm">Chi tiết</Button>
                     </Link>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-5 w-5" />
-                        </Button>
+                        <Button variant="ghost" size="icon"><MoreHorizontal className="h-5 w-5" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/requests/${req.id}`}>Chi tiết</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>In phiếu (PDF)</DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href={`/requests/${req.id}`}>Xem chi tiết</Link></DropdownMenuItem>
+                        <DropdownMenuItem>In phiếu PDF</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -138,11 +125,7 @@ export default function RequestsList() {
         ))}
         {filteredRequests.length === 0 && (
           <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
-            <div className="inline-flex p-4 bg-muted rounded-full mb-4">
-               <Search className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold">Không tìm thấy yêu cầu nào</h3>
-            <p className="text-muted-foreground max-w-sm mx-auto">Thử thay đổi từ khóa tìm kiếm hoặc lọc theo tiêu chí khác.</p>
+            <p className="text-muted-foreground">Không tìm thấy yêu cầu nào.</p>
           </div>
         )}
       </div>

@@ -41,7 +41,7 @@ export default function TasksPage() {
     updateRequestStatus(id, 'in_progress');
     toast({ 
       title: "Đã bắt đầu xử lý", 
-      description: "Trạng thái đã chuyển sang 'Đang thực hiện'. Vui lòng báo cáo khi hoàn tất." 
+      description: "Trạng thái đã chuyển sang 'Đang thực hiện'. Hãy báo cáo sau khi xong." 
     });
   };
 
@@ -65,8 +65,6 @@ export default function TasksPage() {
     });
     
     setReportingId(null);
-    setReportText('');
-    setRepairType('');
   };
 
   const getRepairTypeLabel = (type?: string) => {
@@ -80,10 +78,11 @@ export default function TasksPage() {
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới giao</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang xử lý</Badge>;
-      case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã xong - Chờ duyệt</Badge>;
-      case 'verified': return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã nghiệm thu</Badge>;
+      case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới phân công</Badge>;
+      case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang thực hiện</Badge>;
+      case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã báo cáo hoàn thành</Badge>;
+      case 'verified': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã duyệt kỹ thuật</Badge>;
+      case 'closed': return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
@@ -94,9 +93,9 @@ export default function TasksPage() {
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
             <Wrench className="h-6 w-6 text-accent" />
-            Nhiệm vụ sửa chữa của tôi
+            Nhiệm vụ sửa chữa được giao
           </h1>
-          <p className="text-muted-foreground">Nhận việc và cập nhật tiến độ xử lý các sự cố được giao</p>
+          <p className="text-muted-foreground">Theo dõi và báo cáo kết quả xử lý sự cố</p>
         </div>
       </div>
 
@@ -113,11 +112,6 @@ export default function TasksPage() {
                   <p>Phòng/Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
                   <p>Thiết bị: <span className="text-foreground font-medium">{req.equipmentName}</span></p>
                 </div>
-                {req.repairType && (
-                  <p className="text-xs mt-2 font-bold text-primary bg-primary/5 p-2 rounded inline-block">
-                    Hình thức: {getRepairTypeLabel(req.repairType)}
-                  </p>
-                )}
               </div>
               
               <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
@@ -130,17 +124,17 @@ export default function TasksPage() {
                 {req.status === 'assigned' && (
                   <Button 
                     size="sm" 
-                    className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none" 
+                    className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none font-bold" 
                     onClick={() => handleStart(req.id)}
                   >
-                    <Play className="h-4 w-4" /> Bắt đầu làm
+                    <Play className="h-4 w-4" /> Bắt đầu sửa
                   </Button>
                 )}
 
                 {req.status === 'in_progress' && (
                   <Button 
                     size="sm" 
-                    className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none" 
+                    className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none font-bold" 
                     onClick={() => handleOpenReport(req.id)}
                   >
                     <ClipboardPen className="h-4 w-4" /> Báo cáo hoàn thành
@@ -153,8 +147,7 @@ export default function TasksPage() {
         {myTasks.length === 0 && (
           <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-            <h3 className="text-lg font-semibold">Chưa có nhiệm vụ nào được giao</h3>
-            <p className="text-muted-foreground">Khi Quản lý CSVC phân công, các phiếu sẽ xuất hiện ở đây.</p>
+            <h3 className="text-lg font-semibold">Chưa có nhiệm vụ nào</h3>
           </div>
         )}
       </div>
@@ -164,10 +157,10 @@ export default function TasksPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 uppercase tracking-tight font-black">
               <ClipboardPen className="h-5 w-5 text-primary" />
-              Báo cáo hoàn thành sửa chữa
+              Báo cáo hoàn thành công việc
             </DialogTitle>
             <DialogDescription>
-              Vui lòng chọn hình thức xử lý và mô tả chi tiết kết quả. Thông báo sẽ tự động gửi đến Người yêu cầu & Quản lý sau khi lưu.
+              Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn gửi báo cáo.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-6">
@@ -189,7 +182,7 @@ export default function TasksPage() {
               <Label htmlFor="report" className="text-xs font-black uppercase text-muted-foreground tracking-widest">Chi tiết xử lý</Label>
               <Textarea 
                 id="report"
-                placeholder="Mô tả cụ thể các bước đã thực hiện..." 
+                placeholder="Mô tả cụ thể những gì đã làm..." 
                 value={reportText}
                 onChange={(e) => setReportText(e.target.value)}
                 className="min-h-[120px] border-primary/20"
@@ -198,7 +191,7 @@ export default function TasksPage() {
             
             <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-               <p className="text-xs text-blue-700 font-medium">Sau khi nhấn xác nhận, hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC.</p>
+               <p className="text-xs text-blue-700 font-medium font-bold">Lưu ý: Sau khi nhấn xác nhận, thông báo sẽ được gửi đi tức thì.</p>
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -208,7 +201,7 @@ export default function TasksPage() {
               onClick={handleSubmitReport} 
               disabled={!reportText.trim() || !repairType}
             >
-              Gửi báo cáo & Thông báo
+              Gửi báo cáo hoàn thành
             </Button>
           </DialogFooter>
         </DialogContent>
