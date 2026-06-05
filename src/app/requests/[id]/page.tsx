@@ -92,6 +92,9 @@ export default function RequestDetail() {
 
   const handlePrint = () => { window.print(); };
 
+  const currentDate = new Date();
+  const dateStr = `Đà Nẵng, ngày ${currentDate.getDate()} tháng ${currentDate.getMonth() + 1} năm ${currentDate.getFullYear()}`;
+
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
       {/* Nav Header */}
@@ -108,27 +111,52 @@ export default function RequestDetail() {
 
       {/* Official Print View - Only shown on print */}
       <div className="print-only p-8 space-y-8 bg-white text-black font-serif">
-        <div className="flex justify-between items-start border-b-2 border-black pb-4">
-          <div className="text-center space-y-1">
-            <p className="font-bold text-xs uppercase">PHÒNG QUẢN TRỊ CSVC</p>
-            <p className="text-xs">Số: {req.id}</p>
+        <div className="flex justify-between items-start pb-4">
+          <div className="text-center space-y-0.5">
+            <p className="text-[11px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-[11px] uppercase underline decoration-1 underline-offset-4">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <p className="text-[10px] mt-1 font-bold">Số: {req.id}</p>
           </div>
-          <div className="text-center space-y-1">
-            <p className="font-bold text-xs underline">Độc lập - Tự do - Hạnh phúc</p>
-            <p className="text-[10px] italic">{new Date().toLocaleDateString('vi-VN')}</p>
+          <div className="text-center space-y-0.5">
+            <p className="font-bold text-[11px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-[11px] underline decoration-1 underline-offset-4">Độc lập - Tự do - Hạnh phúc</p>
+            <p className="text-[10px] italic mt-2">{dateStr}</p>
           </div>
         </div>
-        <h1 className="text-xl font-bold uppercase text-center">PHIẾU BÁO CÁO SỬA CHỮA</h1>
-        <div className="space-y-3 text-sm">
-          <p><span className="font-bold">Tiêu đề:</span> {req.title}</p>
-          <p><span className="font-bold">Người báo:</span> {req.requesterName} ({req.unit})</p>
-          <p><span className="font-bold">Thiết bị:</span> {req.equipmentName}</p>
-          <p><span className="font-bold">Kỹ thuật:</span> {req.technicianName || '...'}</p>
-          <p><span className="font-bold">Nội dung:</span> {req.technicianReport || '...'}</p>
+
+        <div className="pt-6">
+          <h1 className="text-xl font-bold uppercase text-center">PHIẾU BÁO CÁO KẾT QUẢ SỬA CHỮA</h1>
+          <p className="text-center italic text-xs mt-1">(Dùng cho lưu trữ hồ sơ cơ sở vật chất)</p>
         </div>
-        <div className="grid grid-cols-2 gap-4 pt-10 text-center text-xs font-bold">
-          <div className="space-y-16"><p>NGƯỜI YÊU CẦU</p><p className="font-normal">(Ký tên)</p></div>
-          <div className="space-y-16"><p>LÃNH ĐẠO ĐƠN VỊ</p><p className="font-normal">(Ký, đóng dấu)</p></div>
+
+        <div className="space-y-4 text-sm pt-4">
+          <div className="grid grid-cols-1 gap-2">
+            <p><span className="font-bold">1. Tiêu đề:</span> {req.title}</p>
+            <p><span className="font-bold">2. Đơn vị yêu cầu:</span> {req.unit}</p>
+            <p><span className="font-bold">3. Người báo hỏng:</span> {req.requesterName}</p>
+            <p><span className="font-bold">4. Thiết bị sửa chữa:</span> {req.equipmentName} ({req.category})</p>
+            <p><span className="font-bold">5. Hình thức xử lý:</span> {getRepairTypeText(req.repairType)}</p>
+            <p><span className="font-bold">6. Nội dung kỹ thuật xử lý:</span></p>
+            <div className="pl-4 italic text-slate-800">
+              {req.technicianReport || 'Chưa cập nhật nội dung.'}
+            </div>
+            <p><span className="font-bold">7. Kết quả nghiệm thu:</span> {req.status === 'closed' ? `Đã hoàn thành (${req.rating} sao)` : 'Đang xử lý'}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 pt-12 text-center text-[11px] font-bold uppercase">
+          <div className="space-y-20">
+            <p>NGƯỜI YÊU CẦU</p>
+            <p className="font-normal italic text-[10px]">(Ký và ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-20">
+            <p>BỘ PHẬN KỸ THUẬT</p>
+            <p className="font-normal italic text-[10px]">(Ký và ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-20">
+            <p>LÃNH ĐẠO ĐƠN VỊ</p>
+            <p className="font-normal italic text-[10px]">(Ký và đóng dấu)</p>
+          </div>
         </div>
       </div>
 
@@ -162,7 +190,7 @@ export default function RequestDetail() {
               </div>
             )}
 
-            {/* Stepper style progress on mobile */}
+            {/* Stepper style progress */}
             <div className="grid grid-cols-3 gap-2 py-2">
               {[
                 { label: 'CSVC', active: req.csvcManagerApproved },
