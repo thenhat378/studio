@@ -129,12 +129,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
 
     try {
-      // Lưu trực tiếp vào Firestore
       await setDoc(doc(db, 'users', userId), userData);
-      
-      // Cập nhật trạng thái cục bộ
-      setCurrentUser(userData);
-      localStorage.setItem('due_user', JSON.stringify(userData));
+      // Removed automatic login to allow user to manually login after registration
     } catch (error: any) {
       console.error("Lỗi đăng ký:", error);
       throw new Error("Không thể lưu thông tin. Vui lòng thử lại.");

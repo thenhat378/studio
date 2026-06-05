@@ -41,6 +41,7 @@ export default function Overview() {
   
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState('login');
   
   // Login states
   const [loginPhone, setLoginPhone] = useState('');
@@ -116,7 +117,19 @@ export default function Overview() {
       await register(regData);
       toast({ 
         title: "Đăng ký thành công!", 
-        description: "Bạn đã có thể bắt đầu sử dụng hệ thống." 
+        description: "Vui lòng đăng nhập bằng tài khoản vừa tạo." 
+      });
+      // Pre-fill login phone and switch to login tab
+      setLoginPhone(regData.phone);
+      setLoginPass('');
+      setActiveTab('login');
+      // Reset registration form
+      setRegData({
+        name: '',
+        phone: '',
+        pass: '',
+        unit: '',
+        role: 'requester' as UserRole
       });
     } catch (error: any) {
       toast({ 
@@ -142,7 +155,7 @@ export default function Overview() {
           </div>
 
           <Card className="border-none shadow-2xl rounded-[3.5rem] overflow-hidden bg-white">
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-20 bg-white border-b p-0">
                 <TabsTrigger value="login" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng nhập</TabsTrigger>
                 <TabsTrigger value="register" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng ký mới</TabsTrigger>
