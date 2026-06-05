@@ -4,6 +4,7 @@ import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
 import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/lib/store';
+import { FirebaseProvider } from '@/firebase/provider';
 
 export const metadata: Metadata = {
   title: 'Ứng dụng Quản lý sửa chữa',
@@ -40,12 +41,14 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="https://picsum.photos/seed/due-university-logo/180/180" />
       </head>
       <body className="font-body antialiased">
-        <AppProvider>
-          <AppShell>
-            {children}
-          </AppShell>
-          <Toaster />
-        </AppProvider>
+        <FirebaseProvider>
+          <AppProvider>
+            <AppShell>
+              {children}
+            </AppShell>
+            <Toaster />
+          </AppProvider>
+        </FirebaseProvider>
       </body>
     </html>
   );
