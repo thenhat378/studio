@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -74,7 +74,7 @@ export default function NewRequest() {
     setIsSubmitting(true);
     const equip = equipment.find(e => e.id === formData.equipmentId);
     
-    addRequest({
+    const requestData: any = {
       title: formData.title,
       description: formData.description,
       equipmentId: formData.equipmentId,
@@ -83,42 +83,56 @@ export default function NewRequest() {
       requesterId: currentUser.id,
       requesterName: currentUser.name,
       unit: currentUser.unit || 'Unknown',
-      aiSuggestions: aiSuggestions ? {
+    };
+
+    if (aiSuggestions) {
+      requestData.aiSuggestions = {
         causes: aiSuggestions.causes,
         recommendedEquipment: aiSuggestions.recommendedEquipment
-      } : undefined
-    });
+      };
+    }
 
-    toast({
-      title: "Thành công",
-      description: "Yêu cầu của bạn đã được gửi đi và đang chờ phê duyệt."
-    });
-
-    router.push('/requests');
+    try {
+      await addRequest(requestData);
+      toast({
+        title: "Thành công",
+        description: "Yêu cầu của bạn đã được gửi đi và đang chờ phê duyệt."
+      });
+      router.push('/requests');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Không thể gửi yêu cầu."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 pb-24">
       <div className="flex items-center gap-2 mb-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full">
           <ChevronLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold">Tạo phiếu yêu cầu sửa chữa</h1>
+        <h1 className="text-2xl font-black text-slate-800">Tạo phiếu yêu cầu</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
-          <Card className="border-none shadow-sm">
-            <CardHeader>
-              <CardTitle>Thông tin sự cố</CardTitle>
-              <CardDescription>Mô tả chi tiết vấn đề bạn đang gặp phải</CardDescription>
+          <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden">
+            <CardHeader className="bg-slate-50/50">
+              <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tighter">Thông tin sự cố</CardTitle>
+              <CardDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mô tả chi tiết vấn đề cần xử lý</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 p-8">
               <div className="space-y-2">
-                <Label htmlFor="title">Tiêu đề yêu cầu</Label>
+                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1">Tiêu đề yêu cầu</Label>
                 <Input 
                   id="title" 
                   placeholder="Ví dụ: Máy chiếu phòng 302 không lên" 
+                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold"
                   value={formData.title}
                   onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   required
@@ -126,24 +140,24 @@ export default function NewRequest() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="description">Mô tả sự cố</Label>
+                <div className="flex justify-between items-center px-1">
+                  <Label htmlFor="description" className="text-[10px] font-black uppercase text-slate-400">Mô tả sự cố</Label>
                   <Button 
                     type="button" 
                     variant="ghost" 
                     size="sm" 
-                    className="text-primary hover:text-accent flex items-center gap-2"
+                    className="text-primary hover:text-accent font-black text-[10px] uppercase tracking-widest"
                     onClick={handleAiAssist}
                     disabled={isAiLoading || !formData.description}
                   >
-                    {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
                     Phân tích bằng AI
                   </Button>
                 </div>
                 <Textarea 
                   id="description" 
-                  placeholder="Mô tả chi tiết tình trạng, thời điểm xảy ra..." 
-                  className="min-h-[120px]"
+                  placeholder="Mô tả tình trạng lỗi..." 
+                  className="min-h-[120px] rounded-2xl bg-slate-50 border-none font-bold p-4"
                   value={formData.description}
                   onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   required
@@ -151,17 +165,17 @@ export default function NewRequest() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="equipment">Thiết bị cần sửa</Label>
+                <Label htmlFor="equipment" className="text-[10px] font-black uppercase text-slate-400 ml-1">Thiết bị cần sửa</Label>
                 <Select 
                   value={formData.equipmentId} 
                   onValueChange={val => setFormData(prev => ({ ...prev, equipmentId: val }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold">
                     <SelectValue placeholder="Chọn thiết bị từ danh mục" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-2xl border-none shadow-xl">
                     {equipment.map(e => (
-                      <SelectItem key={e.id} value={e.id}>{e.name} ({e.category})</SelectItem>
+                      <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -170,43 +184,44 @@ export default function NewRequest() {
           </Card>
 
           {aiSuggestions && (
-            <Card className="border-accent/20 bg-accent/5">
+            <Card className="border-accent/20 bg-accent/5 rounded-[2rem] overflow-hidden">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                <CardTitle className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-widest">
                   <Sparkles className="h-4 w-4" /> Gợi ý từ FixFlow AI
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Nguyên nhân có thể:</p>
+              <CardContent className="space-y-4 p-6 pt-0">
+                <div className="bg-white/50 p-4 rounded-2xl">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">Phân tích nguyên nhân:</p>
                   <ul className="space-y-1">
                     {aiSuggestions.causes.map((cause, i) => (
-                      <li key={i} className="text-sm flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                      <li key={i} className="text-xs font-bold flex items-start gap-2 text-slate-700">
+                        <CheckCircle2 className="h-3 w-3 text-accent mt-0.5 shrink-0" />
                         {cause}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Phân loại AI:</p>
-                    <p className="text-sm">{aiSuggestions.category}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/50 p-4 rounded-2xl">
+                    <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Phân loại AI:</p>
+                    <p className="text-xs font-bold text-primary">{aiSuggestions.category}</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Vật tư gợi ý:</p>
-                    <p className="text-sm">{aiSuggestions.recommendedEquipment.join(', ') || 'N/A'}</p>
+                  <div className="bg-white/50 p-4 rounded-2xl">
+                    <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Vật tư gợi ý:</p>
+                    <p className="text-xs font-bold text-primary">{aiSuggestions.recommendedEquipment.join(', ') || 'N/A'}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
-            <Button type="submit" className="bg-primary" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Gửi yêu cầu phê duyệt
+          <div className="flex flex-col gap-3">
+            <Button type="submit" className="w-full bg-primary h-16 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-blue-100 transition-all active:scale-95" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi yêu cầu phê duyệt"}
+            </Button>
+            <Button type="button" variant="ghost" className="w-full h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400" onClick={() => router.back()}>
+              Hủy bỏ yêu cầu
             </Button>
           </div>
         </div>

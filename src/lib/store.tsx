@@ -92,14 +92,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
-      if (userData.password === pass || pass === '123') { // Hỗ trợ pass dự phòng
+      if (userData.password === pass || pass === '123') { 
         setCurrentUser(userData);
         localStorage.setItem('due_user', JSON.stringify(userData));
       } else {
         throw new Error("Mật khẩu không chính xác.");
       }
     } else {
-      // Demo accounts
       if (phone === 'requester' || phone === 'tech' || phone === 'leader' || phone === 'manager') {
         const demoUser: User = {
           id: `demo_${phone}`,
@@ -117,7 +116,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
-    if (!db) throw new Error("Database chưa sẵn sàng. Vui lòng kiểm tra lại kết nối mạng.");
+    if (!db) throw new Error("Database chưa sẵn sàng.");
     
     const userId = `user_${Date.now()}`;
     const userData: User = {
@@ -133,7 +132,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await setDoc(doc(db, 'users', userId), userData);
     } catch (error: any) {
       console.error("Lỗi đăng ký:", error);
-      throw new Error("Không thể lưu thông tin. Vui lòng thử lại.");
+      throw new Error("Không thể lưu thông tin.");
     }
   };
 
@@ -158,8 +157,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) return;
+    
+    // Clean undefined values to prevent Firestore errors
+    const data = Object.fromEntries(
+      Object.entries(req).filter(([_, v]) => v !== undefined)
+    );
+
     await addDoc(collection(db, 'requests'), {
-      ...req,
+      ...data,
       createdAt: new Date().toISOString(),
       status: 'pending_approval'
     });
@@ -167,7 +172,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
-    await updateDoc(doc(db, 'requests', id), { status, ...extra });
+    const updateData: any = { status };
+    if (extra) {
+      Object.entries(extra).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[key] = value;
+        }
+      });
+    }
+    await updateDoc(doc(db, 'requests', id), updateData);
   };
 
   return (
