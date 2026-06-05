@@ -6,7 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, PlusCircle, Wrench, MoreHorizontal, FileText, Clock } from 'lucide-react';
+import { Search, Filter, PlusCircle, Wrench, MoreHorizontal, FileText, Clock, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { 
@@ -34,7 +34,7 @@ export default function RequestsList() {
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã duyệt hoàn thành</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã duyệt hoàn thành</Badge>;
       case 'closed': return <Badge variant="outline" className="border-green-700 text-white bg-green-700">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
@@ -100,8 +100,8 @@ export default function RequestsList() {
                 <div className="flex items-center justify-between md:justify-end gap-6 md:w-1/3">
                   {req.status === 'verified' && currentUser?.role === 'requester' ? (
                     <Link href={`/requests/${req.id}`}>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1 animate-pulse">
-                        <CheckCircle2 className="h-4 w-4" /> Nghiệm thu
+                      <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1 animate-pulse font-bold px-4">
+                        <CheckCircle2 className="h-4 w-4" /> Xác nhận hoàn thành
                       </Button>
                     </Link>
                   ) : (

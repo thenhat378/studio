@@ -62,7 +62,12 @@ export default function RequestDetail() {
   const handleAction = (status: any, extra?: any) => {
     updateRequestStatus(req.id, status, extra);
     
-    if (status === 'completed') {
+    if (status === 'closed') {
+       toast({
+         title: "Hoàn tất yêu cầu",
+         description: "Cảm ơn bạn đã phản hồi. Phiếu yêu cầu hiện đã được đóng."
+       });
+    } else if (status === 'completed') {
        toast({
          title: "Đã báo cáo hoàn thành",
          description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
@@ -237,7 +242,8 @@ export default function RequestDetail() {
           <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-accent no-print">
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2 font-bold uppercase tracking-tight">
-                 <ShieldAlert className="h-5 w-5 text-accent" /> Thao tác xử lý
+                 <ShieldAlert className="h-5 w-5 text-accent" /> 
+                 {isRequesterOrLeader && req.status === 'verified' ? 'Hoàn tất quy trình' : 'Thao tác xử lý'}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -252,18 +258,18 @@ export default function RequestDetail() {
                 {isRequesterOrLeader && req.status === 'verified' && (
                   <div className="space-y-6">
                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận nghiệm thu & Đánh giá chất lượng:</p>
-                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng của bạn về cách xử lý của kỹ thuật viên.</p>
+                      <p className="text-sm text-emerald-800 font-bold mb-2 uppercase">Xác nhận hoàn thành & Đánh giá chất lượng:</p>
+                      <p className="text-xs text-emerald-600 mb-4 italic">Vui lòng kiểm tra thiết bị và đánh giá mức độ hài lòng của bạn về kết quả sửa chữa.</p>
                       
                       <div className="space-y-3">
-                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Bạn hài lòng như thế nào?</Label>
+                        <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Mức độ hài lòng</Label>
                         <StarRating value={rating} onChange={setRating} />
                       </div>
                     </div>
                     
                     <div className="flex gap-3">
                       <Button className="bg-primary flex-1 h-12 text-md font-bold gap-2" onClick={() => handleAction('closed', { rating })}>
-                        <CheckCircle2 className="h-5 w-5" /> Nghiệm thu & Đóng phiếu
+                        <CheckCircle2 className="h-5 w-5" /> Xác nhận hoàn thành & Đóng phiếu
                       </Button>
                       <Button variant="outline" className="flex-1 h-12 text-md font-bold text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
                         Yêu cầu sửa lại
