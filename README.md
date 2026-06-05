@@ -1,44 +1,37 @@
 
-# 🚀 Cách Build & Deploy "Siêu Tốc" Để Thử Trên Điện Thoại
+# 🚀 Hướng Dẫn Triển Khai & Sử Dụng Hệ Thống
 
-Nếu bạn muốn thấy ứng dụng chạy trên điện thoại ngay lập tức mà không muốn đợi cấu hình Firebase App Hosting phức tạp, hãy thử 2 cách sau:
+Dự án này là hệ thống Quản lý sửa chữa thiết bị được tối ưu cho thiết bị di động (PWA) và tích hợp AI.
 
 ---
 
-## ⚡️ Cách 1: Dùng Vercel (Nhanh nhất - Chỉ 2 phút)
-Đây là cách "mì ăn liền" cho Next.js, cực kỳ mượt mà:
-1. Vào [Vercel.com](https://vercel.com/) và đăng nhập bằng tài khoản GitHub của bạn.
-2. Nhấn **"Add New"** -> **"Project"**.
-3. Chọn cái Kho lưu trữ (Repository) bạn vừa up lên.
+## 📖 Hướng dẫn nhanh
+
+### 1. Quy trình sử dụng
+Để hiểu rõ cách vận hành giữa 4 vai trò (Người yêu cầu, Lãnh đạo, Quản lý, Kỹ thuật), vui lòng xem:
+👉 **[Tài liệu hướng dẫn quy trình chi tiết tại đây](./docs/user-guide.md)**
+
+### 2. Cách Build & Deploy lên điện thoại
+Nếu bạn muốn thấy ứng dụng chạy trên điện thoại ngay lập tức:
+
+#### ⚡️ Cách: Dùng Vercel (Nhanh nhất - Chỉ 2 phút)
+1. Tải code về máy và up lên một Repo GitHub cá nhân của bạn.
+2. Vào [Vercel.com](https://vercel.com/) và đăng nhập bằng GitHub.
+3. Nhấn **"Add New"** -> **"Project"** -> Chọn Repo của bạn.
 4. Nhấn **"Deploy"**.
-5. Đợi 1 phút, Vercel sẽ cho bạn một đường link `https://tên-dự-án.vercel.app`.
-6. Gửi link này vào điện thoại, mở bằng Safari/Chrome và cài đặt như hướng dẫn.
+5. Gửi link `.vercel.app` vào điện thoại, mở bằng Safari/Chrome và chọn **"Thêm vào màn hình chính"**.
 
 ---
 
-## 🔥 Cách 2: Dùng lệnh Firebase CLI (Nếu đã cài Node.js trên máy)
-Cách này giúp bạn đẩy code thẳng từ máy tính lên Firebase Hosting:
+## 📱 Cài đặt vào điện thoại
+*   **iPhone (Safari):** Bấm nút **Chia sẻ** -> **Thêm vào màn hình chính**.
+*   **Android (Chrome):** Bấm **3 chấm** -> **Cài đặt ứng dụng**.
 
-1. **Cài công cụ Firebase**: 
-   `npm install -g firebase-tools`
-2. **Đăng nhập**: 
-   `firebase login`
-3. **Khởi tạo (Chỉ làm 1 lần)**: 
-   `firebase init hosting`
-   * Chọn `Use an existing project` (Chọn đúng dự án trên web của bạn).
-   * Chọn `Next.js` khi được hỏi về framework.
-4. **Deploy**: 
-   `npm run build`
-   `firebase deploy`
+## 🔑 Tài khoản Test (Mật khẩu: bất kỳ)
+- `requester` (Nhân viên - Tạo yêu cầu)
+- `leader` (Lãnh đạo đơn vị - Phê duyệt & Nghiệm thu)
+- `manager` (Quản lý CSVC - Phân công kỹ thuật)
+- `tech` (Kỹ thuật viên - Thực hiện sửa chữa)
 
 ---
-
-## 📱 Cách Cài Vào Điện Thoại (Sau khi có link)
-* **iPhone (Safari)**: Bấm nút **Chia sẻ** -> **Thêm vào màn hình chính**.
-* **Android (Chrome)**: Bấm **3 chấm** -> **Cài đặt ứng dụng**.
-
-## 🔑 Tài khoản Test (Mật khẩu: 123456)
-- `requester`, `leader`, `manager`, `tech`
-
----
-*Lưu ý quan trọng: Nhớ thay các thông số trong `src/firebase/config.ts` để dữ liệu thật có thể lưu trữ được nhé!*
+*© 2026 Hệ thống quản lý sửa chữa DUE*
