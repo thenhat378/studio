@@ -156,15 +156,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
-    if (!db) return;
+    if (!db) throw new Error("Database chưa sẵn sàng.");
     
-    // Clean undefined values to prevent Firestore errors
-    const data = Object.fromEntries(
-      Object.entries(req).filter(([_, v]) => v !== undefined)
-    );
+    // Đảm bảo không có trường undefined để tránh lỗi Firestore
+    const cleanData = JSON.parse(JSON.stringify(req));
 
     await addDoc(collection(db, 'requests'), {
-      ...data,
+      ...cleanData,
       createdAt: new Date().toISOString(),
       status: 'pending_approval'
     });
@@ -172,14 +170,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
-    const updateData: any = { status };
-    if (extra) {
-      Object.entries(extra).forEach(([key, value]) => {
-        if (value !== undefined) {
-          updateData[key] = value;
-        }
-      });
-    }
+    const cleanExtra = extra ? JSON.parse(JSON.stringify(extra)) : {};
+    const updateData: any = { 
+      status,
+      ...cleanExtra
+    };
     await updateDoc(doc(db, 'requests', id), updateData);
   };
 

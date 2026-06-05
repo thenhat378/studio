@@ -41,12 +41,12 @@ export default function NewRequest() {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      // Giới hạn dung lượng ảnh khoảng 2MB để tránh lỗi Firestore payload
-      if (file.size > 2 * 1024 * 1024) {
+      // Giới hạn dung lượng ảnh khoảng 1MB để tránh lỗi Firestore payload (Firestore doc limit is 1MB)
+      if (file.size > 1 * 1024 * 1024) {
         toast({
           variant: "destructive",
           title: "Ảnh quá lớn",
-          description: "Vui lòng chọn ảnh dưới 2MB."
+          description: "Vui lòng chọn ảnh dưới 1MB."
         });
         return;
       }
@@ -57,7 +57,6 @@ export default function NewRequest() {
       };
       reader.readAsDataURL(file);
     });
-    // Reset input value to allow selecting same file again
     e.target.value = '';
   };
 
@@ -79,9 +78,9 @@ export default function NewRequest() {
     try {
       const result = await aiAssistedRequestCreation({ problemDescription: formData.description });
       setAiSuggestions({
-        causes: result.suggestedCauses,
-        category: result.category,
-        recommendedEquipment: result.recommendedEquipment
+        causes: result.suggestedCauses || [],
+        category: result.category || 'General',
+        recommendedEquipment: result.recommendedEquipment || []
       });
       toast({
         title: "Phân tích hoàn tất",
@@ -100,22 +99,28 @@ export default function NewRequest() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.description || !formData.equipmentId || !currentUser) return;
+    if (!formData.title || !formData.description || !formData.equipmentId || !currentUser) {
+      toast({
+        variant: "destructive",
+        title: "Thiếu thông tin",
+        description: "Vui lòng điền đầy đủ các trường bắt buộc."
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     const equip = equipment.find(e => e.id === formData.equipmentId);
     
-    // Đảm bảo không có trường undefined để tránh lỗi Firestore
     const requestData: any = {
-      title: formData.title || '',
-      description: formData.description || '',
-      equipmentId: formData.equipmentId || '',
-      equipmentName: equip?.name || '',
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      equipmentId: formData.equipmentId,
+      equipmentName: equip?.name || 'Thiết bị không xác định',
       category: equip?.category || 'General',
-      requesterId: currentUser.id || '',
-      requesterName: currentUser.name || '',
-      unit: currentUser.unit || 'Không xác định',
-      images: images.length > 0 ? images : [],
+      requesterId: currentUser.id,
+      requesterName: currentUser.name,
+      unit: currentUser.unit || 'Đơn vị không xác định',
+      images: images,
     };
 
     if (aiSuggestions) {
@@ -129,14 +134,15 @@ export default function NewRequest() {
       await addRequest(requestData);
       toast({
         title: "Thành công",
-        description: "Yêu cầu của bạn đã được gửi đi và đang chờ phê duyệt."
+        description: "Yêu cầu của bạn đã được gửi đi."
       });
       router.push('/requests');
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Submit error:", error);
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: "Không thể gửi yêu cầu."
+        title: "Lỗi gửi yêu cầu",
+        description: error.message || "Đã xảy ra lỗi hệ thống, vui lòng thử lại."
       });
     } finally {
       setIsSubmitting(false);
