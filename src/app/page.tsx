@@ -9,19 +9,18 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Wrench,
   Phone,
   Lock,
   Loader2,
   ChevronRight,
   User,
   Building,
-  AlertCircle,
   CheckCircle2,
   ShieldCheck,
   Check,
   X,
-  Info
+  Info,
+  Wrench
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -198,13 +197,15 @@ export default function Overview() {
   };
 
   if (!currentUser) {
+    const logoImg = PlaceHolderImages.find(img => img.id === 'due-logo')?.imageUrl || '';
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
         <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-500">
           <div className="text-center space-y-6">
             <div className="relative h-32 w-32 mx-auto mb-2 animate-in slide-in-from-top-4 duration-700">
               <Image 
-                src={PlaceHolderImages.find(img => img.id === 'due-logo')?.imageUrl || ''}
+                src={logoImg}
                 alt="DUE Logo"
                 fill
                 className="object-contain"
@@ -385,35 +386,44 @@ export default function Overview() {
             <form onSubmit={handleResetPassword} className="space-y-5 py-4">
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Số điện thoại</Label>
-                <Input 
-                  placeholder="09xx..." 
-                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
-                  value={forgotData.phone}
-                  onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))}
-                  required
-                />
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                  <Input 
+                    placeholder="09xx..." 
+                    className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                    value={forgotData.phone}
+                    onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))}
+                    required
+                  />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu mới</Label>
-                <Input 
-                  type="password"
-                  placeholder="••••••••" 
-                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
-                  value={forgotData.newPass}
-                  onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))}
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                  <Input 
+                    type="password"
+                    placeholder="••••••••" 
+                    className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                    value={forgotData.newPass}
+                    onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))}
+                    required
+                  />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Xác nhận mật khẩu mới</Label>
-                <Input 
-                  type="password"
-                  placeholder="••••••••" 
-                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
-                  value={forgotData.confirmPass}
-                  onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))}
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                  <Input 
+                    type="password"
+                    placeholder="••••••••" 
+                    className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                    value={forgotData.confirmPass}
+                    onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))}
+                    required
+                  />
+                </div>
                 
                 {/* Validation indicators inside dialog */}
                 <div className="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
