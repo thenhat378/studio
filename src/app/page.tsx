@@ -6,7 +6,8 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle,
-  CardDescription
+  CardDescription,
+  CardFooter
 } from '@/components/ui/card';
 import { 
   ClipboardList, 
@@ -17,52 +18,164 @@ import {
   ChevronRight,
   User,
   ShieldCheck,
-  HardDrive
+  HardDrive,
+  Lock,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 export default function Dashboard() {
   const { currentUser, login, requests, isInitialized } = useAppStore();
+  const { toast } = useToast();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isInitialized) return null;
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !password) {
+      toast({
+        variant: "destructive",
+        title: "Lỗi đăng nhập",
+        description: "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu."
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    // Trong bản demo này, chúng ta giả định bất kỳ user/pass nào cũng hợp lệ 
+    // và mặc định vào vai trò 'requester' trừ khi sử dụng nút đăng nhập nhanh.
+    setTimeout(() => {
+      login('requester');
+      setIsLoading(false);
+      toast({
+        title: "Đăng nhập thành công",
+        description: `Chào mừng bạn quay trở lại!`
+      });
+    }, 800);
+  };
+
   if (!currentUser) {
     return (
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-slate-50/50">
         <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
           <div className="text-center space-y-2">
             <div className="inline-flex p-4 bg-primary/10 rounded-3xl mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
               <Wrench className="h-12 w-12 text-primary" />
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-primary">FixFlow Pro</h1>
-            <p className="text-muted-foreground text-lg">Hệ thống quản lý sửa chữa cơ sở vật chất</p>
+            <p className="text-muted-foreground text-lg">Hệ thống quản lý sửa chữa thông minh</p>
           </div>
 
-          <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-sm">
+          <Card className="border-none shadow-2xl bg-white/90 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-xl">Chọn vai trò đăng nhập</CardTitle>
-              <CardDescription>Để trải nghiệm quy trình tương ứng</CardDescription>
+              <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
+              <CardDescription>Nhập thông tin để truy cập hệ thống</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pt-4">
-              <Button onClick={() => login('requester')} className="w-full bg-primary hover:bg-primary/90 h-14 text-md font-semibold justify-between px-6">
-                <span className="flex items-center gap-3"><User className="h-5 w-5" /> Người yêu cầu</span>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </Button>
-              <Button onClick={() => login('unit_leader')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
-                <span className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-accent" /> Lãnh đạo đơn vị</span>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </Button>
-              <Button onClick={() => login('csvc_manager')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
-                <span className="flex items-center gap-3"><ClipboardList className="h-5 w-5 text-indigo-600" /> Quản lý CSVC</span>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </Button>
-              <Button onClick={() => login('technician')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
-                <span className="flex items-center gap-3"><Wrench className="h-5 w-5 text-emerald-600" /> Nhân viên kỹ thuật</span>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </Button>
+            <CardContent className="space-y-4 pt-4">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Tên đăng nhập</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="username" 
+                      placeholder="Username hoặc Email" 
+                      className="pl-10 h-11"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Mật khẩu</Label>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="link" className="px-0 font-normal text-xs text-primary h-auto">
+                          Quên mật khẩu?
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Khôi phục mật khẩu</DialogTitle>
+                          <DialogDescription>
+                            Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <Label htmlFor="reset-email">Email công tác</Label>
+                          <div className="relative mt-2">
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input id="reset-email" placeholder="email@tochuc.com" className="pl-10 h-11" />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button className="w-full" onClick={() => toast({ title: "Đã gửi yêu cầu", description: "Vui lòng kiểm tra email của bạn." })}>
+                            Gửi mã khôi phục
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="pl-10 h-11"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full h-11 font-bold bg-primary" disabled={isLoading}>
+                  {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
+                </Button>
+              </form>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-muted"></span>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground font-medium">Hoặc đăng nhập nhanh (Demo)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button onClick={() => login('requester')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
+                  <User className="h-3.5 w-3.5 text-primary" /> Người yêu cầu
+                </Button>
+                <Button onClick={() => login('unit_leader')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
+                  <ShieldCheck className="h-3.5 w-3.5 text-accent" /> Lãnh đạo đơn vị
+                </Button>
+                <Button onClick={() => login('csvc_manager')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
+                  <ClipboardList className="h-3.5 w-3.5 text-indigo-600" /> Quản lý CSVC
+                </Button>
+                <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[11px] h-9 px-2 gap-1.5 border-primary/10">
+                  <Wrench className="h-3.5 w-3.5 text-emerald-600" /> Kỹ thuật viên
+                </Button>
+              </div>
             </CardContent>
           </Card>
           
@@ -117,6 +230,7 @@ export default function Dashboard() {
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'pending_approval': return <Badge variant="outline" className="border-rose-200 text-rose-600 bg-rose-50">Chờ duyệt</Badge>;
+      case 'approved': return <Badge variant="outline" className="border-indigo-200 text-indigo-600 bg-indigo-50">Đã duyệt</Badge>;
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Chờ nghiệm thu</Badge>;
