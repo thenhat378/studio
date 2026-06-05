@@ -20,7 +20,8 @@ import {
   ShieldCheck,
   HardDrive,
   Lock,
-  Mail
+  Mail,
+  LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function Dashboard() {
-  const { currentUser, login, requests, isInitialized } = useAppStore();
+  const { currentUser, login, logout, requests, isInitialized } = useAppStore();
   const { toast } = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -62,7 +63,7 @@ export default function Dashboard() {
     
     setIsLoading(true);
     setTimeout(() => {
-      // Demo logic: mapping roles based on dummy input or just defaulting to requester
+      // Demo logic
       login('requester');
       setIsLoading(false);
       toast({
@@ -190,38 +191,14 @@ export default function Dashboard() {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
     if (currentUser.role === 'technician') return r.technicianId === currentUser.id;
-    return true; // CSVC Manager sees all
+    return true;
   });
 
   const stats = [
-    { 
-      label: 'Tổng yêu cầu', 
-      value: roleFilteredRequests.length, 
-      icon: ClipboardList, 
-      color: 'text-blue-600', 
-      bg: 'bg-blue-50' 
-    },
-    { 
-      label: 'Đang xử lý', 
-      value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, 
-      icon: Clock, 
-      color: 'text-amber-600', 
-      bg: 'bg-amber-50' 
-    },
-    { 
-      label: 'Chờ phê duyệt', 
-      value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, 
-      icon: AlertCircle, 
-      color: 'text-rose-600', 
-      bg: 'bg-rose-50' 
-    },
-    { 
-      label: 'Đã hoàn thành', 
-      value: roleFilteredRequests.filter(r => r.status === 'closed').length, 
-      icon: CheckCircle2, 
-      color: 'text-emerald-600', 
-      bg: 'bg-emerald-50' 
-    },
+    { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Chờ phê duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
 
   const recentRequests = roleFilteredRequests.slice(0, 6);
@@ -250,13 +227,23 @@ export default function Dashboard() {
             {currentUser.unit && ` • Đơn vị: ${currentUser.unit}`}
           </p>
         </div>
-        {currentUser.role === 'requester' && (
-           <Link href="/requests/new">
-            <Button size="lg" className="bg-primary shadow-lg shadow-primary/20 gap-2">
-              <ClipboardList className="h-5 w-5" /> Tạo yêu cầu mới
-            </Button>
-           </Link>
-        )}
+        <div className="flex gap-2">
+          {currentUser.role === 'requester' && (
+             <Link href="/requests/new">
+              <Button size="lg" className="bg-primary shadow-lg shadow-primary/20 gap-2">
+                <ClipboardList className="h-5 w-5" /> Tạo yêu cầu mới
+              </Button>
+             </Link>
+          )}
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-destructive/20 text-destructive hover:bg-destructive/10 gap-2 font-bold"
+            onClick={() => logout()}
+          >
+            <LogOut className="h-5 w-5" /> Đăng xuất
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

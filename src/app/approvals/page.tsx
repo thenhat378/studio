@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, FileText, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, FileText, CheckCircle2, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -21,20 +21,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ApprovalsPage() {
-  const { requests, currentUser, updateRequestStatus } = useAppStore();
+  const { requests, currentUser, updateRequestStatus, logout } = useAppStore();
   const { toast } = useToast();
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
 
-  // Lọc các yêu cầu của đơn vị lãnh đạo
   const unitRequests = requests.filter(r => 
     !currentUser?.unit || r.unit === currentUser.unit
   );
 
-  // 1. Chờ phê duyệt (Mới tạo)
   const pendingRequests = unitRequests.filter(r => r.status === 'pending_approval');
-  
-  // 2. Chờ nghiệm thu (CSVC đã kiểm tra kỹ thuật xong)
   const pendingConfirmation = unitRequests.filter(r => r.status === 'verified');
 
   const handleApprove = (id: string) => {
@@ -76,9 +72,18 @@ export default function ApprovalsPage() {
           </h1>
           <p className="text-muted-foreground">Xét duyệt và xác nhận kết quả sửa chữa của đơn vị</p>
         </div>
-        <Button variant="outline" className="gap-2 border-primary/20 text-primary">
-          <FileText className="h-4 w-4" /> Xuất báo cáo đơn vị
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2 border-primary/20 text-primary font-bold">
+            <FileText className="h-4 w-4" /> Xuất báo cáo
+          </Button>
+          <Button 
+            variant="outline" 
+            className="border-destructive/20 text-destructive hover:bg-destructive/10 gap-2 font-bold"
+            onClick={() => logout()}
+          >
+            <LogOut className="h-4 w-4" /> Đăng xuất
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="approve" className="w-full">
