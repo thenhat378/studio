@@ -49,6 +49,7 @@ const availableCategories = [
   'Thiết bị điện tử-CNTT',
   'Thiết bị điện',
   'Thiết bị nước',
+  'Thiết bị làm mát',
   'Các loại thiết bị khác',
 ];
 
@@ -61,6 +62,10 @@ const equipmentCatalog = [
   'Ổ cắm điện',
   'Bàn cầu',
   'Lavabo',
+  'Máy lạnh',
+  'Điều hòa',
+  'Quạt trần',
+  'Quạt treo tường',
   'Bàn',
   'Ghế',
   'Gạch nền',
@@ -77,8 +82,9 @@ Analyze the user's problem description and provide the following:
 1.  A list of potential causes for the problem.
 2.  An appropriate category for the request from the following list: {{{availableCategories}}}.
     - Thiết bị điện tử-CNTT: Máy chiếu, cáp tín hiệu, Âm thanh, Màn chiếu, v.v.
-    - Thiết bị điện: Bóng đèn, quạt, ổ cắm, hệ thống điện.
+    - Thiết bị điện: Bóng đèn, ổ cắm, hệ thống điện.
     - Thiết bị nước: Bàn cầu, Lavabo, vòi nước, đường ống.
+    - Thiết bị làm mát: Máy lạnh, Điều hòa, Quạt trần, Quạt treo tường, Quạt đứng.
     - Các loại thiết bị khác: Bàn, ghế, gạch nền, laphong, cửa, v.v.
 3.  A list of relevant equipment from the following catalog that might be involved in or related to the problem: {{{equipmentCatalog}}}.
 

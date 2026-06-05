@@ -47,6 +47,7 @@ export default function EquipmentCatalog() {
     'Thiết bị điện tử-CNTT',
     'Thiết bị điện',
     'Thiết bị nước',
+    'Thiết bị làm mát',
     'Các loại thiết bị khác'
   ];
 
