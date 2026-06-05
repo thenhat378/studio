@@ -196,7 +196,7 @@ export default function Overview() {
 
   const getRoleLabel = (role: UserRole) => {
     switch(role) {
-      case 'requester': return 'Nhân viên / Giảng viên';
+      case 'requester': return 'Nhân viên';
       case 'unit_leader': return 'Lãnh đạo đơn vị';
       case 'csvc_manager': return 'Quản lý CSVC';
       case 'technician': return 'Nhân viên';
@@ -207,7 +207,6 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center p-6 overflow-hidden bg-[#F4F7FE]">
-        {/* Background Decorative Blobs */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/15 blur-[120px] animate-pulse" />
           <div className="absolute top-[20%] -right-[15%] w-[40%] h-[40%] rounded-full bg-secondary/15 blur-[120px]" />
@@ -355,7 +354,7 @@ export default function Overview() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-2xl border-none shadow-2xl backdrop-blur-xl bg-white/90">
-                        <SelectItem value="requester">Nhân viên / Giảng viên</SelectItem>
+                        <SelectItem value="requester">Nhân viên</SelectItem>
                         <SelectItem value="unit_leader">Lãnh đạo đơn vị</SelectItem>
                         <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
                         <SelectItem value="technician">Nhân viên</SelectItem>
@@ -382,7 +381,6 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* Forgot Password Dialog */}
         <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
           <DialogContent className="rounded-[3rem] p-10 border-none shadow-2xl bg-white/90 backdrop-blur-2xl">
             <DialogHeader>

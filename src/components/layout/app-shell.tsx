@@ -127,7 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <div>
                       <p className="font-black text-lg">{currentUser.name}</p>
-                      <p className="text-[10px] font-black text-primary uppercase">{currentUser.role.replace('_', ' ')}</p>
+                      <p className="text-[10px] font-black text-primary uppercase">{currentUser.role === 'requester' ? 'Nhân viên' : currentUser.role.replace('_', ' ')}</p>
                     </div>
                   </div>
                   <div className="space-y-2 flex-1">
@@ -166,7 +166,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Desktop Header */}
         <header className="hidden md:flex h-20 items-center justify-between px-8 bg-transparent no-print">
           <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">
-            {navigation.find(n => n.href === pathname)?.name || 'Dashboard'}
+            {pathname === '/' ? '' : (navigation.find(n => n.href === pathname)?.name || '')}
           </h2>
           <div className="flex items-center gap-4">
             <div className="relative">
