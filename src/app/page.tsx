@@ -14,7 +14,6 @@ import {
   CheckCircle2, 
   Clock, 
   AlertCircle,
-  Wrench,
   ChevronRight,
   User,
   ShieldCheck,
@@ -74,7 +73,13 @@ export default function Overview() {
     
     setIsLoading(true);
     setTimeout(() => {
-      login('requester');
+      // Logic đăng nhập demo dựa trên username
+      if (username === 'requester') login('requester');
+      else if (username === 'leader') login('unit_leader');
+      else if (username === 'manager') login('csvc_manager');
+      else if (username === 'tech') login('technician');
+      else login('requester'); // Mặc định
+
       setIsLoading(false);
       toast({
         title: "Đăng nhập thành công",
@@ -102,7 +107,7 @@ export default function Overview() {
             <CardContent className="space-y-6 pt-6 px-10 pb-12">
               <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tên đăng nhập</Label>
+                  <Label htmlFor="username" className="text-sm font-semibold text-slate-600 ml-1">Tên đăng nhập</Label>
                   <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-[#0054A4] transition-colors" />
                     <Input 
@@ -115,7 +120,7 @@ export default function Overview() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Mật khẩu</Label>
+                  <Label htmlFor="password" className="text-sm font-semibold text-slate-600 ml-1">Mật khẩu</Label>
                   <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-[#0054A4] transition-colors" />
                     <Input 
@@ -162,28 +167,35 @@ export default function Overview() {
                 </Button>
               </form>
 
-              <div className="relative mt-12 mb-8">
+              <div className="relative mt-8 mb-4">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t border-slate-100"></span>
                 </div>
-                <div className="relative flex justify-center text-[9px] uppercase font-black tracking-[0.3em]">
-                  <span className="bg-white px-4 text-slate-300">Demo nhanh các vai trò</span>
+                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-[0.1em]">
+                  <span className="bg-white px-4 text-slate-400">Tài khoản truy cập thử nghiệm</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <Button onClick={() => login('requester')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 transition-all font-bold group">
-                  <User className="h-5 w-5 text-[#0054A4] group-hover:scale-110 transition-transform" /> Người yêu cầu
-                </Button>
-                <Button onClick={() => login('unit_leader')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#F58220]/30 transition-all font-bold group">
-                  <ShieldCheck className="h-5 w-5 text-[#F58220] group-hover:scale-110 transition-transform" /> Lãnh đạo đơn vị
-                </Button>
-                <Button onClick={() => login('csvc_manager')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#0054A4]/30 transition-all font-bold group">
-                  <ClipboardList className="h-5 w-5 text-[#0054A4]/70 group-hover:scale-110 transition-transform" /> Quản lý CSVC
-                </Button>
-                <Button onClick={() => login('technician')} variant="outline" className="justify-start text-[10px] h-14 px-4 gap-2 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white hover:border-[#00A651]/30 transition-all font-bold group">
-                  <Key className="h-5 w-5 text-[#00A651] group-hover:scale-110 transition-transform" /> Kỹ thuật viên
-                </Button>
+              <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
+                <div className="grid grid-cols-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">
+                  <span>Vai trò</span>
+                  <span>Tài khoản</span>
+                  <span className="text-right">Mật khẩu</span>
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { role: 'Người yêu cầu', user: 'requester', pass: '123456' },
+                    { role: 'Lãnh đạo đơn vị', user: 'leader', pass: '123456' },
+                    { role: 'Quản lý CSVC', user: 'manager', pass: '123456' },
+                    { role: 'Kỹ thuật viên', user: 'tech', pass: '123456' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="grid grid-cols-3 text-[11px] font-medium text-slate-600 px-2 py-1 bg-white rounded-lg shadow-sm border border-slate-100">
+                      <span className="font-bold text-[#0054A4]">{item.role}</span>
+                      <span className="font-mono text-slate-400">{item.user}</span>
+                      <span className="text-right font-mono text-slate-400">{item.pass}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
