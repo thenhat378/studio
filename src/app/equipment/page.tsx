@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Package, Edit, Trash2, Loader2, RefreshCcw } from 'lucide-react';
+import { Search, Plus, Package, Edit, Trash2, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -28,15 +28,13 @@ import { Equipment } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
 export default function EquipmentCatalog() {
-  const { equipment, addEquipment, updateEquipment, deleteEquipment, resetSystem, currentUser } = useAppStore();
+  const { equipment, addEquipment, updateEquipment, deleteEquipment, currentUser } = useAppStore();
   const { toast } = useToast();
-  const router = useRouter();
   
   const [search, setSearch] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Equipment | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -100,23 +98,6 @@ export default function EquipmentCatalog() {
     }
   };
 
-  const handleReset = async () => {
-    if (confirm("XÁC NHẬN: Bạn muốn xóa toàn bộ Phiếu yêu cầu và các tài khoản người dùng khác? (Danh mục Thiết bị và tài khoản Admin của bạn sẽ được GIỮ LẠI).")) {
-      setIsResetting(true);
-      try {
-        await resetSystem();
-        toast({ 
-          title: "Đã làm sạch dữ liệu", 
-          description: "Phiếu yêu cầu và các tài khoản người dùng khác đã được xóa. Tài khoản Admin và Thiết bị vẫn giữ nguyên." 
-        });
-      } catch (error) {
-        toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu." });
-      } finally {
-        setIsResetting(false);
-      }
-    }
-  };
-
   if (currentUser?.role !== 'admin') {
     return (
       <div className="text-center py-20">
@@ -136,10 +117,6 @@ export default function EquipmentCatalog() {
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò Admin: Thiết lập dữ liệu gốc cho hệ thống</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReset} className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 text-rose-500 border-rose-100 hover:bg-rose-50">
-            {isResetting ? <Loader2 className="animate-spin h-5 w-5" /> : <RefreshCcw className="h-5 w-5" />}
-            Dọn dẹp Phiếu & Người dùng
-          </Button>
           <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-blue-100">
             <Plus className="h-5 w-5" />
             Thêm thiết bị

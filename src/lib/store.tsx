@@ -193,23 +193,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const resetSystem = async () => {
     if (!db || !currentUser) return;
-    const batch = writeBatch(db);
     
-    // Xóa tất cả phiếu yêu cầu
-    const requestSnap = await getDocs(collection(db, 'requests'));
-    requestSnap.forEach(docSnap => batch.delete(docSnap.ref));
-    
-    // Xóa tất cả người dùng NGOẠI TRỪ tài khoản Admin hiện tại
-    const userSnap = await getDocs(collection(db, 'users'));
-    userSnap.forEach(docSnap => {
-      if (docSnap.id !== currentUser.id) {
-        batch.delete(docSnap.ref);
+    try {
+      // Xóa tất cả phiếu yêu cầu
+      const requestSnap = await getDocs(collection(db, 'requests'));
+      for (const docSnap of requestSnap.docs) {
+        await deleteDoc(doc(db, 'requests', docSnap.id));
       }
-    });
-
-    // GIỮ LẠI danh mục thiết bị (không xóa bảng equipment)
-    await batch.commit();
-    // Không gọi logout() để giữ phiên làm việc của Admin
+      
+      // Xóa tất cả người dùng NGOẠI TRỪ tài khoản Admin hiện tại
+      const userSnap = await getDocs(collection(db, 'users'));
+      for (const docSnap of userSnap.docs) {
+        if (docSnap.id !== currentUser.id) {
+          await deleteDoc(doc(db, 'users', docSnap.id));
+        }
+      }
+      
+      // Thành công - bảng thiết bị được giữ nguyên theo yêu cầu
+    } catch (error) {
+      console.error("Reset system error:", error);
+      throw error;
+    }
   };
 
   return (

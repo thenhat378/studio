@@ -1,13 +1,18 @@
 
 "use client"
 
+import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Phone, Building, Shield } from 'lucide-react';
+import { Users, Phone, Building, Shield, RefreshCcw, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export default function UserManagementPage() {
-  const { users, currentUser } = useAppStore();
+  const { users, currentUser, resetSystem } = useAppStore();
+  const { toast } = useToast();
+  const [isResetting, setIsResetting] = useState(false);
 
   if (currentUser?.role !== 'admin') {
     return (
@@ -16,6 +21,23 @@ export default function UserManagementPage() {
       </div>
     );
   }
+
+  const handleReset = async () => {
+    if (confirm("XÁC NHẬN: Bạn muốn xóa toàn bộ Phiếu yêu cầu và các tài khoản người dùng khác? (Danh mục Thiết bị và tài khoản Admin của bạn sẽ được GIỮ LẠI).")) {
+      setIsResetting(true);
+      try {
+        await resetSystem();
+        toast({ 
+          title: "Đã làm sạch dữ liệu", 
+          description: "Phiếu yêu cầu và các tài khoản người dùng khác đã được xóa thành công." 
+        });
+      } catch (error) {
+        toast({ variant: "destructive", title: "Lỗi", description: "Không thể làm sạch dữ liệu. Vui lòng thử lại." });
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
 
   const getRoleLabel = (role: string) => {
     switch(role) {
@@ -30,17 +52,31 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6 pb-24">
-      <div>
-        <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
-          <Users className="h-7 w-7 text-primary" />
-          Danh sách người dùng
-        </h1>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Quản lý tài khoản đã đăng ký trên hệ thống</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
+            <Users className="h-7 w-7 text-primary" />
+            Danh sách người dùng
+          </h1>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Quản lý tài khoản đã đăng ký trên hệ thống</p>
+        </div>
+        <Button 
+          variant="destructive" 
+          onClick={handleReset} 
+          disabled={isResetting}
+          className="rounded-2xl h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-rose-100"
+        >
+          {isResetting ? <Loader2 className="animate-spin h-5 w-5" /> : <RefreshCcw className="h-5 w-5" />}
+          Dọn dẹp Phiếu & Người dùng
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         {users.map((user) => (
-          <Card key={user.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden hover:bg-slate-50 transition-all">
+          <Card key={user.id} className={cn(
+            "border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden hover:bg-slate-50 transition-all",
+            user.id === currentUser.id && "border-2 border-primary/20 bg-blue-50/20"
+          )}>
             <CardContent className="p-7">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex gap-4">
@@ -48,7 +84,10 @@ export default function UserManagementPage() {
                     <span className="text-xl font-black text-primary">{user.name.charAt(0)}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-black text-lg text-slate-800">{user.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-black text-lg text-slate-800">{user.name}</h3>
+                      {user.id === currentUser.id && <Badge className="bg-primary text-[8px] uppercase">Bạn</Badge>}
+                    </div>
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[9px] font-black uppercase">
                       {getRoleLabel(user.role)}
                     </Badge>
@@ -89,4 +128,9 @@ export default function UserManagementPage() {
       )}
     </div>
   );
+}
+
+// Helper function to concatenate classes (defined if not already available in utils)
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(' ');
 }
