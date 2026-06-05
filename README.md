@@ -1,5 +1,5 @@
 
-# Ứng dụng Quản lý sửa chữa
+# Ứng dụng Quản lý sửa chữa - DUE
 
 Ứng dụng hỗ trợ các tổ chức quản lý quy trình sửa chữa thiết bị cơ sở vật chất một cách chuyên nghiệp và hiệu quả trên nền tảng di động.
 
@@ -13,7 +13,42 @@
 - **In phiếu (PDF)**: Xuất báo cáo để lưu trữ bản cứng chính thức.
 
 ## Vai trò trong hệ thống:
-1. **Người yêu cầu**: Tạo phiếu, theo dõi và nghiệm thu.
-2. **Lãnh đạo đơn vị**: Phê duyệt hoặc từ chối yêu cầu từ nhân viên trong đơn vị.
-3. **Quản lý CSVC**: Phân công kỹ thuật viên xử lý và duyệt hoàn thành kỹ thuật.
-4. **Kỹ thuật viên**: Nhận nhiệm vụ, cập nhật tiến độ, báo cáo hoàn thành và in phiếu.
+1. **Người yêu cầu** (requester): Tạo phiếu, theo dõi và nghiệm thu.
+2. **Lãnh đạo đơn vị** (leader): Phê duyệt hoặc từ chối yêu cầu từ nhân viên trong đơn vị.
+3. **Quản lý CSVC** (manager): Phân công kỹ thuật viên xử lý và duyệt hoàn thành kỹ thuật.
+4. **Kỹ thuật viên** (tech): Nhận nhiệm vụ, cập nhật tiến độ, báo cáo hoàn thành và in phiếu.
+
+## Hướng dẫn Deploy (Phát hành ứng dụng)
+
+Để chạy ứng dụng trên điện thoại, bạn cần deploy lên một máy chủ web. Cách đơn giản nhất là dùng **Firebase**:
+
+### Bước 1: Cài đặt Firebase CLI
+Nếu chưa có, hãy cài đặt công cụ dòng lệnh của Firebase trên máy tính:
+```bash
+npm install -g firebase-tools
+```
+
+### Bước 2: Đăng nhập và Khởi tạo
+Mở terminal tại thư mục dự án và chạy:
+```bash
+firebase login
+firebase init
+```
+- Chọn **Hosting** hoặc **App Hosting** (Khuyên dùng App Hosting cho Next.js).
+- Chọn project Firebase của bạn.
+- Thiết lập thư mục public là `.next` (đối với App Hosting hệ thống sẽ tự nhận diện).
+
+### Bước 3: Deploy
+Chạy lệnh sau để tải ứng dụng lên mạng:
+```bash
+npm run build
+firebase deploy
+```
+
+### Bước 4: Cài đặt lên điện thoại (PWA)
+Sau khi có đường link `https://...`, hãy mở link đó trên:
+- **iPhone (Safari)**: Nhấn nút **Chia sẻ** -> **Thêm vào màn hình chính**.
+- **Android (Chrome)**: Nhấn **3 chấm** -> **Cài đặt ứng dụng**.
+
+---
+*© 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất*
