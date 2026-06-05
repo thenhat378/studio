@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -14,13 +15,10 @@ import {
   AlertCircle,
   ChevronRight,
   User,
-  Lock,
   Wrench,
   PlusCircle,
   Sparkles,
   HardDrive,
-  Mail,
-  Building2,
   BarChart3,
   ArrowUpRight,
   ShieldCheck,
@@ -39,11 +37,8 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 export default function Overview() {
   const { 
     currentUser, 
-    login, 
-    loginWithGoogle, 
     loginAsTestAccount,
     register, 
-    resetPassword, 
     requests, 
     users, 
     isInitialized 
@@ -60,55 +55,31 @@ export default function Overview() {
 
   if (!isInitialized) return null;
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleSimpleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập Email và Mật khẩu." });
-      return;
-    }
-    
     setIsLoading(true);
+    
     try {
-      if (authMode === 'login') {
-        await login(email, password);
-        toast({ title: "Đăng nhập thành công" });
-      } else {
-        if (!fullName || !unit) {
-          toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập Họ tên và Đơn vị để đăng ký." });
+      if (authMode === 'register') {
+        if (!fullName || !unit || !email) {
+          toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Họ tên, Đơn vị và Email." });
           setIsLoading(false);
           return;
         }
-        await register(email, password, fullName, unit);
+        await register(email, password || '123456', fullName, unit);
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
+      } else {
+        // Đăng nhập đơn giản hóa - ưu tiên tìm trong list users hiện có
+        const existingUser = users.find(u => u.email === email);
+        if (existingUser) {
+          loginAsTestAccount(existingUser.role, existingUser);
+          toast({ title: "Đăng nhập thành công" });
+        } else {
+          toast({ variant: "destructive", title: "Thông báo", description: "Không tìm thấy tài khoản. Vui lòng dùng nút Đăng nhập nhanh bên dưới." });
+        }
       }
-    } catch (error: any) {
-      console.error("Auth Error:", error);
-      let message = "Lỗi xác thực. Có thể do cấu hình Firebase API Key chưa khớp.";
-      
-      if (error.code === 'auth/api-key-not-valid') {
-        message = "LỖI API KEY: Vui lòng kiểm tra lại cấu hình trong Firebase Console.";
-      } else if (error.code === 'auth/operation-not-allowed') {
-        message = "CHƯA BẬT ĐĂNG NHẬP: Vui lòng bật Email/Password trong Firebase Auth.";
-      }
-      
-      toast({ variant: "destructive", title: "Thông báo", description: message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    try {
-      await loginWithGoogle();
-      toast({ title: "Đăng nhập Google thành công" });
-    } catch (error: any) {
-      console.error("Google Auth Error:", error);
-      toast({ 
-        variant: "destructive", 
-        title: "Lỗi Google Auth", 
-        description: "Vui lòng kiểm tra phương thức Google trong Firebase Console." 
-      });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Thông báo", description: "Đã có lỗi xảy ra. Vui lòng sử dụng Đăng nhập nhanh." });
     } finally {
       setIsLoading(false);
     }
@@ -130,27 +101,27 @@ export default function Overview() {
           <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-xl font-black text-slate-800">
-                {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
+                {authMode === 'login' ? 'Đăng nhập hệ thống' : 'Đăng ký tài khoản'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <form onSubmit={handleAuth} className="space-y-5">
+              <form onSubmit={handleSimpleAuth} className="space-y-4">
                 {authMode === 'register' && (
                   <>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Họ và tên</Label>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên</Label>
                       <Input 
                         placeholder="Nguyễn Văn A" 
-                        className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Đơn vị</Label>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị</Label>
                       <Input 
                         placeholder="Phòng Hành chính" 
-                        className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                        className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
                         value={unit}
                         onChange={(e) => setUnit(e.target.value)}
                       />
@@ -158,61 +129,49 @@ export default function Overview() {
                   </>
                 )}
 
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Email</Label>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Email</Label>
                   <Input 
-                    type="email"
                     placeholder="example@due.edu.vn" 
-                    className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
+                    className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Mật khẩu</Label>
-                  <Input 
-                    type="password" 
-                    placeholder="••••••••" 
-                    className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary uppercase tracking-widest text-xs shadow-xl" disabled={isLoading}>
-                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Đăng nhập" : "Đăng ký")}
+                <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
+                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Vào hệ thống" : "Tạo tài khoản")}
                 </Button>
+
+                <div className="text-center">
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-[10px] font-black text-primary uppercase"
+                    onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                  >
+                    {authMode === 'login' ? 'Hoặc Đăng ký tài khoản mới' : 'Đã có tài khoản? Đăng nhập'}
+                  </Button>
+                </div>
               </form>
 
               <div className="relative flex items-center gap-4 py-2">
                 <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc trải nghiệm nhanh</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Đăng nhập nhanh</span>
                 <div className="h-px bg-slate-100 flex-1"></div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('requester')}>
-                  <User className="h-3 w-3 mr-1" /> Nhân viên
+                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-blue-50" onClick={() => loginAsTestAccount('requester')}>
+                  <User className="h-3 w-3 mr-1 text-blue-500" /> Nhân viên
                 </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('unit_leader')}>
-                  <ShieldCheck className="h-3 w-3 mr-1" /> Lãnh đạo
+                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-green-50" onClick={() => loginAsTestAccount('unit_leader')}>
+                  <ShieldCheck className="h-3 w-3 mr-1 text-green-500" /> Lãnh đạo
                 </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('csvc_manager')}>
-                  <UserCheck className="h-3 w-3 mr-1" /> Quản lý
+                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-orange-50" onClick={() => loginAsTestAccount('csvc_manager')}>
+                  <UserCheck className="h-3 w-3 mr-1 text-orange-500" /> Quản lý
                 </Button>
-                <Button variant="outline" className="h-12 rounded-xl text-[10px] font-black uppercase" onClick={() => loginAsTestAccount('technician')}>
-                  <Wrench className="h-3 w-3 mr-1" /> Kỹ thuật
-                </Button>
-              </div>
-
-              <div className="text-center mt-4">
-                <Button 
-                  variant="link" 
-                  className="p-0 h-auto text-[11px] font-black text-primary uppercase"
-                  onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-                >
-                  {authMode === 'login' ? 'Tạo tài khoản mới' : 'Đã có tài khoản? Đăng nhập'}
+                <Button variant="outline" className="h-12 rounded-xl text-[9px] font-black uppercase hover:bg-slate-50" onClick={() => loginAsTestAccount('technician')}>
+                  <Wrench className="h-3 w-3 mr-1 text-slate-500" /> Kỹ thuật
                 </Button>
               </div>
             </CardContent>
@@ -222,7 +181,7 @@ export default function Overview() {
     );
   }
 
-  // Dashboard View
+  // Dashboard View (giữ nguyên logic cũ)
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
