@@ -12,7 +12,7 @@
  */
 
 export const firebaseConfig = {
-  apiKey: "AIzaSy...", // DÁN API KEY THẬT CỦA BẠN VÀO ĐÂY
+  apiKey: "AIzaSy_Placeholder_Please_Replace_With_Real_Key",
   authDomain: "your-project-id.firebaseapp.com",
   projectId: "your-project-id",
   storageBucket: "your-project-id.firebasestorage.app",
