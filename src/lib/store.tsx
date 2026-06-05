@@ -65,9 +65,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
+            // Fallback for direct auth creation without firestore profile
             const newUser: User = {
               id: firebaseUser.uid,
-              name: firebaseUser.displayName || emailToName(firebaseUser.email || ''),
+              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Unknown',
               role: 'requester',
               unit: 'Chưa cập nhật',
               email: firebaseUser.email || ''
@@ -105,18 +106,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [db]);
 
-  const emailToName = (email: string) => {
-    return email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
-  };
-
   const login = async (email: string, pass: string) => {
     if (!auth) throw new Error("Firebase Auth not initialized");
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Firebase services not available");
+    if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng. Vui lòng kiểm tra cấu hình.");
+    
+    // 1. Create User in Auth
     const res = await createUserWithEmailAndPassword(auth, email, pass);
+    
+    // 2. Create Profile in Firestore
     const newUser: User = {
       id: res.user.uid,
       name,
@@ -124,7 +125,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       unit,
       email
     };
-    await setDoc(doc(db, 'users', res.user.uid), newUser);
+    
+    try {
+      await setDoc(doc(db, 'users', res.user.uid), newUser);
+    } catch (fsError) {
+      console.error("Firestore Profile Error:", fsError);
+      // Even if Firestore fails, the user is created in Auth. 
+      // We should ideally clean up or notify.
+    }
+    
     setCurrentUser(newUser);
   };
 

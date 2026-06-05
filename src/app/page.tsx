@@ -84,12 +84,16 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
-      let message = "Có lỗi xảy ra trong quá trình xác thực.";
+      console.error("Auth error details:", error);
+      let message = error.message || "Có lỗi xảy ra trong quá trình xác thực.";
+      
+      // Friendly messages for common Firebase errors
       if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
       if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
       if (error.code === 'auth/email-already-in-use') message = "Email này đã được đăng ký sử dụng.";
       if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
       if (error.code === 'auth/invalid-email') message = "Định dạng Email không hợp lệ.";
+      if (error.code === 'auth/operation-not-allowed') message = "Vui lòng BẬT 'Email/Password' trong Firebase Console.";
       
       toast({ 
         variant: "destructive", 
@@ -146,7 +150,7 @@ export default function Overview() {
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                         <Input 
                           placeholder="Nguyễn Văn A" 
-                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                         />
@@ -158,7 +162,7 @@ export default function Overview() {
                         <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                         <Input 
                           placeholder="Phòng Hành chính" 
-                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
                           value={unit}
                           onChange={(e) => setUnit(e.target.value)}
                         />
@@ -174,7 +178,7 @@ export default function Overview() {
                     <Input 
                       type="email"
                       placeholder="example@due.edu.vn" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -188,7 +192,7 @@ export default function Overview() {
                     <Input 
                       type="password" 
                       placeholder="••••••••" 
-                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                      className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-sm"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
