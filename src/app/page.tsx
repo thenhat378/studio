@@ -166,37 +166,6 @@ export default function Overview() {
                   {isLoading ? "Đang xử lý..." : "Đăng nhập ngay"}
                 </Button>
               </form>
-
-              <div className="relative mt-8 mb-4">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-slate-100"></span>
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-[0.1em]">
-                  <span className="bg-white px-4 text-slate-400">Tài khoản truy cập thử nghiệm</span>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
-                <div className="grid grid-cols-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">
-                  <span>Vai trò</span>
-                  <span>Tài khoản</span>
-                  <span className="text-right">Mật khẩu</span>
-                </div>
-                <div className="space-y-2">
-                  {[
-                    { role: 'Người yêu cầu', user: 'requester', pass: '123456' },
-                    { role: 'Lãnh đạo đơn vị', user: 'leader', pass: '123456' },
-                    { role: 'Quản lý CSVC', user: 'manager', pass: '123456' },
-                    { role: 'Kỹ thuật viên', user: 'tech', pass: '123456' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="grid grid-cols-3 text-[11px] font-medium text-slate-600 px-2 py-1 bg-white rounded-lg shadow-sm border border-slate-100">
-                      <span className="font-bold text-[#0054A4]">{item.role}</span>
-                      <span className="font-mono text-slate-400">{item.user}</span>
-                      <span className="text-right font-mono text-slate-400">{item.pass}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </CardContent>
           </Card>
           
