@@ -49,4 +49,6 @@ export interface RepairRequest {
   rejectionReason?: string;
   unitFeedback?: string;
   rating?: number; // 1 to 5 stars
+  requesterConfirmed?: boolean;
+  csvcManagerApproved?: boolean;
 }
