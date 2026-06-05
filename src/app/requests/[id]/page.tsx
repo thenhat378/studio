@@ -2,7 +2,7 @@
 "use client"
 
 import { useAppStore } from '@/lib/store';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   ChevronLeft, 
@@ -10,7 +10,6 @@ import {
   User, 
   Calendar, 
   CheckCircle2, 
-  Clock, 
   FileText, 
   Sparkles,
   Printer,
@@ -22,9 +21,13 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 export default function RequestDetail() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id as string;
   const router = useRouter();
   const { toast } = useToast();
   const { requests, currentUser, updateRequestStatus, users } = useAppStore();
@@ -257,8 +260,4 @@ export default function RequestDetail() {
       </div>
     </div>
   );
-}
-
-function Label({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <span className={cn("block", className)}>{children}</span>;
 }
