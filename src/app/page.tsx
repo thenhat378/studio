@@ -198,28 +198,28 @@ export default function Overview() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
         <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="text-center space-y-6">
-            <div className="space-y-1">
-              <h1 className="text-4xl font-black text-[#0054A4] uppercase tracking-tighter">REQUISITION DUE</h1>
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Phiếu Yêu cầu cấp phát sửa chữa thiết bị</p>
-            </div>
+          <div className="text-center space-y-2">
+            <h1 className="text-4xl font-black text-slate-800 tracking-tighter">
+              Requisition <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
+            </h1>
+            <p className="text-sm font-bold text-slate-400">Phiếu yêu cầu cấp phát sửa chữa thiết bị</p>
           </div>
 
           <Card className="border-none shadow-2xl rounded-[3.5rem] overflow-hidden bg-white">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-20 bg-white border-b p-0">
-                <TabsTrigger value="login" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng ký mới</TabsTrigger>
+                <TabsTrigger value="login" className="h-full rounded-none font-bold text-sm data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-none font-bold text-sm data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">Đăng ký mới</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login" className="p-10 space-y-6">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Số điện thoại</Label>
+                    <Label className="text-xs font-bold text-slate-400 ml-2">Số điện thoại</Label>
                     <div className="relative">
                       <Phone className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                       <Input 
-                        placeholder="09xx..." 
+                        placeholder="Nhập số điện thoại" 
                         className="pl-14 h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold text-slate-700 text-lg"
                         value={loginPhone}
                         onChange={e => setLoginPhone(e.target.value)}
@@ -228,7 +228,7 @@ export default function Overview() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu</Label>
+                    <Label className="text-xs font-bold text-slate-400 ml-2">Mật khẩu</Label>
                     <div className="relative">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                       <Input 
@@ -244,14 +244,14 @@ export default function Overview() {
                       <button 
                         type="button" 
                         onClick={() => setIsForgotOpen(true)}
-                        className="text-[10px] font-black text-primary uppercase hover:underline tracking-widest"
+                        className="text-xs font-bold text-primary hover:underline"
                       >
                         Quên mật khẩu?
                       </button>
                     </div>
                   </div>
-                  <Button className="w-full h-16 rounded-[1.8rem] bg-[#0054A4] font-black uppercase tracking-widest text-xs shadow-2xl shadow-blue-100 mt-4 transition-transform active:scale-95" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="animate-spin" /> : "VÀO HỆ THỐNG"}
+                  <Button className="w-full h-16 rounded-[1.8rem] bg-[#0054A4] font-bold text-base shadow-2xl shadow-blue-100 mt-4 transition-transform active:scale-95" disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Vào hệ thống"}
                   </Button>
                 </form>
               </TabsContent>
@@ -259,7 +259,7 @@ export default function Overview() {
               <TabsContent value="register" className="p-10 space-y-5">
                 <form onSubmit={handleRegister} className="space-y-5">
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Họ và tên</Label>
+                    <Label className="text-xs font-bold text-slate-400 ml-2">Họ và tên</Label>
                     <Input 
                       placeholder="Nguyễn Văn A" 
                       className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
@@ -271,7 +271,7 @@ export default function Overview() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Số điện thoại</Label>
+                      <Label className="text-xs font-bold text-slate-400 ml-2">Số điện thoại</Label>
                       <Input 
                         placeholder="09xxx" 
                         className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
@@ -281,7 +281,7 @@ export default function Overview() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu</Label>
+                      <Label className="text-xs font-bold text-slate-400 ml-2">Mật khẩu</Label>
                       <Input 
                         type="password"
                         placeholder="••••••••" 
@@ -296,16 +296,16 @@ export default function Overview() {
                       />
                       {showPassHint && (
                         <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                          <p className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-1.5 mb-1">
+                          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 mb-1">
                             <Info className="h-3 w-3" /> Yêu cầu mật khẩu:
                           </p>
                           <div className="flex items-center gap-2">
                             {passValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                            <span className={cn("text-[10px] font-bold uppercase tracking-tighter", passValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
+                            <span className={cn("text-[11px] font-medium", passValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
                           </div>
                           <div className="flex items-center gap-2">
                             {passValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                            <span className={cn("text-[10px] font-bold uppercase tracking-tighter", passValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt (!@#...)</span>
+                            <span className={cn("text-[11px] font-medium", passValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt (!@#...)</span>
                           </div>
                         </div>
                       )}
@@ -313,7 +313,7 @@ export default function Overview() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Đơn vị / Khoa</Label>
+                    <Label className="text-xs font-bold text-slate-400 ml-2">Đơn vị / Khoa</Label>
                     <Input 
                       placeholder="Phòng QLCL, Khoa CNTT..." 
                       className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
@@ -324,7 +324,7 @@ export default function Overview() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Vai trò người dùng</Label>
+                    <Label className="text-xs font-bold text-slate-400 ml-2">Vai trò người dùng</Label>
                     <Select value={regData.role} onValueChange={(val: any) => setRegData(prev => ({...prev, role: val}))}>
                       <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700">
                         <SelectValue />
@@ -339,10 +339,10 @@ export default function Overview() {
                   </div>
 
                   <Button 
-                    className="w-full h-16 rounded-[1.8rem] bg-[#00A651] font-black uppercase tracking-widest text-xs mt-4 shadow-2xl shadow-emerald-100 transition-transform active:scale-95 disabled:opacity-50" 
+                    className="w-full h-16 rounded-[1.8rem] bg-[#00A651] font-bold text-base mt-4 shadow-2xl shadow-emerald-100 transition-transform active:scale-95 disabled:opacity-50" 
                     disabled={isSubmitting || !passValidation.length || !passValidation.special}
                   >
-                    {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐĂNG KÝ"}
+                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận đăng ký"}
                   </Button>
                 </form>
               </TabsContent>
@@ -350,8 +350,8 @@ export default function Overview() {
           </Card>
           
           <div className="flex flex-col items-center gap-4">
-            <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] text-center flex items-center justify-center gap-2">
-              <ShieldCheck className="h-3 w-3" />
+            <p className="text-xs text-slate-400 font-medium flex items-center justify-center gap-2">
+              <ShieldCheck className="h-4 w-4" />
               2026 Được phát triển bởi Phòng Cơ sở vật chất
             </p>
           </div>
@@ -361,18 +361,18 @@ export default function Overview() {
         <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
           <DialogContent className="rounded-[3rem] p-10 border-none shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter">Đặt lại mật khẩu</DialogTitle>
-              <DialogDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <DialogTitle className="text-2xl font-black text-primary tracking-tighter">Đặt lại mật khẩu</DialogTitle>
+              <DialogDescription className="text-sm font-medium text-slate-400">
                 Nhập số điện thoại và mật khẩu mới của bạn
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleResetPassword} className="space-y-5 py-4">
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Số điện thoại</Label>
+                <Label className="text-xs font-bold text-slate-400 ml-2">Số điện thoại</Label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                   <Input 
-                    placeholder="09xx..." 
+                    placeholder="Nhập số điện thoại" 
                     className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
                     value={forgotData.phone}
                     onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))}
@@ -381,7 +381,7 @@ export default function Overview() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu mới</Label>
+                <Label className="text-xs font-bold text-slate-400 ml-2">Mật khẩu mới</Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                   <Input 
@@ -395,7 +395,7 @@ export default function Overview() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Xác nhận mật khẩu mới</Label>
+                <Label className="text-xs font-bold text-slate-400 ml-2">Xác nhận mật khẩu mới</Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                   <Input 
@@ -408,33 +408,32 @@ export default function Overview() {
                   />
                 </div>
                 
-                {/* Validation indicators inside dialog */}
                 <div className="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
                   <div className="flex items-center gap-2">
                     {forgotPassValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
+                    <span className={cn("text-[11px] font-medium", forgotPassValidation.length ? "text-emerald-600" : "text-slate-400")}>Tối thiểu 8 ký tự</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {forgotPassValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt</span>
+                    <span className={cn("text-[11px] font-medium", forgotPassValidation.special ? "text-emerald-600" : "text-slate-400")}>Có ký tự đặc biệt</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {forgotPassValidation.match ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
-                    <span className={cn("text-[9px] font-bold uppercase tracking-tighter", forgotPassValidation.match ? "text-emerald-600" : "text-slate-400")}>Mật khẩu xác nhận khớp</span>
+                    <span className={cn("text-[11px] font-medium", forgotPassValidation.match ? "text-emerald-600" : "text-slate-400")}>Mật khẩu xác nhận khớp</span>
                   </div>
                 </div>
               </div>
               <DialogFooter className="pt-4">
                 <Button 
                   className={cn(
-                    "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl",
+                    "w-full h-14 rounded-2xl font-bold text-base transition-all shadow-xl",
                     (forgotPassValidation.length && forgotPassValidation.special && forgotPassValidation.match && forgotData.phone) 
                       ? "bg-primary text-white shadow-blue-100 opacity-100" 
                       : "bg-slate-100 text-slate-400 shadow-none opacity-50 cursor-not-allowed"
                   )}
                   disabled={isSubmitting || !forgotPassValidation.length || !forgotPassValidation.special || !forgotPassValidation.match || !forgotData.phone}
                 >
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐỔI MẬT KHẨU"}
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận đổi mật khẩu"}
                 </Button>
               </DialogFooter>
             </form>
