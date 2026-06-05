@@ -23,6 +23,22 @@ Nếu bạn muốn thấy ứng dụng chạy trên điện thoại ngay lập t
 
 ---
 
+## 🔄 Cách cập nhật mã nguồn (Sync Git)
+
+**Quan trọng:** Khi tôi (AI) thay đổi code ở đây, code trên GitHub của bạn sẽ chưa có ngay. Bạn cần thực hiện các bước sau để cập nhật:
+
+1.  **Tải mã nguồn mới nhất:** Nhấn nút **Download Project** (hoặc Export) trong môi trường này để tải về bản mới nhất.
+2.  **Ghi đè vào thư mục trên máy:** Giải nén và chép đè vào thư mục dự án trên máy tính của bạn.
+3.  **Đẩy lên GitHub:** Mở Terminal tại thư mục đó và gõ:
+    ```bash
+    git add .
+    git commit -m "Cập nhật giao diện di động và tính năng mới"
+    git push origin main
+    ```
+4.  **Kết quả:** Vercel hoặc Firebase App Hosting sẽ tự động nhận diện và cập nhật ứng dụng trên điện thoại của bạn sau 1-2 phút.
+
+---
+
 ## 📱 Cài đặt vào điện thoại
 *   **iPhone (Safari):** Bấm nút **Chia sẻ** -> **Thêm vào màn hình chính**.
 *   **Android (Chrome):** Bấm **3 chấm** -> **Cài đặt ứng dụng**.
