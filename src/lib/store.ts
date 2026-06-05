@@ -5,19 +5,19 @@ import { useState, useEffect } from 'react';
 import type { User, UserRole, RepairRequest, Equipment } from './types';
 
 const MOCK_USERS: User[] = [
-  { id: 'u1', name: 'Nguyễn Văn A', role: 'requester', unit: 'Phòng Hành chính' },
-  { id: 'u2', name: 'Trần Thị B', role: 'unit_leader', unit: 'Phòng Hành chính' },
-  { id: 'u3', name: 'Lê Văn C', role: 'csvc_manager' },
-  { id: 'u4', name: 'Phạm Văn D', role: 'technician' },
+  { id: 'u1', name: 'Nhân viên A', role: 'requester', unit: 'Phòng Hành chính' },
+  { id: 'u2', name: 'Lãnh đạo B', role: 'unit_leader', unit: 'Phòng Hành chính' },
+  { id: 'u3', name: 'Quản lý CSVC C', role: 'csvc_manager' },
+  { id: 'u4', name: 'Kỹ thuật viên D', role: 'technician' },
 ];
 
 const MOCK_EQUIPMENT: Equipment[] = [
-  { id: 'e1', name: 'Bàn ghế', category: 'Furniture' },
-  { id: 'e2', name: 'Máy chiếu', category: 'IT' },
-  { id: 'e3', name: 'Cáp HDMI', category: 'IT' },
-  { id: 'e4', name: 'VGA', category: 'IT' },
-  { id: 'e5', name: 'Bàn cầu', category: 'Plumbing' },
-  { id: 'e6', name: 'Lavabo', category: 'Plumbing' },
+  { id: 'e1', name: 'Bàn ghế văn phòng', category: 'Furniture' },
+  { id: 'e2', name: 'Máy chiếu Sony', category: 'IT' },
+  { id: 'e3', name: 'Cáp HDMI 5m', category: 'IT' },
+  { id: 'e4', name: 'Cáp VGA 3m', category: 'IT' },
+  { id: 'e5', name: 'Bồn cầu Viglacera', category: 'Plumbing' },
+  { id: 'e6', name: 'Lavabo Inax', category: 'Plumbing' },
 ];
 
 const INITIAL_REQUESTS: RepairRequest[] = [
@@ -26,28 +26,13 @@ const INITIAL_REQUESTS: RepairRequest[] = [
     title: 'Hỏng vòi nước Lavabo',
     description: 'Vòi nước tại nhà vệ sinh tầng 2 bị rò rỉ mạnh không khóa được.',
     equipmentId: 'e6',
-    equipmentName: 'Lavabo',
+    equipmentName: 'Lavabo Inax',
     category: 'Plumbing',
     status: 'pending_approval',
     requesterId: 'u1',
-    requesterName: 'Nguyễn Văn A',
+    requesterName: 'Nhân viên A',
     unit: 'Phòng Hành chính',
     createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'req-2',
-    title: 'Máy chiếu không lên hình',
-    description: 'Bật máy chiếu nhưng không nhận tín hiệu từ máy tính.',
-    equipmentId: 'e2',
-    equipmentName: 'Máy chiếu',
-    category: 'IT',
-    status: 'assigned',
-    requesterId: 'u1',
-    requesterName: 'Nguyễn Văn A',
-    unit: 'Phòng Hành chính',
-    technicianId: 'u4',
-    technicianName: 'Phạm Văn D',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
   }
 ];
 
@@ -58,11 +43,21 @@ export function useAppStore() {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('fixflow_user');
+    const savedRequests = localStorage.getItem('fixflow_requests');
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
+    if (savedRequests) {
+      setRequests(JSON.parse(savedRequests));
+    }
     setIsInitialized(true);
   }, []);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('fixflow_requests', JSON.stringify(requests));
+    }
+  }, [requests, isInitialized]);
 
   const login = (role: UserRole) => {
     const user = MOCK_USERS.find(u => u.role === role) || MOCK_USERS[0];
@@ -78,7 +73,7 @@ export function useAppStore() {
   const addRequest = (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     const newReq: RepairRequest = {
       ...req,
-      id: `req-${Date.now()}`,
+      id: `REQ-${Math.floor(1000 + Math.random() * 9000)}`,
       createdAt: new Date().toISOString(),
       status: 'pending_approval',
     };
