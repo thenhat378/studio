@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ClipboardList, UserCheck, Wrench, CheckCircle2, AlertCircle, Eye, LogOut } from 'lucide-react';
+import { ClipboardList, UserCheck, Wrench, CheckCircle2, AlertCircle, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -19,7 +19,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function ManagementPage() {
-  const { requests, users, updateRequestStatus, logout } = useAppStore();
+  const { requests, users, updateRequestStatus } = useAppStore();
   const { toast } = useToast();
   const [selectedTechs, setSelectedTechs] = useState<Record<string, string>>({});
 
@@ -88,13 +88,6 @@ export default function ManagementPage() {
           </h1>
           <p className="text-muted-foreground">Phân công nhân sự và kiểm soát chất lượng sửa chữa</p>
         </div>
-        <Button 
-          variant="outline" 
-          className="border-destructive/20 text-destructive hover:bg-destructive/10 gap-2 font-bold"
-          onClick={() => logout()}
-        >
-          <LogOut className="h-4 w-4" /> Đăng xuất
-        </Button>
       </div>
 
       <Tabs defaultValue="assign" className="w-full">
