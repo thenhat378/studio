@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell, Printer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +27,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { RepairType } from '@/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function TasksPage() {
   const { requests, currentUser, updateRequestStatus } = useAppStore();
@@ -36,6 +37,8 @@ export default function TasksPage() {
   const [repairType, setRepairType] = useState<RepairType | ''>('');
 
   const myTasks = requests.filter(r => r.technicianId === currentUser?.id);
+  const activeTasks = myTasks.filter(r => r.status !== 'closed' && r.status !== 'rejected');
+  const closedTasks = myTasks.filter(r => r.status === 'closed');
 
   const handleStart = (id: string) => {
     updateRequestStatus(id, 'in_progress');
@@ -61,7 +64,7 @@ export default function TasksPage() {
 
     toast({
       title: "Đã báo cáo hoàn thành",
-      description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
+      description: "Phiếu đã được gửi tới Lãnh đạo đơn vị để xác nhận đóng phiếu."
     });
     
     setReportingId(null);
@@ -71,8 +74,7 @@ export default function TasksPage() {
     switch(status) {
       case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã báo cáo hoàn thành</Badge>;
-      case 'verified': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã duyệt hoàn thành</Badge>;
+      case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã báo xong</Badge>;
       case 'closed': return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -86,62 +88,114 @@ export default function TasksPage() {
             <Wrench className="h-6 w-6 text-accent" />
             Nhiệm vụ sửa chữa được giao
           </h1>
-          <p className="text-muted-foreground">Theo dõi và báo cáo kết quả xử lý sự cố</p>
+          <p className="text-muted-foreground">Theo dõi, báo cáo và in phiếu sau khi hoàn thành</p>
         </div>
       </div>
 
-      <div className="grid gap-4">
-        {myTasks.map(req => (
-          <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-primary hover:shadow-md transition-shadow">
-            <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                  {getStatusBadge(req.status)}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-2">
-                  <p>Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
-                  <p>Thiết bị: <span className="text-foreground font-medium">{req.equipmentName}</span></p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
-                <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
-                  <Button variant="outline" size="sm" className="w-full gap-1">
-                    <Eye className="h-4 w-4" /> Chi tiết
-                  </Button>
-                </Link>
+      <Tabs defaultValue="active" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+          <TabsTrigger value="active" className="gap-2">
+            Đang xử lý
+            {activeTasks.length > 0 && (
+              <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                {activeTasks.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="closed" className="gap-2">
+            Đã hoàn tất (In phiếu)
+            {closedTasks.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                {closedTasks.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-                {req.status === 'assigned' && (
-                  <Button 
-                    size="sm" 
-                    className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none font-bold" 
-                    onClick={() => handleStart(req.id)}
-                  >
-                    <Play className="h-4 w-4" /> Bắt đầu sửa
-                  </Button>
-                )}
+        <TabsContent value="active" className="space-y-4 mt-6">
+          {activeTasks.map(req => (
+            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-primary hover:shadow-md transition-shadow">
+              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-lg truncate">{req.title}</h3>
+                    {getStatusBadge(req.status)}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-2">
+                    <p>Đơn vị: <span className="text-foreground font-medium">{req.unit}</span></p>
+                    <p>Thiết bị: <span className="text-foreground font-medium">{req.equipmentName}</span></p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
+                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
+                    <Button variant="outline" size="sm" className="w-full gap-1">
+                      <Eye className="h-4 w-4" /> Chi tiết
+                    </Button>
+                  </Link>
 
-                {req.status === 'in_progress' && (
-                  <Button 
-                    size="sm" 
-                    className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none font-bold" 
-                    onClick={() => handleOpenReport(req.id)}
-                  >
-                    <ClipboardPen className="h-4 w-4" /> Báo cáo hoàn thành
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {myTasks.length === 0 && (
-          <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
-            <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-            <h3 className="text-lg font-semibold">Chưa có nhiệm vụ nào</h3>
-          </div>
-        )}
-      </div>
+                  {req.status === 'assigned' && (
+                    <Button 
+                      size="sm" 
+                      className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none font-bold" 
+                      onClick={() => handleStart(req.id)}
+                    >
+                      <Play className="h-4 w-4" /> Bắt đầu sửa
+                    </Button>
+                  )}
+
+                  {req.status === 'in_progress' && (
+                    <Button 
+                      size="sm" 
+                      className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none font-bold" 
+                      onClick={() => handleOpenReport(req.id)}
+                    >
+                      <ClipboardPen className="h-4 w-4" /> Báo cáo hoàn thành
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {activeTasks.length === 0 && (
+            <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
+              <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+              <h3 className="text-lg font-semibold">Chưa có nhiệm vụ đang xử lý</h3>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="closed" className="space-y-4 mt-6">
+          {closedTasks.map(req => (
+            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-green-500">
+              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-lg truncate">{req.title}</h3>
+                    <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Lãnh đạo đã xác nhận nghiệm thu. Hãy in phiếu để lưu trữ hồ sơ.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
+                    <Button variant="outline" size="sm" className="w-full gap-1">
+                      <Printer className="h-4 w-4" /> Xem & In phiếu
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {closedTasks.length === 0 && (
+            <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
+              <CheckCircle2 className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+              <h3 className="text-lg font-semibold">Chưa có nhiệm vụ nào hoàn tất</h3>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={!!reportingId} onOpenChange={(open) => !open && setReportingId(null)}>
         <DialogContent className="sm:max-w-[500px]">
@@ -179,7 +233,7 @@ export default function TasksPage() {
             
             <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-               <p className="text-xs text-blue-700 font-bold">Lưu ý: Sau khi gửi, thông báo sẽ tự động gửi tới Người yêu cầu và Quản lý PCSVC.</p>
+               <p className="text-xs text-blue-700 font-bold">Lưu ý: Sau khi gửi, phiếu sẽ chuyển về Lãnh đạo đơn vị để xác nhận đóng phiếu.</p>
             </div>
           </div>
           <DialogFooter className="gap-2">

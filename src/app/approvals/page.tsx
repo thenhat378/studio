@@ -35,7 +35,7 @@ export default function ApprovalsPage() {
   );
 
   const pendingRequests = unitRequests.filter(r => r.status === 'pending_approval');
-  const pendingConfirmation = unitRequests.filter(r => r.status === 'verified');
+  const pendingConfirmation = unitRequests.filter(r => r.status === 'completed');
 
   const handleApprove = (id: string) => {
     updateRequestStatus(id, 'approved');
@@ -56,7 +56,7 @@ export default function ApprovalsPage() {
     updateRequestStatus(ratingId, 'closed', { rating: currentRating });
     toast({
       title: "Đã nghiệm thu",
-      description: "Đơn vị đã xác nhận hài lòng và phiếu đã được đóng."
+      description: "Đã xác nhận hoàn thành & Đóng phiếu yêu cầu."
     });
     setRatingId(null);
   };
@@ -83,11 +83,6 @@ export default function ApprovalsPage() {
             Xét duyệt & Nghiệm thu ({currentUser?.unit})
           </h1>
           <p className="text-muted-foreground">Quản lý vòng đời phiếu yêu cầu tại đơn vị</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 border-primary/20 text-primary font-bold">
-            <FileText className="h-4 w-4" /> Xuất báo cáo
-          </Button>
         </div>
       </div>
 
@@ -155,10 +150,10 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Sửa xong</Badge>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật báo xong</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Kỹ thuật đã xử lý xong. Vui lòng xác nhận kết quả.
+                    Nhân viên kỹ thuật đã báo hoàn tất. Lãnh đạo vui lòng xác nhận kết quả.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -172,7 +167,7 @@ export default function ApprovalsPage() {
                     className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none font-bold" 
                     onClick={() => handleOpenRating(req.id)}
                   >
-                    <CheckCircle2 className="h-4 w-4" /> Xác nhận hoàn thành
+                    <CheckCircle2 className="h-4 w-4" /> Xác nhận & Đóng phiếu
                   </Button>
                 </div>
               </CardContent>
@@ -190,8 +185,8 @@ export default function ApprovalsPage() {
       <Dialog open={!!ratingId} onOpenChange={(open) => !open && setRatingId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Xác nhận hoàn thành & Đánh giá</DialogTitle>
-            <DialogDescription>Hãy cho chúng tôi biết mức độ hài lòng của bạn về việc xử lý sự cố này.</DialogDescription>
+            <DialogTitle>Xác nhận hoàn thành & Đóng phiếu</DialogTitle>
+            <DialogDescription>Hãy cho chúng tôi biết mức độ hài lòng về kết quả xử lý sự cố này.</DialogDescription>
           </DialogHeader>
           <div className="py-6 flex flex-col items-center gap-4">
             <div className="flex gap-2">
@@ -215,7 +210,7 @@ export default function ApprovalsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRatingId(null)}>Hủy</Button>
-            <Button className="bg-emerald-600 font-bold" onClick={handleConfirmAcceptance}>Xác nhận hoàn thành</Button>
+            <Button className="bg-emerald-600 font-bold" onClick={handleConfirmAcceptance}>Xác nhận & Đóng phiếu</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

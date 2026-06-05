@@ -62,17 +62,12 @@ export default function RequestDetail() {
     if (status === 'completed') {
        toast({
          title: "Đã báo cáo hoàn thành",
-         description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
+         description: "Dữ liệu đã được chuyển đến Lãnh đạo đơn vị để xác nhận đóng phiếu."
        });
     } else if (status === 'closed') {
        toast({
-         title: "Đã xác nhận hoàn thành",
-         description: "Phiếu yêu cầu hiện đã được đóng và nghiệm thu."
-       });
-    } else if (status === 'verified') {
-       toast({
-         title: "Đã duyệt hoàn thành",
-         description: "Đã xác nhận kết quả sửa chữa. Đang chờ đơn vị yêu cầu xác nhận cuối cùng."
+         title: "Đã xác nhận & Đóng phiếu",
+         description: "Phiếu đã được đóng thành công. Kỹ thuật viên hiện có thể thực hiện in phiếu."
        });
     } else {
        toast({
@@ -101,9 +96,9 @@ export default function RequestDetail() {
       case 'approved': return <Badge className="bg-indigo-500">Đã phê duyệt</Badge>;
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
-      case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã báo xong</Badge>;
+      case 'completed': return <Badge className="bg-emerald-500 text-white">Chờ lãnh đạo xác nhận</Badge>;
       case 'verified': return <Badge className="bg-cyan-600">Đã duyệt hoàn thành</Badge>;
-      case 'closed': return <Badge className="bg-green-700 text-white">Đã đóng phiếu</Badge>;
+      case 'closed': return <Badge className="bg-green-700 text-white">Đã hoàn tất & Đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -146,9 +141,11 @@ export default function RequestDetail() {
             <p className="text-xs text-muted-foreground uppercase font-mono">{req.category}</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-primary font-semibold" onClick={handlePrint}>
-          <Printer className="h-4 w-4" /> In phiếu lưu trữ
-        </Button>
+        {(req.status === 'closed') && (
+          <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-primary font-semibold" onClick={handlePrint}>
+            <Printer className="h-4 w-4" /> In phiếu lưu trữ
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -246,10 +243,6 @@ export default function RequestDetail() {
                     >
                       <ClipboardPen className="h-5 w-5" /> Báo cáo hoàn thành
                     </Button>
-                    <div className="bg-blue-50 p-3 rounded-lg flex items-start gap-2 border border-blue-100">
-                       <Bell className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
-                       <p className="text-[10px] text-blue-800 font-bold leading-tight">Sau khi gửi, hệ thống sẽ tự động thông báo cho Người yêu cầu và Quản lý PCSVC.</p>
-                    </div>
                   </div>
                 )}
                 
@@ -259,11 +252,11 @@ export default function RequestDetail() {
                    </Button>
                 )}
 
-                {/* NGƯỜI YÊU CẦU / LÃNH ĐẠO XÁC NHẬN HOÀN THÀNH (NGHIỆM THU) */}
-                {isRequesterOrLeader && req.status === 'verified' && (
+                {/* XÁC NHẬN HOÀN THÀNH & ĐÓNG PHIẾU (LÃNH ĐẠO / NGƯỜI YÊU CẦU) */}
+                {isRequesterOrLeader && req.status === 'completed' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
-                      <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng của bạn</Label>
+                      <Label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Đánh giá độ hài lòng của đơn vị</Label>
                       <StarRating value={rating} onChange={setRating} />
                     </div>
                     <Button className="bg-primary w-full h-14 text-md font-bold gap-2 shadow-lg shadow-primary/20" onClick={() => handleAction('closed', { rating })}>
@@ -272,7 +265,7 @@ export default function RequestDetail() {
                   </div>
                 )}
 
-                {/* QUẢN LÝ CSVC PHÂN CÔNG / DUYỆT HOÀN THÀNH */}
+                {/* QUẢN LÝ CSVC PHÂN CÔNG */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                   <div className="flex flex-col gap-3">
                     <Select onValueChange={setSelectedTechId} value={selectedTechId}>
@@ -284,12 +277,6 @@ export default function RequestDetail() {
                       handleAction('assigned', { technicianId: tech?.id, technicianName: tech?.name });
                     }}>Phân công kỹ thuật viên</Button>
                   </div>
-                )}
-
-                {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
-                  <Button className="bg-emerald-600 h-14 text-md font-bold gap-2" onClick={() => handleAction('verified')}>
-                    <CheckCircle2 className="h-5 w-5" /> Duyệt hoàn thành
-                  </Button>
                 )}
               </div>
             </CardContent>
