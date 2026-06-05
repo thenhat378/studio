@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect } from 'react';
@@ -11,7 +10,6 @@ import {
   ShieldCheck,
   Package,
   Menu,
-  User,
   Bell,
   Search
 } from 'lucide-react';
@@ -48,8 +46,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   ];
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
-
-  // Bottom Nav items (Max 4 to make room for FAB)
   const bottomNavItems = filteredNav.slice(0, 4);
 
   return (
@@ -57,9 +53,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-white no-print fixed h-full z-40">
         <div className="flex h-16 items-center px-6 border-b shrink-0">
-          <Link href="/" className="flex items-center gap-2 font-black text-lg text-primary tracking-tighter">
+          <Link href="/" className="flex items-center gap-2 font-black text-sm text-primary tracking-tighter uppercase">
             <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" />
-            <span>Sửa chữa DUE</span>
+            <span>Requisition form DUE</span>
           </Link>
         </div>
         <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
@@ -81,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
           {currentUser.role === 'requester' && (
             <Link href="/requests/new">
-              <Button variant="ghost" className="w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl text-orange-600 hover:bg-orange-50">
+              <Button variant="ghost" className="w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl text-accent hover:bg-orange-50">
                 <PlusCircle className="h-5 w-5" />
                 Tạo phiếu mới
               </Button>
@@ -108,7 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {currentUser.name.charAt(0)}
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">Xin chào,</p>
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest leading-none">Xin chào,</p>
               <p className="text-sm font-black text-slate-800">{currentUser.name.split(' ').pop()}</p>
             </div>
           </div>
@@ -130,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <div>
                       <p className="font-black text-lg">{currentUser.name}</p>
-                      <p className="text-xs font-bold text-primary uppercase">{currentUser.role.replace('_', ' ')}</p>
+                      <p className="text-[10px] font-black text-primary uppercase">{currentUser.role.replace('_', ' ')}</p>
                     </div>
                   </div>
                   <div className="space-y-2 flex-1">
@@ -146,7 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {currentUser.role === 'requester' && (
                       <SheetClose asChild>
                         <Link href="/requests/new">
-                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-orange-500">
+                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-accent">
                             <PlusCircle className="h-5 w-5" /> Tạo phiếu mới
                           </Button>
                         </Link>
@@ -168,7 +164,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Desktop Header */}
         <header className="hidden md:flex h-20 items-center justify-between px-8 bg-transparent no-print">
-          <h2 className="text-xl font-black text-slate-800">
+          <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">
             {navigation.find(n => n.href === pathname)?.name || 'Dashboard'}
           </h2>
           <div className="flex items-center gap-4">
@@ -211,7 +207,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
           {currentUser.role === 'requester' && (
             <Link href="/requests/new" className="absolute -top-8 left-1/2 -translate-x-1/2">
-              <div className="h-16 w-16 rounded-full bg-[#F58220] flex items-center justify-center text-white shadow-xl shadow-orange-200 border-4 border-[#F4F7FE] active:scale-95 transition-transform">
+              <div className="h-16 w-16 rounded-full bg-accent flex items-center justify-center text-white shadow-xl shadow-orange-200 border-4 border-[#F4F7FE] active:scale-95 transition-transform">
                 <PlusCircle className="h-8 w-8" />
               </div>
             </Link>

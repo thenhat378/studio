@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,19 +10,26 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 210 100% 33%;
+    
+    /* Blue - Primary */
+    --primary: 210 100% 32%;
     --primary-foreground: 210 40% 98%;
+    
+    /* Green - Secondary */
     --secondary: 149 100% 33%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    
+    /* Orange - Accent */
     --accent: 28 92% 54%;
     --accent-foreground: 210 40% 98%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 33%;
+    --ring: 210 100% 32%;
     --radius: 1.25rem;
   }
 }
@@ -35,7 +41,6 @@
   body {
     @apply bg-[#F4F7FE] text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
     -webkit-tap-highlight-color: transparent;
-    user-select: none; /* Prevent text selection on UI elements for app feel */
   }
 }
 
@@ -64,12 +69,11 @@
 /* Mobile optimizations */
 input, select, textarea {
   @apply !text-base md:!text-sm;
-  user-select: text;
 }
 
 /* Safe area for mobile with bottom nav */
 .pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 
 .glass-morphism {

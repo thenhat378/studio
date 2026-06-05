@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -15,8 +14,6 @@ import {
   AlertCircle,
   ChevronRight,
   User,
-  ShieldCheck,
-  HardDrive,
   Lock,
   Star,
   BarChart3,
@@ -25,7 +22,8 @@ import {
   ArrowUpRight,
   Wrench,
   PlusCircle,
-  Sparkles
+  Sparkles,
+  HardDrive
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -46,8 +44,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
@@ -91,15 +87,15 @@ export default function Overview() {
              <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-4">
                 <Wrench className="h-10 w-10 text-primary p-1" />
              </div>
-            <h1 className="text-3xl font-black tracking-tighter text-[#0054A4] uppercase leading-tight">
-              Sửa chữa DUE
+            <h1 className="text-2xl font-black tracking-tighter text-primary uppercase leading-tight">
+              Requisition form DUE
             </h1>
           </div>
 
           <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-xl font-black text-slate-800">Chào mừng trở lại!</CardTitle>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Đăng nhập để bắt đầu</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đăng nhập để bắt đầu</p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <form onSubmit={handleLogin} className="space-y-5">
@@ -128,7 +124,7 @@ export default function Overview() {
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-[#0054A4] hover:bg-[#003d7a] uppercase tracking-widest text-xs shadow-xl shadow-blue-100" disabled={isLoading}>
+                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary hover:bg-primary/90 uppercase tracking-widest text-xs shadow-xl shadow-blue-100" disabled={isLoading}>
                   {isLoading ? "Đang kết nối..." : "Đăng nhập ngay"}
                 </Button>
               </form>
@@ -148,13 +144,13 @@ export default function Overview() {
                   </DialogHeader>
                   <div className="space-y-6 py-4">
                     <div className="bg-slate-50 p-6 rounded-3xl space-y-3">
-                      <p className="font-black text-sm flex items-center gap-2">
+                      <p className="font-black text-sm flex items-center gap-2 text-primary">
                         <Apple className="h-5 w-5" /> iPhone (Safari)
                       </p>
                       <p className="text-xs text-slate-500 leading-relaxed">Nhấn nút <b>Chia sẻ</b> (ô vuông mũi tên) ở dưới cùng, sau đó chọn <b>"Thêm vào màn hình chính"</b>.</p>
                     </div>
                     <div className="bg-slate-50 p-6 rounded-3xl space-y-3">
-                      <p className="font-black text-sm flex items-center gap-2">
+                      <p className="font-black text-sm flex items-center gap-2 text-primary">
                         <Smartphone className="h-5 w-5" /> Android (Chrome)
                       </p>
                       <p className="text-xs text-slate-500 leading-relaxed">Nhấn biểu tượng <b>3 chấm</b> ở góc trên bên phải, sau đó chọn <b>"Cài đặt ứng dụng"</b>.</p>
@@ -177,10 +173,10 @@ export default function Overview() {
   });
 
   const stats = [
-    { label: 'Tổng phiếu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Đang làm', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: 'Tổng phiếu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-primary', bg: 'bg-blue-50' },
+    { label: 'Đang làm', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-accent', bg: 'bg-orange-50' },
     { label: 'Chờ duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-50' },
-    { label: 'Đã xong', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { label: 'Đã xong', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-secondary', bg: 'bg-emerald-50' },
   ];
 
   const recentRequests = roleFilteredRequests.slice(0, 5);
@@ -197,13 +193,13 @@ export default function Overview() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden bg-[#0054A4] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-100 md:hidden">
+      <div className="relative overflow-hidden bg-primary rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-100 md:hidden">
          <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-         <p className="text-xs font-black uppercase tracking-widest text-blue-200 mb-1">Hệ thống QLSC DUE</p>
+         <p className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-1">Requisition form DUE</p>
          <h1 className="text-2xl font-black">Chào, {currentUser.name.split(' ').pop()}! 👋</h1>
          <div className="mt-4 flex gap-2">
-            <Badge className="bg-white/20 hover:bg-white/30 border-none text-[10px] font-black">{currentUser.role.replace('_', ' ')}</Badge>
-            {currentUser.unit && <Badge className="bg-white/20 hover:bg-white/30 border-none text-[10px] font-black">{currentUser.unit}</Badge>}
+            <Badge className="bg-white/20 hover:bg-white/30 border-none text-[9px] font-black">{currentUser.role.replace('_', ' ')}</Badge>
+            {currentUser.unit && <Badge className="bg-white/20 hover:bg-white/30 border-none text-[9px] font-black">{currentUser.unit}</Badge>}
          </div>
       </div>
 
@@ -214,16 +210,16 @@ export default function Overview() {
             <CardContent className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 rounded-2xl bg-orange-50 flex items-center justify-center border border-orange-100">
-                  <PlusCircle className="h-7 w-7 text-orange-500" />
+                  <PlusCircle className="h-7 w-7 text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-slate-800">Tạo yêu cầu sửa chữa</h3>
+                  <h3 className="font-black text-lg text-slate-800">Tạo phiếu yêu cầu mới</h3>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-orange-400" /> Có hỗ trợ AI phân tích lỗi
+                    <Sparkles className="h-3 w-3 text-accent" /> Có hỗ trợ AI phân tích lỗi
                   </p>
                 </div>
               </div>
-              <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+              <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
                 <ChevronRight className="h-5 w-5" />
               </div>
             </CardContent>
@@ -250,7 +246,7 @@ export default function Overview() {
         <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
           <CardHeader className="px-8 py-6 border-b border-slate-50">
             <CardTitle className="text-lg font-black text-slate-800 flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-orange-500" /> Hiệu suất kỹ thuật
+              <BarChart3 className="h-5 w-5 text-accent" /> Hiệu suất kỹ thuật
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -261,11 +257,11 @@ export default function Overview() {
                     <TableRow key={tech.id} className="border-none hover:bg-slate-50 transition-colors">
                       <TableCell className="font-bold py-5 px-8 text-sm">{tech.name}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-none font-black text-[10px] px-3">
+                        <Badge variant="secondary" className="bg-emerald-50 text-secondary border-none font-black text-[10px] px-3">
                           {tech.completed} DONE
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right pr-8 font-black text-amber-500 text-sm">{tech.avgRating} ★</TableCell>
+                      <TableCell className="text-right pr-8 font-black text-accent text-sm">{tech.avgRating} ★</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -278,7 +274,7 @@ export default function Overview() {
       {/* Recent Activity List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
-           <h3 className="text-lg font-black text-slate-800">Yêu cầu gần đây</h3>
+           <h3 className="text-lg font-black text-slate-800">Hoạt động gần đây</h3>
            <Link href="/requests" className="text-xs font-black text-primary uppercase tracking-tighter flex items-center gap-1">
              Tất cả <ArrowUpRight className="h-3 w-3" />
            </Link>
@@ -291,7 +287,7 @@ export default function Overview() {
                 <CardContent className="p-5 flex items-center justify-between gap-4">
                   <div className="flex gap-4 items-center min-w-0">
                     <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                      <HardDrive className="h-7 w-7 text-primary/30" />
+                      <HardDrive className="h-7 w-7 text-primary/20" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-black text-sm text-slate-800 truncate mb-0.5">{req.title}</p>
@@ -301,8 +297,8 @@ export default function Overview() {
                   <div className="shrink-0">
                     <div className={cn(
                       "h-8 w-8 rounded-full flex items-center justify-center",
-                      req.status === 'closed' ? "bg-emerald-100 text-emerald-600" : 
-                      req.status === 'pending_approval' ? "bg-rose-100 text-rose-600" : "bg-blue-100 text-blue-600"
+                      req.status === 'closed' ? "bg-emerald-100 text-secondary" : 
+                      req.status === 'pending_approval' ? "bg-rose-100 text-rose-600" : "bg-blue-100 text-primary"
                     )}>
                       {req.status === 'closed' ? <CheckCircle2 className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </div>

@@ -1,4 +1,3 @@
-
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
@@ -7,12 +6,12 @@ import { AppProvider } from '@/lib/store';
 import { FirebaseProvider } from '@/firebase/provider';
 
 export const metadata: Metadata = {
-  title: 'Ứng dụng Quản lý sửa chữa',
+  title: 'Requisition form DUE',
   description: 'Hệ thống hỗ trợ quản lý quy trình sửa chữa thiết bị cơ sở vật chất DUE',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'QLSC DUE',
+    title: 'Requisition DUE',
   },
   formatDetection: {
     telephone: false,
@@ -37,7 +36,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <link rel="apple-touch-icon" href="https://picsum.photos/seed/due-university-logo/180/180" />
       </head>
       <body className="font-body antialiased">

@@ -1,14 +1,13 @@
-
 import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Ứng dụng Quản lý sửa chữa',
-    short_name: 'QLSC DUE',
+    name: 'Requisition form DUE',
+    short_name: 'Requisition DUE',
     description: 'Hệ thống hỗ trợ quản lý quy trình sửa chữa thiết bị cơ sở vật chất DUE',
     start_url: '/',
     display: 'standalone',
-    background_color: '#F0F2F5',
+    background_color: '#F4F7FE',
     theme_color: '#0054A4',
     icons: [
       {
