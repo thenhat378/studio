@@ -15,10 +15,17 @@ import {
   addDoc,
   updateDoc
 } from 'firebase/firestore';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 
 interface AppContextType {
   currentUser: User | null;
-  loginAsRole: (role: UserRole, customName?: string, customUnit?: string) => void;
+  login: (phone: string, pass: string) => Promise<void>;
+  register: (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => Promise<void>;
   logout: () => void;
   requests: RepairRequest[];
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
@@ -26,6 +33,7 @@ interface AppContextType {
   equipment: Equipment[];
   users: User[];
   isInitialized: boolean;
+  loading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,20 +48,34 @@ const MOCK_EQUIPMENT: Equipment[] = [
 ];
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const { db } = useFirebase();
+  const { db, auth } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<RepairRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Chuyển đổi số điện thoại thành email giả để dùng Firebase Auth Email/Pass (ổn định nhất)
+  const phoneToEmail = (phone: string) => `${phone.replace(/\D/g, '')}@due-repair.vn`;
 
   useEffect(() => {
-    // Tự động khôi phục phiên làm việc từ LocalStorage (không cần mật khẩu)
-    const savedUser = localStorage.getItem('due_repair_user');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    setIsInitialized(true);
-  }, []);
+    if (!auth || !db) return;
+
+    const unsubAuth = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+        if (userDoc.exists()) {
+          setCurrentUser({ id: fbUser.uid, ...userDoc.data() } as User);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setIsInitialized(true);
+      setLoading(false);
+    });
+
+    return () => unsubAuth();
+  }, [auth, db]);
 
   useEffect(() => {
     if (!db) return;
@@ -72,27 +94,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
-  const loginAsRole = (role: UserRole, customName?: string, customUnit?: string) => {
-    const defaultUsers: Record<UserRole, User> = {
-      'requester': { id: 'req-1', name: customName || 'Nguyễn Văn A', role: 'requester', unit: customUnit || 'Khoa Quản trị' },
-      'unit_leader': { id: 'leader-1', name: customName || 'Trần Thị B', role: 'unit_leader', unit: customUnit || 'Khoa Quản trị' },
-      'csvc_manager': { id: 'manager-1', name: customName || 'Phạm Văn C', role: 'csvc_manager', unit: 'Phòng CSVC' },
-      'technician': { id: 'tech-1', name: customName || 'Kỹ thuật viên 01', role: 'technician', unit: 'Tổ Kỹ thuật' },
-    };
-    
-    const user = defaultUsers[role];
-    setCurrentUser(user);
-    localStorage.setItem('due_repair_user', JSON.stringify(user));
-    
-    // Lưu vào Firestore để quản lý danh sách người dùng
-    if (db) {
-      setDoc(doc(db, 'users', user.id), user, { merge: true });
-    }
+  const login = async (phone: string, pass: string) => {
+    if (!auth) return;
+    await signInWithEmailAndPassword(auth, phoneToEmail(phone), pass);
   };
 
-  const logout = () => {
+  const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
+    if (!auth || !db) return;
+    const { user: fbUser } = await createUserWithEmailAndPassword(auth, phoneToEmail(data.phone), data.pass);
+    
+    const userData: User = {
+      id: fbUser.uid,
+      name: data.name,
+      role: data.role,
+      unit: data.unit,
+      phoneNumber: data.phone
+    };
+
+    await setDoc(doc(db, 'users', fbUser.uid), userData);
+    setCurrentUser(userData);
+  };
+
+  const logout = async () => {
+    if (!auth) return;
+    await signOut(auth);
     setCurrentUser(null);
-    localStorage.removeItem('due_repair_user');
   };
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
@@ -112,14 +138,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       currentUser, 
-      loginAsRole, 
+      login,
+      register,
       logout,
       requests, 
       addRequest, 
       updateRequestStatus,
       equipment: MOCK_EQUIPMENT, 
       users, 
-      isInitialized
+      isInitialized,
+      loading
     }}>
       {children}
     </AppContext.Provider>
