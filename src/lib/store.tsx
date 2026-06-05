@@ -5,12 +5,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import type { User, RepairRequest, Equipment, UserRole } from './types';
 import { useFirebase } from '@/firebase';
 import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut
-} from 'firebase/auth';
-import { 
   doc, 
   getDoc, 
   setDoc, 
@@ -24,10 +18,8 @@ import {
 
 interface AppContextType {
   currentUser: User | null;
-  login: (phone: string, pass: string) => Promise<void>;
-  register: (phone: string, pass: string, name: string, unit: string) => Promise<void>;
-  loginAsTestAccount: (role: UserRole) => void;
-  logout: () => Promise<void>;
+  loginAsRole: (role: UserRole, customName?: string, customUnit?: string) => void;
+  logout: () => void;
   requests: RepairRequest[];
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   updateRequestStatus: (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => Promise<void>;
@@ -48,96 +40,59 @@ const MOCK_EQUIPMENT: Equipment[] = [
 ];
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const { auth, db } = useFirebase();
+  const { db } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<RepairRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Helper to convert phone to internal auth email
-  const phoneToEmail = (phone: string) => `${phone.trim()}@due-repair.vn`;
-
   useEffect(() => {
-    if (!auth || !db) {
-      setIsInitialized(true);
-      return;
+    // Tự động khôi phục phiên làm việc từ LocalStorage (không cần mật khẩu)
+    const savedUser = localStorage.getItem('due_repair_user');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
     }
-
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            setCurrentUser(userDoc.data() as User);
-          }
-        } catch (e) {
-          console.error("User load error:", e);
-        }
-      } else {
-        const testUser = localStorage.getItem('test_user_session');
-        if (testUser) {
-          setCurrentUser(JSON.parse(testUser));
-        } else {
-          setCurrentUser(null);
-        }
-      }
-      setIsInitialized(true);
-    });
-
-    return () => unsubscribe();
-  }, [auth, db]);
+    setIsInitialized(true);
+  }, []);
 
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
-    return onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, (snapshot) => {
       setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
     });
+    return () => unsub();
   }, [db]);
 
   useEffect(() => {
     if (!db) return;
-    return onSnapshot(collection(db, 'users'), (snapshot) => {
+    const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
       setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User)));
     });
+    return () => unsub();
   }, [db]);
 
-  const login = async (phone: string, pass: string) => {
-    if (!auth) throw new Error("Service unavailable");
-    localStorage.removeItem('test_user_session');
-    await signInWithEmailAndPassword(auth, phoneToEmail(phone), pass);
-  };
-
-  const register = async (phone: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Service unavailable");
-    const result = await createUserWithEmailAndPassword(auth, phoneToEmail(phone), pass);
-    const newUser: User = {
-      id: result.user.uid,
-      name,
-      unit,
-      role: 'requester',
-      phoneNumber: phone
+  const loginAsRole = (role: UserRole, customName?: string, customUnit?: string) => {
+    const defaultUsers: Record<UserRole, User> = {
+      'requester': { id: 'req-1', name: customName || 'Nguyễn Văn A', role: 'requester', unit: customUnit || 'Khoa Quản trị' },
+      'unit_leader': { id: 'leader-1', name: customName || 'Trần Thị B', role: 'unit_leader', unit: customUnit || 'Khoa Quản trị' },
+      'csvc_manager': { id: 'manager-1', name: customName || 'Phạm Văn C', role: 'csvc_manager', unit: 'Phòng CSVC' },
+      'technician': { id: 'tech-1', name: customName || 'Kỹ thuật viên 01', role: 'technician', unit: 'Tổ Kỹ thuật' },
     };
-    await setDoc(doc(db, 'users', result.user.uid), newUser);
-    setCurrentUser(newUser);
-  };
-
-  const loginAsTestAccount = (role: UserRole) => {
-    const testUsers: Record<UserRole, User> = {
-      'requester': { id: 'test-req', name: 'Nhân viên (Test)', role: 'requester', unit: 'Phòng Hành chính' },
-      'unit_leader': { id: 'test-leader', name: 'Lãnh đạo (Test)', role: 'unit_leader', unit: 'Phòng Hành chính' },
-      'csvc_manager': { id: 'test-manager', name: 'Quản lý (Test)', role: 'csvc_manager', unit: 'Phòng CSVC' },
-      'technician': { id: 'test-tech', name: 'Kỹ thuật (Test)', role: 'technician', unit: 'Tổ Kỹ thuật' },
-    };
-    const user = testUsers[role];
+    
+    const user = defaultUsers[role];
     setCurrentUser(user);
-    localStorage.setItem('test_user_session', JSON.stringify(user));
+    localStorage.setItem('due_repair_user', JSON.stringify(user));
+    
+    // Lưu vào Firestore để quản lý danh sách người dùng
+    if (db) {
+      setDoc(doc(db, 'users', user.id), user, { merge: true });
+    }
   };
 
-  const logout = async () => {
-    if (auth) await signOut(auth);
+  const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('test_user_session');
+    localStorage.removeItem('due_repair_user');
   };
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
@@ -156,9 +111,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      currentUser, login, register, loginAsTestAccount, logout,
-      requests, addRequest, updateRequestStatus,
-      equipment: MOCK_EQUIPMENT, users, isInitialized
+      currentUser, 
+      loginAsRole, 
+      logout,
+      requests, 
+      addRequest, 
+      updateRequestStatus,
+      equipment: MOCK_EQUIPMENT, 
+      users, 
+      isInitialized
     }}>
       {children}
     </AppContext.Provider>

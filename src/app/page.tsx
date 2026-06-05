@@ -12,180 +12,72 @@ import {
   Wrench,
   PlusCircle,
   HardDrive,
-  Phone,
-  Lock,
   User,
-  Building
+  ShieldCheck,
+  Briefcase,
+  UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
 
 export default function Overview() {
   const { 
     currentUser, 
-    login, 
-    register, 
-    loginAsTestAccount,
+    loginAsRole,
     requests, 
     isInitialized 
   } = useAppStore();
   
-  const { toast } = useToast();
-  const [isRegister, setIsRegister] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    phone: '',
-    password: '',
-    name: '',
-    unit: ''
-  });
-
   if (!isInitialized) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      if (isRegister) {
-        if (!formData.name || !formData.unit) throw new Error("Vui lòng điền đủ thông tin.");
-        await register(formData.phone, formData.password, formData.name, formData.unit);
-        toast({ title: "Đăng ký thành công", description: "Chào mừng bạn gia nhập hệ thống!" });
-      } else {
-        await login(formData.phone, formData.password);
-        toast({ title: "Đăng nhập thành công" });
-      }
-    } catch (error: any) {
-      toast({ 
-        variant: "destructive", 
-        title: "Lỗi xác thực", 
-        description: error.message || "Thông tin không chính xác." 
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Giao diện khi chưa chọn vai trò (Trang "Đăng nhập" mới)
   if (!currentUser) {
+    const roles = [
+      { id: 'requester', title: 'Nhân viên / Giảng viên', desc: 'Tạo phiếu yêu cầu sửa chữa', icon: User, color: 'bg-blue-500' },
+      { id: 'unit_leader', title: 'Lãnh đạo đơn vị', desc: 'Duyệt yêu cầu & Nghiệm thu', icon: ShieldCheck, color: 'bg-emerald-500' },
+      { id: 'csvc_manager', title: 'Quản lý CSVC', desc: 'Điều phối & Giao việc kỹ thuật', icon: Briefcase, color: 'bg-indigo-500' },
+      { id: 'technician', title: 'Kỹ thuật viên', desc: 'Thực hiện sửa chữa & Báo cáo', icon: Wrench, color: 'bg-orange-500' },
+    ];
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-500">
+        <div className="w-full max-w-[600px] space-y-8 animate-in fade-in zoom-in duration-500">
           <div className="text-center space-y-3">
              <div className="inline-flex p-5 bg-white rounded-[2.5rem] shadow-2xl mb-2">
                 <Wrench className="h-10 w-10 text-primary" />
              </div>
-            <h1 className="text-2xl font-black text-primary uppercase tracking-tighter">Requisition DUE</h1>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hệ thống quản lý sửa chữa chuyên nghiệp</p>
+            <h1 className="text-3xl font-black text-primary uppercase tracking-tighter">Requisition DUE</h1>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Hệ thống quản lý sửa chữa chuyên nghiệp</p>
           </div>
 
-          <Card className="border-none shadow-2xl bg-white rounded-[3rem] overflow-hidden">
-            <CardHeader className="text-center pt-8 pb-2">
-              <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
-                {isRegister ? 'Tạo tài khoản mới' : 'Đăng nhập hệ thống'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5 px-8 pb-10">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-1">
-                  <Label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Số điện thoại</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input 
-                      placeholder="09xx..." 
-                      className="h-14 rounded-2xl bg-slate-50 border-none font-bold pl-12"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      required
-                    />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {roles.map((role) => (
+              <Card 
+                key={role.id} 
+                className="border-none shadow-xl bg-white rounded-[2rem] hover:scale-[1.03] transition-all cursor-pointer overflow-hidden group"
+                onClick={() => loginAsRole(role.id as any)}
+              >
+                <CardContent className="p-6 flex flex-col items-center text-center space-y-3">
+                  <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-white shadow-lg", role.color)}>
+                    <role.icon className="h-7 w-7" />
                   </div>
-                </div>
-
-                {isRegister && (
-                  <>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Họ và tên</Label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                          placeholder="Nhập tên của bạn..." 
-                          className="h-14 rounded-2xl bg-slate-50 border-none font-bold pl-12"
-                          value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Đơn vị</Label>
-                      <div className="relative">
-                        <Building className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                          placeholder="Khoa / Phòng / Trung tâm" 
-                          className="h-14 rounded-2xl bg-slate-50 border-none font-bold pl-12"
-                          value={formData.unit}
-                          onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div className="space-y-1">
-                  <Label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Mật khẩu</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input 
-                      type="password"
-                      placeholder="••••••••" 
-                      className="h-14 rounded-2xl bg-slate-50 border-none font-bold pl-12"
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      required
-                    />
+                  <div>
+                    <h3 className="font-black text-slate-800 uppercase text-xs tracking-tight">{role.title}</h3>
+                    <p className="text-[10px] text-slate-400 font-bold mt-1 leading-tight">{role.desc}</p>
                   </div>
-                </div>
-
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary shadow-xl uppercase text-xs tracking-widest mt-4" disabled={isLoading}>
-                  {isLoading ? "Đang xử lý..." : isRegister ? "Đăng ký ngay" : "Vào hệ thống"}
-                </Button>
-
-                <Button 
-                  type="button" 
-                  variant="link" 
-                  className="w-full text-xs text-slate-400 font-bold" 
-                  onClick={() => setIsRegister(!isRegister)}
-                >
-                  {isRegister ? "Đã có tài khoản? Đăng nhập" : "Chưa có tài khoản? Đăng ký ngay"}
-                </Button>
-              </form>
-
-              <div className="relative py-4 flex items-center gap-3">
-                <div className="h-px bg-slate-100 flex-1"></div>
-                <span className="text-[10px] font-black text-slate-300 uppercase">Truy cập nhanh</span>
-                <div className="h-px bg-slate-100 flex-1"></div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase border-slate-100 hover:bg-slate-50" onClick={() => loginAsTestAccount('requester')}>Nhân viên</Button>
-                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase border-slate-100 hover:bg-slate-50" onClick={() => loginAsTestAccount('unit_leader')}>Lãnh đạo</Button>
-                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase border-slate-100 hover:bg-slate-50" onClick={() => loginAsTestAccount('csvc_manager')}>Quản lý</Button>
-                <Button variant="outline" className="h-11 rounded-xl text-[9px] font-black uppercase border-slate-100 hover:bg-slate-50" onClick={() => loginAsTestAccount('technician')}>Kỹ thuật</Button>
-              </div>
-            </CardContent>
-          </Card>
-          <p className="text-center text-[9px] text-slate-300 font-bold uppercase tracking-widest pb-10">© 2026 Hệ thống quản lý sửa chữa DUE</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <p className="text-center text-[9px] text-slate-300 font-bold uppercase tracking-widest">Vui lòng chọn vai trò để bắt đầu làm việc</p>
         </div>
       </div>
     );
   }
 
+  // Giao diện Dashboard sau khi đã vào hệ thống
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
