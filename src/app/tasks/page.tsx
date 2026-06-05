@@ -59,12 +59,13 @@ export default function TasksPage() {
 
     updateRequestStatus(reportingId, 'completed', { 
       technicianReport: reportText,
-      repairType: repairType as RepairType
+      repairType: repairType as RepairType,
+      completedAt: new Date().toISOString()
     });
 
     toast({
       title: "Đã báo cáo hoàn thành",
-      description: "Phiếu đã được gửi tới Lãnh đạo đơn vị để xác nhận đóng phiếu."
+      description: "Phiếu đã được gửi tới Quản lý CSVC để duyệt kỹ thuật."
     });
     
     setReportingId(null);
@@ -74,7 +75,7 @@ export default function TasksPage() {
     switch(status) {
       case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã báo xong</Badge>;
+      case 'completed': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã báo xong</Badge>;
       case 'closed': return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -175,7 +176,7 @@ export default function TasksPage() {
                     <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Đã đóng phiếu</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Lãnh đạo đã xác nhận nghiệm thu. Hãy in phiếu để lưu trữ hồ sơ.
+                    Nghiệm thu hoàn tất vào {req.completedAt && new Date(req.completedAt).toLocaleDateString('vi-VN')}. Hãy in phiếu.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -233,7 +234,7 @@ export default function TasksPage() {
             
             <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-               <p className="text-xs text-blue-700 font-bold">Lưu ý: Sau khi gửi, phiếu sẽ chuyển về Lãnh đạo đơn vị để xác nhận đóng phiếu.</p>
+               <p className="text-xs text-blue-700 font-bold">Sau khi gửi, phiếu sẽ chuyển về Quản lý CSVC để duyệt kỹ thuật.</p>
             </div>
           </div>
           <DialogFooter className="gap-2">

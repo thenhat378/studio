@@ -18,7 +18,8 @@ import {
   XCircle,
   UserCheck,
   ShieldCheck,
-  ThumbsUp
+  ThumbsUp,
+  CheckCircle
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -64,8 +65,8 @@ export default function RequestDetail() {
     updateRequestStatus(req.id, status, extra);
     
     let msg = "Cập nhật thành công";
-    if (status === 'completed') msg = "Kỹ thuật viên đã báo cáo xong. Chờ Quản lý CSVC duyệt.";
-    if (status === 'verified') msg = "Quản lý CSVC đã duyệt. Chờ Người dùng & Lãnh đạo nghiệm thu.";
+    if (status === 'completed') msg = "Kỹ thuật viên đã báo cáo xong. Chờ Quản lý CSVC duyệt kỹ thuật.";
+    if (status === 'verified') msg = "Quản lý CSVC đã duyệt. Chờ Người dùng xác nhận hài lòng.";
     if (status === 'closed') msg = "Phiếu đã được đóng. Nghiệm thu hoàn tất.";
 
     toast({ title: "Thông báo", description: msg });
@@ -86,7 +87,7 @@ export default function RequestDetail() {
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
       case 'completed': return <Badge className="bg-cyan-500 text-white">Chờ QL CSVC duyệt</Badge>;
-      case 'verified': return <Badge className="bg-emerald-500 text-white">Đang nghiệm thu sử dụng</Badge>;
+      case 'verified': return <Badge className="bg-emerald-500 text-white">Chờ người dùng xác nhận</Badge>;
       case 'closed': return <Badge className="bg-green-700 text-white">Đã hoàn tất & Đóng phiếu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
@@ -109,11 +110,18 @@ export default function RequestDetail() {
       <Card className="border-none shadow-sm overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex justify-between items-start">
-            <div>
+            <div className="space-y-1">
               <CardTitle className="text-2xl font-bold">{req.title}</CardTitle>
-              <CardDescription className="flex items-center gap-2 mt-2 font-bold text-primary">
-                <Clock className="h-4 w-4" /> Thời gian báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}
-              </CardDescription>
+              <div className="flex flex-col gap-1">
+                <p className="flex items-center gap-2 text-sm font-bold text-primary">
+                  <Clock className="h-4 w-4" /> Thời gian báo hỏng: {new Date(req.createdAt).toLocaleString('vi-VN')}
+                </p>
+                {req.completedAt && (
+                  <p className="flex items-center gap-2 text-sm font-bold text-emerald-600">
+                    <CheckCircle className="h-4 w-4" /> Thời gian hoàn thành: {new Date(req.completedAt).toLocaleString('vi-VN')}
+                  </p>
+                )}
+              </div>
             </div>
             {getStatusBadge(req.status)}
           </div>
@@ -131,17 +139,32 @@ export default function RequestDetail() {
             </div>
           )}
 
-          {/* HIỂN THỊ TRẠNG THÁI XÁC NHẬN */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* HIỂN THỊ TRẠNG THÁI XÁC NHẬN ĐA CẤP */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className={cn("p-3 rounded-lg border", req.csvcManagerApproved ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-muted/20 border-dashed")}>
-              <p className="text-xs font-bold uppercase tracking-tight">1. Quản lý CSVC Duyệt</p>
-              <p className="text-sm">{req.csvcManagerApproved ? "✓ Đã duyệt chất lượng kỹ thuật" : "● Đang chờ kỹ thuật/duyệt"}</p>
+              <p className="text-xs font-bold uppercase tracking-tight">1. QL CSVC Duyệt kỹ thuật</p>
+              <p className="text-sm">{req.csvcManagerApproved ? "✓ Đã duyệt" : "● Đang chờ"}</p>
             </div>
             <div className={cn("p-3 rounded-lg border", req.requesterConfirmed ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-muted/20 border-dashed")}>
-              <p className="text-xs font-bold uppercase tracking-tight">2. Người dùng Xác nhận</p>
-              <p className="text-sm">{req.requesterConfirmed ? "✓ Đã hài lòng & xác nhận" : "● Đang chờ nghiệm thu"}</p>
+              <p className="text-xs font-bold uppercase tracking-tight">2. Người yêu cầu hài lòng</p>
+              <p className="text-sm">{req.requesterConfirmed ? "✓ Đã xác nhận" : "● Đang chờ"}</p>
+            </div>
+            <div className={cn("p-3 rounded-lg border", req.status === 'closed' ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-muted/20 border-dashed")}>
+              <p className="text-xs font-bold uppercase tracking-tight">3. Lãnh đạo Đóng phiếu</p>
+              <p className="text-sm">{req.status === 'closed' ? "✓ Đã đóng" : "● Đang chờ"}</p>
             </div>
           </div>
+          
+          {req.rating && (
+            <div className="flex items-center gap-2 py-2">
+              <span className="text-sm font-bold">Đánh giá mức độ hài lòng:</span>
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(s => (
+                  <Star key={s} className={cn("h-4 w-4", s <= req.rating! ? "fill-amber-400 text-amber-400" : "text-muted")} />
+                ))}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -203,7 +226,7 @@ export default function RequestDetail() {
                       </SelectContent>
                     </Select>
                     <Textarea placeholder="Chi tiết xử lý kỹ thuật..." className="min-h-[100px]" value={report} onChange={e => setReport(e.target.value)} />
-                    <Button className="w-full bg-emerald-600 h-14 font-bold text-lg" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType })}>Báo cáo hoàn thành</Button>
+                    <Button className="w-full bg-emerald-600 h-14 font-bold text-lg" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType, completedAt: new Date().toISOString() })}>Báo cáo hoàn thành</Button>
                   </div>
                 )}
               </>
@@ -212,26 +235,35 @@ export default function RequestDetail() {
             {/* NGƯỜI YÊU CẦU: XÁC NHẬN HÀI LÒNG */}
             {currentUser?.role === 'requester' && req.status === 'verified' && !req.requesterConfirmed && (
               <Button className="w-full bg-primary h-14 font-bold text-lg gap-2" onClick={handleRequesterConfirm}>
-                <ThumbsUp className="h-6 w-6" /> Xác nhận hài lòng về kết quả
+                <ThumbsUp className="h-6 w-6" /> Xác nhận hài lòng & Gửi Lãnh đạo đóng phiếu
               </Button>
             )}
 
-            {/* LÃNH ĐẠO: XÁC NHẬN & ĐÓNG PHIẾU */}
+            {/* LÃNH ĐẠO: XÁC NHẬN & ĐÓNG PHIẾU CUỐI CÙNG */}
             {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
               <div className="space-y-4">
-                <div className="flex gap-2 justify-center py-4">
-                  {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-8 w-8 cursor-pointer", s <= rating ? "fill-amber-400 text-amber-400" : "text-muted")} onClick={() => setRating(s)} />)}
+                <div className="flex flex-col items-center gap-3 py-4 bg-muted/20 rounded-xl">
+                  <Label className="text-sm font-bold">Đánh giá mức độ hài lòng của đơn vị</Label>
+                  <div className="flex gap-2">
+                    {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-10 w-10 cursor-pointer transition-all", s <= rating ? "fill-amber-400 text-amber-400 scale-110" : "text-muted hover:text-amber-200")} onClick={() => setRating(s)} />)}
+                  </div>
                 </div>
-                <Button className="w-full bg-primary h-14 font-bold text-lg gap-2" disabled={!req.requesterConfirmed} onClick={() => handleAction('closed', { rating })}>
+                <Button className="w-full bg-emerald-700 h-14 font-bold text-lg gap-2" disabled={!req.requesterConfirmed} onClick={() => handleAction('closed', { rating })}>
                   <CheckCircle2 className="h-6 w-6" /> Xác nhận hoàn thành & Đóng phiếu
                 </Button>
-                {!req.requesterConfirmed && <p className="text-center text-xs text-rose-600 font-bold">Chờ người yêu cầu xác nhận hài lòng trước khi đóng phiếu.</p>}
+                {!req.requesterConfirmed && <p className="text-center text-xs text-rose-600 font-bold">Nhân viên yêu cầu cần xác nhận hài lòng trước.</p>}
               </div>
             )}
 
             {/* TRẠNG THÁI KHÁC */}
             {req.status === 'closed' && (
-              <div className="text-center py-6 text-emerald-600 font-bold">✓ Phiếu đã đóng. Nghiệm thu hoàn tất.</div>
+              <div className="flex flex-col items-center gap-2 py-6">
+                <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+                </div>
+                <p className="text-emerald-700 font-bold text-lg">Phiếu đã đóng. Nghiệm thu hoàn tất.</p>
+                <p className="text-sm text-muted-foreground">Nhân viên kỹ thuật có thể thực hiện in phiếu báo cáo.</p>
+              </div>
             )}
           </div>
         </CardContent>

@@ -40,6 +40,7 @@ export interface RepairRequest {
   technicianId?: string;
   technicianName?: string;
   createdAt: string;
+  completedAt?: string; // Thời gian kỹ thuật báo xong
   aiSuggestions?: {
     causes: string[];
     recommendedEquipment: string[];
