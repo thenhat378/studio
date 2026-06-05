@@ -1,10 +1,11 @@
+
 {
   "placeholderImages": [
     {
       "id": "due-logo",
-      "description": "Logo DUE SINCE 1975",
-      "imageUrl": "https://picsum.photos/seed/due-logo/400/400",
-      "imageHint": "university logo"
+      "description": "Logo DUE - University of Economics - University of Da Nang",
+      "imageUrl": "https://picsum.photos/seed/due-university-logo/400/400",
+      "imageHint": "university emblem"
     },
     {
       "id": "hero-repair",

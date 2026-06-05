@@ -92,13 +92,13 @@ export default function Overview() {
         <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-               <div className="relative w-40 h-40 p-4 bg-white rounded-3xl shadow-2xl flex items-center justify-center group overflow-hidden border border-white/20">
+               <div className="relative w-40 h-40 p-4 bg-white rounded-full shadow-2xl flex items-center justify-center group overflow-hidden border border-white/20">
                   {dueLogo && (
                     <Image 
                       src={dueLogo.imageUrl}
                       alt={dueLogo.description}
-                      width={160}
-                      height={160}
+                      width={200}
+                      height={200}
                       className="object-contain mix-blend-multiply scale-110 group-hover:scale-125 transition-transform duration-700"
                       data-ai-hint={dueLogo.imageHint}
                     />
@@ -109,8 +109,8 @@ export default function Overview() {
             <h1 className="text-3xl font-black tracking-tighter text-primary uppercase drop-shadow-sm">Ứng dụng Quản lý sửa chữa</h1>
           </div>
 
-          <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden">
-            <div className="h-1.5 w-full bg-gradient-to-r from-accent via-secondary to-primary"></div>
+          <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden rounded-3xl">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#F58220] via-[#00A651] to-[#0054A4]"></div>
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-2xl font-bold tracking-tight">Đăng nhập</CardTitle>
               <CardDescription>Vui lòng nhập thông tin tài khoản</CardDescription>
@@ -146,7 +146,7 @@ export default function Overview() {
                   <div className="flex justify-end pt-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="link" className="px-0 font-bold text-xs text-primary h-auto py-0 hover:text-accent">
+                        <Button variant="link" className="px-0 font-bold text-xs text-primary h-auto py-0 hover:text-[#F58220]">
                           Quên mật khẩu?
                         </Button>
                       </DialogTrigger>
@@ -189,16 +189,16 @@ export default function Overview() {
 
               <div className="grid grid-cols-2 gap-2.5">
                 <Button onClick={() => login('requester')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-primary/30 hover:bg-primary/5 transition-all font-bold">
-                  <User className="h-3.5 w-3.5 text-primary" /> Người yêu cầu
+                  <User className="h-3.5 w-3.5 text-[#0054A4]" /> Người yêu cầu
                 </Button>
-                <Button onClick={() => login('unit_leader')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-accent/30 hover:bg-accent/5 transition-all font-bold">
-                  <ShieldCheck className="h-3.5 w-3.5 text-accent" /> Lãnh đạo đơn vị
+                <Button onClick={() => login('unit_leader')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-[#F58220]/30 hover:bg-[#F58220]/5 transition-all font-bold">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#F58220]" /> Lãnh đạo đơn vị
                 </Button>
                 <Button onClick={() => login('csvc_manager')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-primary/30 hover:bg-primary/5 transition-all font-bold">
                   <ClipboardList className="h-3.5 w-3.5 text-primary/80" /> Quản lý CSVC
                 </Button>
-                <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-secondary/30 hover:bg-secondary/5 transition-all font-bold">
-                  <Wrench className="h-3.5 w-3.5 text-secondary" /> Kỹ thuật viên
+                <Button onClick={() => login('technician')} variant="outline" size="sm" className="justify-start text-[10px] h-10 px-3 gap-2 rounded-xl border-slate-100 hover:border-[#00A651]/30 hover:bg-[#00A651]/5 transition-all font-bold">
+                  <Wrench className="h-3.5 w-3.5 text-[#00A651]" /> Kỹ thuật viên
                 </Button>
               </div>
             </CardContent>
@@ -206,10 +206,7 @@ export default function Overview() {
           
           <div className="text-center space-y-1">
             <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">
-              © 2026 Hệ thống quản lý sửa chữa v1.0
-            </p>
-            <p className="text-[10px] font-black uppercase tracking-widest text-primary/40">
-              Phát triển bởi Phòng Cơ sở vật chất
+              © 2026 Hệ thống quản lý sửa chữa v1.0 • Phát triển bởi Phòng Cơ sở vật chất
             </p>
           </div>
         </div>
@@ -226,9 +223,9 @@ export default function Overview() {
 
   const stats = [
     { label: 'Tổng yêu cầu', value: roleFilteredRequests.length, icon: ClipboardList, color: 'text-primary', bg: 'bg-primary/10' },
-    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-accent', bg: 'bg-accent/10' },
+    { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress', 'completed', 'verified'].includes(r.status)).length, icon: Clock, color: 'text-[#F58220]', bg: 'bg-[#F58220]/10' },
     { label: 'Chờ phê duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { label: 'Đã hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-[#00A651]', bg: 'bg-[#00A651]/10' },
   ];
 
   const recentRequests = roleFilteredRequests.slice(0, 6);
@@ -256,10 +253,10 @@ export default function Overview() {
       case 'pending_approval': return <Badge variant="outline" className="border-rose-200 text-rose-600 bg-rose-50">Chờ duyệt</Badge>;
       case 'approved': return <Badge variant="outline" className="border-primary/20 text-primary bg-primary/5">Đã duyệt</Badge>;
       case 'assigned': return <Badge variant="outline" className="border-primary/20 text-primary bg-primary/5">Đã phân công</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="border-accent/20 text-accent bg-accent/5">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="border-secondary/20 text-secondary bg-secondary/5">Kỹ thuật đã xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-secondary/20 text-secondary bg-secondary/5">Đã duyệt hoàn thành</Badge>;
-      case 'closed': return <Badge variant="outline" className="border-secondary/30 text-secondary bg-secondary/10">Đã đóng</Badge>;
+      case 'in_progress': return <Badge variant="outline" className="border-[#F58220]/20 text-[#F58220] bg-[#F58220]/5">Đang thực hiện</Badge>;
+      case 'completed': return <Badge variant="outline" className="border-[#00A651]/20 text-[#00A651] bg-[#00A651]/5">Kỹ thuật đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-[#00A651]/20 text-[#00A651] bg-[#00A651]/5">Đã duyệt hoàn thành</Badge>;
+      case 'closed': return <Badge variant="outline" className="border-[#00A651]/30 text-[#00A651] bg-[#00A651]/10">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -305,17 +302,17 @@ export default function Overview() {
       </div>
 
       {currentUser.role === 'csvc_manager' && (
-        <Card className="border-none shadow-xl overflow-hidden rounded-3xl border-t-4 border-t-accent">
+        <Card className="border-none shadow-xl overflow-hidden rounded-3xl border-t-4 border-t-[#F58220]">
           <CardHeader className="flex flex-row items-center justify-between bg-white/50 backdrop-blur-sm px-8 py-6">
             <div>
               <CardTitle className="text-xl flex items-center gap-2 font-black tracking-tight text-primary">
-                <BarChart3 className="h-6 w-6 text-accent" />
+                <BarChart3 className="h-6 w-6 text-[#F58220]" />
                 Hiệu suất xử lý của Kỹ thuật viên
               </CardTitle>
               <CardDescription className="font-medium">Cơ sở đánh giá năng suất và chất lượng phục vụ</CardDescription>
             </div>
-            <div className="p-3 bg-accent/10 rounded-2xl shadow-inner">
-               <Users className="h-6 w-6 text-accent" />
+            <div className="p-3 bg-[#F58220]/10 rounded-2xl shadow-inner">
+               <Users className="h-6 w-6 text-[#F58220]" />
             </div>
           </CardHeader>
           <CardContent className="p-0 border-t">
@@ -339,12 +336,12 @@ export default function Overview() {
                       <span className="text-slate-700">{tech.name}</span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-accent/10 text-accent hover:bg-accent/20 font-bold px-3 py-1">
+                      <Badge variant="secondary" className="bg-[#F58220]/10 text-[#F58220] hover:bg-[#F58220]/20 font-bold px-3 py-1">
                         {tech.inProgress} phiếu
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20 font-bold px-3 py-1">
+                      <Badge variant="secondary" className="bg-[#00A651]/10 text-[#00A651] hover:bg-[#00A651]/20 font-bold px-3 py-1">
                         {tech.completed} phiếu
                       </Badge>
                     </TableCell>
