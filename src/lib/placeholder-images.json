@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-repair",
+      "description": "Professional technician repairing equipment",
+      "imageUrl": "https://picsum.photos/seed/repair1/1200/600",
+      "imageHint": "repair technician"
+    },
+    {
+      "id": "equipment-catalog",
+      "description": "Office and technical equipment catalog",
+      "imageUrl": "https://picsum.photos/seed/equip/800/600",
+      "imageHint": "office equipment"
+    }
+  ]
 }
