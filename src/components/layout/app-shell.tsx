@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -6,18 +5,16 @@ import {
   LayoutDashboard, 
   PlusCircle, 
   ClipboardList, 
-  Settings, 
   LogOut, 
-  User, 
   Wrench,
   ShieldCheck,
   Package,
   Menu,
-  FileText
+  FileText,
+  User
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -35,56 +32,62 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { name: 'Yêu cầu của tôi', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
     { name: 'Duyệt yêu cầu', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
     { name: 'Quản lý phiếu', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
-    { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
-    { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['csvc_manager'] },
-    { name: 'Báo cáo', href: '/reports', icon: FileText },
+    { name: 'Nhiệm vụ của tôi', href: '/tasks', icon: Wrench, roles: ['technician'] },
+    { name: 'Danh mục thiết bị', href: '/equipment', icon: Package, roles: ['csvc_manager'] },
   ];
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex h-14 items-center px-6">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-          <Wrench className="h-6 w-6 text-accent" />
+    <div className="flex h-full flex-col gap-6 no-print">
+      <div className="flex h-16 items-center px-6 border-b">
+        <Link href="/" className="flex items-center gap-3 font-black text-2xl text-primary tracking-tighter">
+          <div className="p-2 bg-primary rounded-xl">
+            <Wrench className="h-6 w-6 text-white" />
+          </div>
           <span>FixFlow Pro</span>
         </Link>
       </div>
-      <div className="flex-1 px-4 space-y-1">
+      <div className="flex-1 px-4 space-y-2">
+        <p className="text-[10px] font-black uppercase text-muted-foreground px-3 mb-2 tracking-widest">Main Navigation</p>
         {filteredNav.map((item) => (
           <Link key={item.name} href={item.href}>
             <Button
               variant={pathname === item.href ? "secondary" : "ghost"}
               className={cn(
-                "w-full justify-start gap-3 px-3",
-                pathname === item.href ? "bg-accent/10 text-primary font-semibold" : "text-muted-foreground"
+                "w-full justify-start gap-3 h-11 px-4 text-sm font-medium rounded-xl transition-all duration-200",
+                pathname === item.href 
+                  ? "bg-primary/10 text-primary shadow-sm" 
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
               )}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-muted-foreground")} />
               {item.name}
             </Button>
           </Link>
         ))}
         {currentUser.role === 'requester' && (
-          <Link href="/requests/new">
-            <Button className="w-full mt-4 bg-primary hover:bg-primary/90">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Tạo yêu cầu
-            </Button>
-          </Link>
+          <div className="pt-4 px-2">
+            <Link href="/requests/new">
+              <Button className="w-full bg-primary hover:bg-primary/90 shadow-md shadow-primary/10 rounded-xl h-11 font-bold">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Tạo yêu cầu mới
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
-      <div className="mt-auto p-4 border-t">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+      <div className="mt-auto p-4 border-t bg-muted/20">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-white shadow-sm border mb-3">
+          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-sm">
             {currentUser.name.charAt(0)}
           </div>
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-medium truncate">{currentUser.name}</span>
-            <span className="text-xs text-muted-foreground truncate uppercase">{currentUser.role.replace('_', ' ')}</span>
+          <div className="flex flex-col overflow-hidden min-w-0">
+            <span className="text-sm font-extrabold truncate text-foreground">{currentUser.name}</span>
+            <span className="text-[10px] text-primary font-black uppercase tracking-tighter truncate opacity-80">{currentUser.role.replace('_', ' ')}</span>
           </div>
         </div>
-        <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={logout}>
+        <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 h-11 rounded-xl font-bold" onClick={logout}>
           <LogOut className="mr-3 h-5 w-5" />
           Đăng xuất
         </Button>
@@ -95,40 +98,40 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col border-r bg-card">
+      <aside className="hidden md:flex w-72 flex-col border-r bg-white shadow-sm no-print">
         <SidebarContent />
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="flex h-14 items-center gap-4 border-b bg-card px-4 md:px-6">
+        <header className="flex h-16 items-center gap-4 border-b bg-white/80 backdrop-blur-md px-4 md:px-8 no-print sticky top-0 z-30">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden rounded-xl">
                 <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side="left" className="w-72 p-0 border-r-none">
               <SidebarContent />
             </SheetContent>
           </Sheet>
           <div className="flex-1 md:hidden">
-            <Link href="/" className="font-bold text-lg text-primary flex items-center gap-2">
-               <Wrench className="h-5 w-5 text-accent" /> FixFlow Pro
+            <Link href="/" className="font-black text-xl text-primary flex items-center gap-2">
+               <Wrench className="h-6 w-6 p-1 bg-primary text-white rounded-lg" /> FixFlow
             </Link>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Settings className="h-5 w-5 text-muted-foreground" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5 text-muted-foreground" />
-            </Button>
+          <div className="ml-auto flex items-center gap-4">
+             <div className="hidden sm:flex flex-col items-end">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{new Date().toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
+                <span className="text-xs font-mono">{new Date().toLocaleDateString('vi-VN')}</span>
+             </div>
+             <Button variant="ghost" size="icon" className="rounded-full bg-muted/50">
+               <User className="h-5 w-5 text-muted-foreground" />
+             </Button>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <main className="flex-1 overflow-y-auto p-4 md:p-10 bg-slate-50/50">
+          <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>

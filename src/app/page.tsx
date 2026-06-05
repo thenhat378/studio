@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -16,9 +15,9 @@ import {
   AlertCircle,
   Wrench,
   ChevronRight,
-  PlusCircle,
-  FileText,
-  Package
+  User,
+  ShieldCheck,
+  HardDrive
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -33,74 +32,87 @@ export default function Dashboard() {
   if (!currentUser) {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <Wrench className="h-10 w-10 text-primary" />
-              </div>
+        <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
+          <div className="text-center space-y-2">
+            <div className="inline-flex p-4 bg-primary/10 rounded-3xl mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
+              <Wrench className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">FixFlow Pro</CardTitle>
-            <CardDescription>Vui lòng đăng nhập để tiếp tục</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
-              <Button onClick={() => login('requester')} className="w-full bg-primary h-12">
-                Đăng nhập (Người yêu cầu)
+            <h1 className="text-4xl font-extrabold tracking-tight text-primary">FixFlow Pro</h1>
+            <p className="text-muted-foreground text-lg">Hệ thống quản lý sửa chữa cơ sở vật chất</p>
+          </div>
+
+          <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-sm">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-xl">Chọn vai trò đăng nhập</CardTitle>
+              <CardDescription>Để trải nghiệm quy trình tương ứng</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-4">
+              <Button onClick={() => login('requester')} className="w-full bg-primary hover:bg-primary/90 h-14 text-md font-semibold justify-between px-6">
+                <span className="flex items-center gap-3"><User className="h-5 w-5" /> Người yêu cầu</span>
+                <ChevronRight className="h-4 w-4 opacity-50" />
               </Button>
-              <Button onClick={() => login('unit_leader')} variant="outline" className="w-full h-12">
-                Đăng nhập (Lãnh đạo đơn vị)
+              <Button onClick={() => login('unit_leader')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
+                <span className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-accent" /> Lãnh đạo đơn vị</span>
+                <ChevronRight className="h-4 w-4 opacity-50" />
               </Button>
-              <Button onClick={() => login('csvc_manager')} variant="outline" className="w-full h-12">
-                Đăng nhập (Quản lý CSVC)
+              <Button onClick={() => login('csvc_manager')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
+                <span className="flex items-center gap-3"><ClipboardList className="h-5 w-5 text-indigo-600" /> Quản lý CSVC</span>
+                <ChevronRight className="h-4 w-4 opacity-50" />
               </Button>
-              <Button onClick={() => login('technician')} variant="outline" className="w-full h-12">
-                Đăng nhập (Nhân viên kỹ thuật)
+              <Button onClick={() => login('technician')} variant="outline" className="w-full h-14 text-md font-semibold justify-between px-6 border-primary/20 hover:bg-primary/5">
+                <span className="flex items-center gap-3"><Wrench className="h-5 w-5 text-emerald-600" /> Nhân viên kỹ thuật</span>
+                <ChevronRight className="h-4 w-4 opacity-50" />
               </Button>
-            </div>
-            <div className="text-center mt-4">
-              <Button variant="link" className="text-muted-foreground text-sm">
-                Quên mật khẩu?
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+          
+          <p className="text-center text-xs text-muted-foreground">
+            © 2024 FixFlow Pro v1.0 • Phát triển bởi Phòng Công nghệ thông tin
+          </p>
+        </div>
       </div>
     );
   }
 
+  const roleFilteredRequests = requests.filter(r => {
+    if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
+    if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;
+    if (currentUser.role === 'technician') return r.technicianId === currentUser.id;
+    return true; // CSVC Manager sees all
+  });
+
   const stats = [
     { 
       label: 'Tổng yêu cầu', 
-      value: requests.length, 
+      value: roleFilteredRequests.length, 
       icon: ClipboardList, 
-      color: 'text-blue-500', 
+      color: 'text-blue-600', 
       bg: 'bg-blue-50' 
     },
     { 
       label: 'Đang xử lý', 
-      value: requests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, 
+      value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, 
       icon: Clock, 
-      color: 'text-amber-500', 
+      color: 'text-amber-600', 
       bg: 'bg-amber-50' 
     },
     { 
       label: 'Chờ phê duyệt', 
-      value: requests.filter(r => r.status === 'pending_approval').length, 
+      value: roleFilteredRequests.filter(r => r.status === 'pending_approval').length, 
       icon: AlertCircle, 
-      color: 'text-rose-500', 
+      color: 'text-rose-600', 
       bg: 'bg-rose-50' 
     },
     { 
       label: 'Đã hoàn thành', 
-      value: requests.filter(r => r.status === 'verified').length, 
+      value: roleFilteredRequests.filter(r => r.status === 'closed').length, 
       icon: CheckCircle2, 
-      color: 'text-emerald-500', 
+      color: 'text-emerald-600', 
       bg: 'bg-emerald-50' 
     },
   ];
 
-  const recentRequests = requests.slice(0, 5);
+  const recentRequests = roleFilteredRequests.slice(0, 6);
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -108,31 +120,43 @@ export default function Dashboard() {
       case 'assigned': return <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50">Đã phân công</Badge>;
       case 'in_progress': return <Badge variant="outline" className="border-amber-200 text-amber-600 bg-amber-50">Đang thực hiện</Badge>;
       case 'completed': return <Badge variant="outline" className="border-emerald-200 text-emerald-600 bg-emerald-50">Chờ nghiệm thu</Badge>;
-      case 'verified': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã xong</Badge>;
+      case 'verified': return <Badge variant="outline" className="border-cyan-200 text-cyan-600 bg-cyan-50">Đã xong</Badge>;
+      case 'closed': return <Badge variant="outline" className="border-green-200 text-green-600 bg-green-50">Đã đóng</Badge>;
+      case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-primary">Xin chào, {currentUser.name}</h1>
-        <p className="text-muted-foreground mt-1">
-          Hệ thống quản lý FixFlow Pro đang hoạt động ổn định.
-        </p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-primary">Chào buổi sáng, {currentUser.name}!</h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Bạn đang đăng nhập với vai trò <span className="font-bold text-foreground uppercase">{currentUser.role.replace('_', ' ')}</span>
+            {currentUser.unit && ` • Đơn vị: ${currentUser.unit}`}
+          </p>
+        </div>
+        {currentUser.role === 'requester' && (
+           <Link href="/requests/new">
+            <Button size="lg" className="bg-primary shadow-lg shadow-primary/20 gap-2">
+              <ClipboardList className="h-5 w-5" /> Tạo yêu cầu mới
+            </Button>
+           </Link>
+        )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label} className="border-none shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+          <Card key={stat.label} className="border-none shadow-sm hover:shadow-md transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                  <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-3xl font-bold">{stat.value}</p>
                 </div>
-                <div className={cn("p-3 rounded-xl", stat.bg)}>
-                  <stat.icon className={cn("h-6 w-6", stat.color)} />
+                <div className={cn("p-4 rounded-2xl", stat.bg)}>
+                  <stat.icon className={cn("h-7 w-7", stat.color)} />
                 </div>
               </div>
             </CardContent>
@@ -140,74 +164,54 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-7">
-        <Card className="md:col-span-4 border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Yêu cầu gần đây</CardTitle>
-              <CardDescription>Các phiếu sửa chữa vừa được tạo hoặc cập nhật</CardDescription>
-            </div>
-            <Link href="/requests">
-              <Button variant="ghost" size="sm" className="text-primary gap-1">
-                Xem tất cả <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentRequests.map((req) => (
-                <div key={req.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors cursor-pointer group">
-                  <div className="flex gap-4 items-center">
-                    <div className="h-10 w-10 rounded-full bg-primary/5 flex items-center justify-center">
-                      <Wrench className="h-5 w-5 text-primary opacity-70" />
+      <Card className="border-none shadow-sm overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/20 px-6 py-4">
+          <div>
+            <CardTitle className="text-xl">Yêu cầu vừa cập nhật</CardTitle>
+            <CardDescription>Các hoạt động sửa chữa liên quan đến bạn</CardDescription>
+          </div>
+          <Link href="/requests">
+            <Button variant="ghost" className="text-primary font-semibold gap-1 hover:bg-primary/5">
+              Xem toàn bộ danh sách <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="divide-y divide-border">
+            {recentRequests.map((req) => (
+              <Link key={req.id} href={`/requests/${req.id}`}>
+                <div className="flex items-center justify-between p-5 hover:bg-accent/5 transition-colors cursor-pointer group">
+                  <div className="flex gap-4 items-center min-w-0">
+                    <div className="h-12 w-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
+                      <HardDrive className="h-6 w-6 text-primary/60 group-hover:text-primary transition-colors" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">{req.title}</p>
-                      <p className="text-xs text-muted-foreground">{req.equipmentName} • {req.unit}</p>
+                    <div className="min-w-0">
+                      <p className="font-bold text-base truncate group-hover:text-primary transition-colors">{req.title}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                        <Badge variant="secondary" className="font-medium text-[10px] px-1.5 py-0 h-4">{req.equipmentName}</Badge>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="truncate">{req.unit}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0 flex flex-col items-end gap-2 ml-4">
                     {getStatusBadge(req.status)}
-                    <p className="text-[10px] text-muted-foreground mt-1">
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase">
                       {new Date(req.createdAt).toLocaleDateString('vi-VN')}
                     </p>
                   </div>
                 </div>
-              ))}
-              {recentRequests.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">Chưa có yêu cầu nào</div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-3 border-none shadow-sm">
-          <CardHeader>
-            <CardTitle>Lối tắt nhanh</CardTitle>
-            <CardDescription>Thực hiện các tác vụ thường dùng</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-             <Button className="w-full justify-start h-14 bg-primary text-white" asChild>
-                <Link href="/requests/new">
-                  <PlusCircle className="mr-3 h-5 w-5" />
-                  Tạo yêu cầu sửa chữa mới
-                </Link>
-             </Button>
-             <Button variant="outline" className="w-full justify-start h-14 border-primary/20 hover:bg-primary/5" asChild>
-                <Link href="/reports">
-                  <FileText className="mr-3 h-5 w-5 text-primary" />
-                  Xuất báo cáo lưu trữ (PDF)
-                </Link>
-             </Button>
-             <Button variant="outline" className="w-full justify-start h-14 border-primary/20 hover:bg-primary/5" asChild>
-                <Link href="/equipment">
-                  <Package className="mr-3 h-5 w-5 text-accent" />
-                  Tra cứu danh mục thiết bị
-                </Link>
-             </Button>
-          </CardContent>
-        </Card>
-      </div>
+              </Link>
+            ))}
+            {recentRequests.length === 0 && (
+              <div className="text-center py-16">
+                <ClipboardList className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-20" />
+                <p className="text-muted-foreground font-medium">Bạn chưa có yêu cầu nào trong hệ thống.</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
