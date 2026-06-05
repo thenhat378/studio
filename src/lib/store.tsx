@@ -8,7 +8,9 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { 
   doc, 
@@ -25,6 +27,7 @@ import {
 interface AppContextType {
   currentUser: User | null;
   login: (email: string, pass: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   register: (email: string, pass: string, name: string, unit: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -63,9 +66,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
+          } else {
+            // Trường hợp đăng nhập Google lần đầu chưa có hồ sơ
+            const newUser: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Người dùng mới',
+              role: 'requester',
+              unit: 'Chưa xác định',
+              email: firebaseUser.email || ''
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+            setCurrentUser(newUser);
           }
         } catch (e) {
-          console.error("Error fetching user data from Firestore:", e);
+          console.error("Error fetching user data:", e);
         }
       } else {
         setCurrentUser(null);
@@ -82,6 +96,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
       setRequests(data);
+    }, (error) => {
+      console.error("Firestore Error:", error);
     });
     return () => unsubscribe();
   }, [db]);
@@ -100,21 +116,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
+  const loginWithGoogle = async () => {
+    if (!auth) throw new Error("Firebase Auth is not initialized");
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
   const register = async (email: string, pass: string, name: string, unit: string) => {
     if (!auth || !db) throw new Error("Firebase services are not initialized");
-    
-    // 1. Tạo tài khoản Authentication
     const res = await createUserWithEmailAndPassword(auth, email, pass);
-    
-    // 2. Lưu hồ sơ người dùng vào Firestore
     const newUser: User = {
       id: res.user.uid,
       name,
-      role: 'requester', // Mặc định là nhân viên yêu cầu
+      role: 'requester',
       unit,
       email
     };
-    
     await setDoc(doc(db, 'users', res.user.uid), newUser);
     setCurrentUser(newUser);
   };
@@ -150,6 +167,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       currentUser,
       login,
+      loginWithGoogle,
       register,
       logout,
       resetPassword,

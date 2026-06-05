@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/table";
 
 export default function Overview() {
-  const { currentUser, login, register, resetPassword, requests, users, isInitialized } = useAppStore();
+  const { currentUser, login, loginWithGoogle, register, resetPassword, requests, users, isInitialized } = useAppStore();
   const { toast } = useToast();
   
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -83,38 +83,32 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
-      console.error("Firebase Auth Detailed Error:", error);
-      let message = "Đã xảy ra lỗi không xác định.";
-      
-      // Xử lý các mã lỗi phổ biến của Firebase để báo cho người dùng
-      const errorCode = error.code || "";
-      
-      if (errorCode === 'auth/api-key-not-valid') {
-        message = "LỖI CẤU HÌNH: API Key của bạn không hợp lệ hoặc bị giới hạn. Vui lòng kiểm tra lại Firebase Console.";
-      } else if (errorCode === 'auth/invalid-api-key') {
-        message = "API Key không hợp lệ. Vui lòng kiểm tra tệp config.ts.";
-      } else if (errorCode === 'auth/network-request-failed') {
-        message = "Lỗi kết nối mạng. Vui lòng kiểm tra internet.";
-      } else if (errorCode === 'auth/user-not-found') {
+      console.error("Auth Error:", error);
+      let message = "Lỗi xác thực. Vui lòng kiểm tra lại.";
+      if (error.code === 'auth/api-key-not-valid') {
+        message = "LỖI CẤU HÌNH: API Key Firebase không hợp lệ. Vui lòng kiểm tra lại cấu hình dự án.";
+      } else if (error.code === 'auth/user-not-found') {
         message = "Tài khoản không tồn tại.";
-      } else if (errorCode === 'auth/wrong-password') {
+      } else if (error.code === 'auth/wrong-password') {
         message = "Mật khẩu không chính xác.";
-      } else if (errorCode === 'auth/email-already-in-use') {
-        message = "Email này đã được sử dụng bởi một tài khoản khác.";
-      } else if (errorCode === 'auth/weak-password') {
-        message = "Mật khẩu quá yếu (tối thiểu 6 ký tự).";
-      } else if (errorCode === 'auth/invalid-email') {
-        message = "Email không đúng định dạng.";
-      } else if (errorCode === 'auth/operation-not-allowed') {
-        message = "Phương thức Email/Password chưa được bật trong Firebase Authentication.";
-      } else {
-        message = error.message || "Không thể thực hiện xác thực lúc này.";
       }
-      
+      toast({ variant: "destructive", title: "Thông báo", description: message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      await loginWithGoogle();
+      toast({ title: "Đăng nhập Google thành công" });
+    } catch (error: any) {
+      console.error("Google Auth Error:", error);
       toast({ 
         variant: "destructive", 
-        title: "Lỗi hệ thống", 
-        description: message 
+        title: "Lỗi Google Auth", 
+        description: "Không thể đăng nhập bằng Google. Vui lòng thử lại hoặc dùng Email." 
       });
     } finally {
       setIsLoading(false);
@@ -153,7 +147,7 @@ export default function Overview() {
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'Đăng ký để gửi yêu cầu sửa chữa'}
+                Đăng nhập để bắt đầu quản lý
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -215,10 +209,31 @@ export default function Overview() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary hover:bg-primary/90 uppercase tracking-widest text-xs shadow-xl shadow-blue-100" disabled={isLoading}>
+                <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary hover:bg-primary/90 uppercase tracking-widest text-xs shadow-xl" disabled={isLoading}>
                   {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Đăng nhập ngay" : "Đăng ký ngay")}
                 </Button>
               </form>
+
+              <div className="relative flex items-center gap-4 py-2">
+                <div className="h-px bg-slate-100 flex-1"></div>
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hoặc</span>
+                <div className="h-px bg-slate-100 flex-1"></div>
+              </div>
+
+              <Button 
+                variant="outline" 
+                className="w-full h-14 font-bold rounded-2xl border-2 flex gap-2 items-center justify-center text-xs uppercase"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Tiếp tục với Google
+              </Button>
 
               <div className="flex items-center justify-between px-2">
                 <Button 
@@ -238,36 +253,6 @@ export default function Overview() {
               </div>
             </CardContent>
           </Card>
-          
-          <div className="flex justify-center gap-4">
-             <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" className="text-[10px] font-black uppercase text-slate-500">Cài đặt App</Button>
-                </DialogTrigger>
-                <DialogContent className="rounded-[3rem] border-none shadow-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-black text-primary flex items-center gap-2">
-                      <Smartphone className="h-6 w-6" /> Cài đặt di động
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-6 py-4">
-                    <div className="bg-slate-50 p-6 rounded-3xl space-y-3">
-                      <p className="font-black text-sm flex items-center gap-2 text-primary">
-                        <Apple className="h-5 w-5" /> iPhone (Safari)
-                      </p>
-                      <p className="text-xs text-slate-500 leading-relaxed">Nhấn nút <b>Chia sẻ</b> (ô vuông mũi tên) ở dưới cùng, sau đó chọn <b>"Thêm vào màn hình chính"</b>.</p>
-                    </div>
-                    <div className="bg-slate-50 p-6 rounded-3xl space-y-3">
-                      <p className="font-black text-sm flex items-center gap-2 text-primary">
-                        <Smartphone className="h-5 w-5" /> Android (Chrome)
-                      </p>
-                      <p className="text-xs text-slate-500 leading-relaxed">Nhấn biểu tượng <b>3 chấm</b> ở góc trên bên phải, sau đó chọn <b>"Cài đặt ứng dụng"</b>.</p>
-                    </div>
-                  </div>
-                </DialogContent>
-             </Dialog>
-             <Button variant="ghost" className="text-[10px] font-black uppercase text-slate-500">Hỗ trợ 24/7</Button>
-          </div>
         </div>
       </div>
     );
