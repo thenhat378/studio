@@ -64,8 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
-            // Document might not exist yet during registration, wait a bit or handle it
-            console.log("User authenticated but document not found yet.");
+            console.log("User doc not found, possibly first registration.");
           }
         } catch (e) {
           console.error("Error fetching user doc:", e);
@@ -106,24 +105,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const register = async (email: string, pass: string, name: string, unit: string) => {
     if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng.");
     
-    try {
-      const res = await createUserWithEmailAndPassword(auth, email, pass);
-      
-      const newUser: User = {
-        id: res.user.uid,
-        name,
-        role: 'requester',
-        unit,
-        email
-      };
-      
-      // Attempt to save profile to Firestore
-      await setDoc(doc(db, 'users', res.user.uid), newUser);
-      setCurrentUser(newUser);
-    } catch (error: any) {
-      console.error("Registration sub-error:", error);
-      throw error; // Re-throw to be handled by UI
-    }
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    
+    const newUser: User = {
+      id: res.user.uid,
+      name,
+      role: 'requester',
+      unit,
+      email
+    };
+    
+    await setDoc(doc(db, 'users', res.user.uid), newUser);
+    setCurrentUser(newUser);
   };
 
   const logout = async () => {

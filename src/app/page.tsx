@@ -64,7 +64,7 @@ export default function Overview() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập đầy đủ thông tin." });
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Email và Mật khẩu." });
       return;
     }
     
@@ -75,7 +75,7 @@ export default function Overview() {
         toast({ title: "Đăng nhập thành công" });
       } else {
         if (!fullName || !unit) {
-          toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập Họ tên và Đơn vị." });
+          toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập Họ tên và Đơn vị để đăng ký." });
           setIsLoading(false);
           return;
         }
@@ -83,20 +83,39 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
-      console.error("Auth error detail:", error);
-      let message = "Có lỗi xảy ra trong quá trình xác thực.";
+      console.error("Firebase Auth Detailed Error:", error);
+      let message = "Đã xảy ra lỗi không xác định.";
       
-      // Handle Firebase specific error codes
-      if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
-      else if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
-      else if (error.code === 'auth/email-already-in-use') message = "Email này đã được sử dụng.";
-      else if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
-      else if (error.code === 'auth/invalid-email') message = "Email không đúng định dạng.";
-      else if (error.code === 'auth/operation-not-allowed') message = "Đăng nhập bằng Email/Password chưa được bật trong Firebase Console.";
-      else if (error.code === 'auth/api-key-not-valid') message = "Lỗi cấu hình: API Key không hợp lệ. Vui lòng kiểm tra config.ts";
-      else if (error.message) message = error.message; // Use raw message for unknown errors
+      // Xử lý các mã lỗi phổ biến của Firebase để báo cho người dùng
+      const errorCode = error.code || "";
       
-      toast({ variant: "destructive", title: "Lỗi xác thực", description: message });
+      if (errorCode === 'auth/api-key-not-valid') {
+        message = "LỖI CẤU HÌNH: API Key của bạn không hợp lệ hoặc bị giới hạn. Vui lòng kiểm tra lại Firebase Console.";
+      } else if (errorCode === 'auth/invalid-api-key') {
+        message = "API Key không hợp lệ. Vui lòng kiểm tra tệp config.ts.";
+      } else if (errorCode === 'auth/network-request-failed') {
+        message = "Lỗi kết nối mạng. Vui lòng kiểm tra internet.";
+      } else if (errorCode === 'auth/user-not-found') {
+        message = "Tài khoản không tồn tại.";
+      } else if (errorCode === 'auth/wrong-password') {
+        message = "Mật khẩu không chính xác.";
+      } else if (errorCode === 'auth/email-already-in-use') {
+        message = "Email này đã được sử dụng bởi một tài khoản khác.";
+      } else if (errorCode === 'auth/weak-password') {
+        message = "Mật khẩu quá yếu (tối thiểu 6 ký tự).";
+      } else if (errorCode === 'auth/invalid-email') {
+        message = "Email không đúng định dạng.";
+      } else if (errorCode === 'auth/operation-not-allowed') {
+        message = "Phương thức Email/Password chưa được bật trong Firebase Authentication.";
+      } else {
+        message = error.message || "Không thể thực hiện xác thực lúc này.";
+      }
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Lỗi hệ thống", 
+        description: message 
+      });
     } finally {
       setIsLoading(false);
     }
