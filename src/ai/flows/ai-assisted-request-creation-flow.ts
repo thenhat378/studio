@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI assistant for repair request creation.
@@ -26,12 +27,12 @@ const AiAssistedRequestCreationOutputSchema = z.object({
   category: z
     .string()
     .describe(
-      'An automatic category for the repair request, chosen from a predefined list (e.g., Electrical, Plumbing, IT, Furniture, HVAC, Structural, General Maintenance).'
+      'An automatic category for the repair request, chosen from a predefined list.'
     ),
   recommendedEquipment: z
     .array(z.string())
     .describe(
-      'A list of relevant equipment from the catalog that might be related to the problem (e.g., Bàn ghế, Máy chiếu, cáp HDMI, VGA, Bàn cầu, Lavabo).'
+      'A list of relevant equipment from the catalog that might be related to the problem.'
     ),
 });
 export type AiAssistedRequestCreationOutput = z.infer<
@@ -45,33 +46,40 @@ export async function aiAssistedRequestCreation(
 }
 
 const availableCategories = [
-  'Electrical',
-  'Plumbing',
-  'IT',
-  'Furniture',
-  'HVAC',
-  'Structural',
-  'General Maintenance',
+  'Thiết bị điện tử-CNTT',
+  'Thiết bị điện',
+  'Thiết bị nước',
+  'Các loại thiết bị khác',
 ];
 
 const equipmentCatalog = [
-  'Bàn ghế',
   'Máy chiếu',
-  'cáp HDMI',
-  'VGA',
+  'cáp tín hiệu (HDMI, VGA)',
+  'Âm thanh',
+  'Màn chiếu',
+  'Bóng đèn',
+  'Ổ cắm điện',
   'Bàn cầu',
   'Lavabo',
+  'Bàn',
+  'Ghế',
+  'Gạch nền',
+  'Laphong',
 ];
 
 const prompt = ai.definePrompt({
   name: 'aiAssistedRequestCreationPrompt',
   input: {schema: AiAssistedRequestCreationInputSchema},
   output: {schema: AiAssistedRequestCreationOutputSchema},
-  prompt: `You are an intelligent assistant designed to help users create accurate and complete repair requests.
+  prompt: `You are an intelligent assistant designed to help users create accurate and complete repair requests for a university's equipment management system.
 
 Analyze the user's problem description and provide the following:
 1.  A list of potential causes for the problem.
 2.  An appropriate category for the request from the following list: {{{availableCategories}}}.
+    - Thiết bị điện tử-CNTT: Máy chiếu, cáp tín hiệu, Âm thanh, Màn chiếu, v.v.
+    - Thiết bị điện: Bóng đèn, quạt, ổ cắm, hệ thống điện.
+    - Thiết bị nước: Bàn cầu, Lavabo, vòi nước, đường ống.
+    - Các loại thiết bị khác: Bàn, ghế, gạch nền, laphong, cửa, v.v.
 3.  A list of relevant equipment from the following catalog that might be involved in or related to the problem: {{{equipmentCatalog}}}.
 
 Problem Description: {{{problemDescription}}}`,

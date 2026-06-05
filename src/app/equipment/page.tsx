@@ -38,8 +38,15 @@ export default function EquipmentCatalog() {
   
   const [formData, setFormData] = useState({
     name: '',
-    category: 'General'
+    category: 'Thiết bị điện tử-CNTT'
   });
+
+  const categories = [
+    'Thiết bị điện tử-CNTT',
+    'Thiết bị điện',
+    'Thiết bị nước',
+    'Các loại thiết bị khác'
+  ];
 
   const filteredEquipment = equipment.filter(item => 
     item.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -48,7 +55,7 @@ export default function EquipmentCatalog() {
 
   const handleOpenAdd = () => {
     setEditingItem(null);
-    setFormData({ name: '', category: 'General' });
+    setFormData({ name: '', category: 'Thiết bị điện tử-CNTT' });
     setIsDialogOpen(true);
   };
 
@@ -180,16 +187,16 @@ export default function EquipmentCatalog() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Phân loại</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Nhóm thiết bị</Label>
               <Select 
                 value={formData.category} 
                 onValueChange={val => setFormData(prev => ({ ...prev, category: val }))}
               >
                 <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold">
-                  <SelectValue placeholder="Chọn danh mục..." />
+                  <SelectValue placeholder="Chọn nhóm thiết bị..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-none shadow-xl">
-                  {['Furniture', 'IT', 'Plumbing', 'Electrical', 'HVAC', 'General'].map(cat => (
+                  {categories.map(cat => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
                 </SelectContent>
