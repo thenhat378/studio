@@ -15,7 +15,8 @@ import {
   History,
   Star,
   Clock,
-  User
+  User,
+  ChevronRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -36,13 +37,13 @@ export default function ManagementPage() {
   const { toast } = useToast();
   const [selectedTechs, setSelectedTechs] = useState<Record<string, string>>({});
 
-  // 1. Chờ phân công
+  // 1. Chờ phân công (Chỉ những phiếu đã được Đơn vị phê duyệt 'approved')
   const pendingAssignment = requests.filter(r => r.status === 'approved');
   
-  // 2. Chờ duyệt hoàn thành (Kỹ thuật đã báo xong)
+  // 2. Chờ duyệt hoàn thành kỹ thuật (Kỹ thuật đã báo xong 'completed')
   const pendingVerification = requests.filter(r => r.status === 'completed');
 
-  // 3. Lịch sử các phiếu đã đóng (Để xem thời gian xử lý và đánh giá)
+  // 3. Lịch sử các phiếu đã đóng
   const historyRequests = requests.filter(r => r.status === 'closed');
 
   const technicians = users.filter(u => u.role === 'technician');
@@ -84,7 +85,6 @@ export default function ManagementPage() {
     });
   };
 
-  // Hàm tính thời gian xử lý
   const getProcessingTime = (start: string, end?: string) => {
     if (!end) return 'N/A';
     const startTime = new Date(start).getTime();
@@ -92,7 +92,6 @@ export default function ManagementPage() {
     const diffMs = endTime - startTime;
     const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
     if (diffHrs > 0) return `${diffHrs} giờ ${diffMins} phút`;
     return `${diffMins} phút`;
   };
@@ -105,14 +104,14 @@ export default function ManagementPage() {
             <ClipboardList className="h-7 w-7 text-primary" />
             Điều phối & Quản lý CSVC
           </h1>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Phó Trưởng phòng CSVC giám sát thực hiện và điều phối</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò: Phó Trưởng phòng CSVC</p>
         </div>
       </div>
 
       <Tabs defaultValue="assign" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-[500px] h-14 p-1 bg-white rounded-2xl shadow-sm border mb-6">
           <TabsTrigger value="assign" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Chờ phân công
+            Phân công KT
             {pendingAssignment.length > 0 && (
               <Badge variant="destructive" className="h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[9px] border-none">
                 {pendingAssignment.length}
@@ -128,7 +127,7 @@ export default function ManagementPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Lịch sử & Đánh giá
+            Giám sát chung
           </TabsTrigger>
         </TabsList>
 
@@ -139,7 +138,7 @@ export default function ManagementPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 text-[9px] font-black uppercase">Chờ giao việc</Badge>
+                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 text-[9px] font-black uppercase">Chờ phân công</Badge>
                   </div>
                   <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
                     <p>Đơn vị: <span className="text-slate-800">{req.unit}</span></p>
@@ -154,7 +153,7 @@ export default function ManagementPage() {
                       onValueChange={(val) => setSelectedTechs(prev => ({ ...prev, [req.id]: val }))}
                     >
                       <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs">
-                        <SelectValue placeholder="Chọn kỹ thuật viên..." />
+                        <SelectValue placeholder="Chọn nhân viên..." />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-none shadow-2xl">
                         {technicians.map(t => (
@@ -176,7 +175,7 @@ export default function ManagementPage() {
           ))}
           {pendingAssignment.length === 0 && (
             <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ phân công</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ phân công kỹ thuật</p>
             </div>
           )}
         </TabsContent>
@@ -192,7 +191,7 @@ export default function ManagementPage() {
                   </div>
                   <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
                     <p>Thực hiện: <span className="text-slate-800">{req.technicianName}</span></p>
-                    <p>Hình thức: <span className="text-primary">{req.repairType === 'replacement' ? 'Thay mới' : 'Sửa chữa'}</span></p>
+                    <p>Đơn vị: <span className="text-slate-800">{req.unit}</span></p>
                   </div>
                 </div>
                 
@@ -236,13 +235,13 @@ export default function ManagementPage() {
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kỹ thuật thực hiện</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kỹ thuật viên</p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
                              <User className="h-3.5 w-3.5 text-primary" /> {req.technicianName}
                           </div>
                        </div>
                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian xử lý</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian sửa</p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
                              <Clock className="h-3.5 w-3.5" /> {getProcessingTime(req.createdAt, req.completedAt)}
                           </div>
@@ -275,31 +274,11 @@ export default function ManagementPage() {
           {historyRequests.length === 0 && (
             <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
               <History className="h-16 w-16 text-slate-100 mx-auto mb-6" />
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có dữ liệu lịch sử</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có dữ liệu lịch sử hoàn thành</p>
             </div>
           )}
         </TabsContent>
       </Tabs>
     </div>
   );
-}
-
-// Helper icon
-function ChevronRight(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  )
 }

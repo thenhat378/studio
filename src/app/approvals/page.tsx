@@ -32,14 +32,14 @@ export default function ApprovalsPage() {
 
   // Lọc phiếu theo đơn vị của lãnh đạo (không phân biệt hoa thường)
   const unitRequests = requests.filter(r => {
-    if (!currentUser?.unit) return true;
+    if (!currentUser?.unit) return false;
     return r.unit?.trim().toLowerCase() === currentUser.unit.trim().toLowerCase();
   });
 
-  // Phiếu chờ duyệt bước 2
+  // Phiếu chờ duyệt bước 2 (Chỉ đơn vị mình)
   const pendingRequests = unitRequests.filter(r => r.status === 'pending_approval');
   
-  // Phiếu chờ nghiệm thu bước 7 (sau khi Quản lý CSVC đã duyệt 'verified')
+  // Phiếu chờ nghiệm thu bước 7 (sau khi CSVC đã verified)
   const pendingConfirmation = unitRequests.filter(r => r.status === 'verified');
 
   const handleApprove = (id: string) => {
@@ -85,9 +85,9 @@ export default function ApprovalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-accent" />
-            Nghiệm thu tại đơn vị ({currentUser?.unit})
+            Xét duyệt & Nghiệm thu ({currentUser?.unit})
           </h1>
-          <p className="text-muted-foreground">Phó Trưởng đơn vị quản lý vòng đời phiếu yêu cầu</p>
+          <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest opacity-60">Vai trò: Phó Trưởng đơn vị</p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[9px] font-black uppercase">Đang chờ duyệt</Badge>
+                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[9px] font-black uppercase">Chờ duyệt đơn vị</Badge>
                   </div>
                   <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
                     <p>Người yêu cầu: <span className="text-slate-800">{req.requesterName}</span></p>
@@ -128,11 +128,11 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
                     <Button variant="ghost" size="sm" className="w-full h-12 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest">
-                      <Eye className="h-4 w-4 mr-2" /> Chi tiết
+                      <Eye className="h-4 w-4 mr-2" /> Xem xét
                     </Button>
                   </Link>
                   <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 h-12 rounded-xl text-white font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none" onClick={() => handleApprove(req.id)}>
-                    <Check className="h-4 w-4" /> Duyệt
+                    <Check className="h-4 w-4" /> Duyệt phiếu
                   </Button>
                   <Button size="sm" variant="destructive" className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none" onClick={() => setRejectingId(req.id)}>
                     <X className="h-4 w-4" /> Từ chối
@@ -143,7 +143,7 @@ export default function ApprovalsPage() {
           ))}
           {pendingRequests.length === 0 && (
             <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có yêu cầu chờ duyệt.</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có yêu cầu chờ duyệt tại đơn vị.</p>
             </div>
           )}
         </TabsContent>
@@ -155,10 +155,10 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[9px] font-black uppercase">CSVC báo xong</Badge>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[9px] font-black uppercase">Đã sửa xong</Badge>
                   </div>
                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
-                    Phòng CSVC đã duyệt hoàn thành. Phó Trưởng đơn vị vui lòng nghiệm thu & đóng phiếu.
+                    Phòng CSVC đã xác nhận hoàn thành kỹ thuật. Phó Trưởng đơn vị vui lòng nghiệm thu & đóng phiếu.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -172,7 +172,7 @@ export default function ApprovalsPage() {
                     className="bg-primary hover:bg-primary/90 h-12 rounded-xl text-white font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none shadow-lg shadow-blue-100" 
                     onClick={() => handleOpenRating(req.id)}
                   >
-                    <CheckCircle2 className="h-4 w-4" /> Xác nhận & Đóng
+                    <CheckCircle2 className="h-4 w-4" /> Nghiệm thu & Đóng
                   </Button>
                 </div>
               </CardContent>
@@ -224,11 +224,11 @@ export default function ApprovalsPage() {
       <Dialog open={!!rejectingId} onOpenChange={(open) => !open && setRejectingId(null)}>
         <DialogContent className="rounded-[3rem] p-10 border-none shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-rose-600 uppercase tracking-tighter">Từ chối yêu cầu</DialogTitle>
+            <DialogTitle className="text-xl font-black text-rose-600 uppercase tracking-tighter">Từ chối phê duyệt</DialogTitle>
           </DialogHeader>
           <div className="py-6">
             <Textarea 
-              placeholder="Nhập lý do từ chối cụ thể..." 
+              placeholder="Nhập lý do từ chối cụ thể để nhân viên nắm thông tin..." 
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               className="min-h-[120px] rounded-2xl bg-slate-50 border-none font-bold p-4"
