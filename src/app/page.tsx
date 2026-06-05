@@ -353,7 +353,7 @@ export default function Overview() {
           
           <div className="flex flex-col items-center gap-4">
             <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] text-center">
-              Internal Management System<br/>DUE - University of Economics
+              2026 Được phát triển bởi Phòng Cơ sở vật chất
             </p>
             <div className="flex gap-4 opacity-40 hover:opacity-100 transition-opacity">
                <button onClick={() => login('requester', '123')} className="text-[9px] font-black uppercase border-2 px-3 py-1.5 rounded-full text-slate-400 hover:text-primary hover:border-primary">Demo Requester</button>
