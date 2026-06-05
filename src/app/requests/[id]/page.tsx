@@ -14,7 +14,8 @@ import {
   Sparkles,
   Printer,
   ShieldAlert,
-  HardDrive
+  HardDrive,
+  UserCheck
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +24,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 
 export default function RequestDetail() {
   const params = useParams();
@@ -32,8 +39,10 @@ export default function RequestDetail() {
   const { toast } = useToast();
   const { requests, currentUser, updateRequestStatus, users } = useAppStore();
   const [report, setReport] = useState('');
+  const [selectedTechId, setSelectedTechId] = useState('');
 
   const req = requests.find(r => r.id === id);
+  const technicians = users.filter(u => u.role === 'technician');
 
   if (!req) {
     return (
@@ -48,7 +57,7 @@ export default function RequestDetail() {
     updateRequestStatus(req.id, status, extra);
     toast({
       title: "Cập nhật thành công",
-      description: `Yêu cầu đã được chuyển sang trạng thái: ${status}`
+      description: `Phiếu đã chuyển sang trạng thái: ${status}`
     });
   };
 
@@ -58,8 +67,8 @@ export default function RequestDetail() {
       case 'approved': return <Badge className="bg-indigo-500">Đã phê duyệt</Badge>;
       case 'assigned': return <Badge className="bg-blue-500">Đã phân công</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500">Đang thực hiện</Badge>;
-      case 'completed': return <Badge className="bg-emerald-500">Chờ nghiệm thu</Badge>;
-      case 'verified': return <Badge className="bg-green-600">Hoàn thành</Badge>;
+      case 'completed': return <Badge className="bg-emerald-500">Kỹ thuật đã xong</Badge>;
+      case 'verified': return <Badge className="bg-green-600">Đã nghiệm thu</Badge>;
       case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -91,7 +100,7 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label className="text-xs uppercase text-muted-foreground font-bold">Mô tả sự cố</Label>
+                <Label className="text-xs uppercase text-muted-foreground font-bold">Mô tả sự cố từ người dùng</Label>
                 <p className="mt-1 text-sm bg-accent/5 p-4 rounded-lg border border-accent/10 leading-relaxed italic">
                   "{req.description}"
                 </p>
@@ -125,10 +134,17 @@ export default function RequestDetail() {
                   </p>
                 </div>
               )}
+
+              {req.rejectionReason && (
+                <div className="bg-rose-50 border border-rose-100 rounded-lg p-4">
+                  <Label className="text-xs uppercase text-rose-700 font-bold mb-2 block">Lý do từ chối phê duyệt</Label>
+                  <p className="text-sm text-rose-900 italic">"{req.rejectionReason}"</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Role Actions */}
+          {/* Role Actions Container */}
           <Card className="border-none shadow-sm overflow-hidden border-t-4 border-t-accent">
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -136,72 +152,104 @@ export default function RequestDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-wrap gap-3">
-                {/* Unit Leader Actions */}
+              <div className="flex flex-col gap-4">
+                {/* Lãnh đạo duyệt */}
                 {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
-                  <>
-                    <Button className="bg-primary" onClick={() => handleAction('approved')}>
-                      Phê duyệt phiếu
-                    </Button>
-                    <Button variant="destructive" onClick={() => handleAction('rejected', { rejectionReason: 'Không phù hợp' })}>
-                      Từ chối
-                    </Button>
-                  </>
+                  <div className="flex gap-3">
+                    <Button className="bg-primary" onClick={() => handleAction('approved')}>Phê duyệt</Button>
+                    <Button variant="destructive" onClick={() => handleAction('rejected', { rejectionReason: 'Không phù hợp mục tiêu đơn vị.' })}>Từ chối</Button>
+                  </div>
                 )}
 
-                {/* CSVC Manager Actions */}
+                {/* Quản lý CSVC Phân công */}
                 {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
-                  <Button className="bg-blue-600" onClick={() => {
-                    const tech = users.find(u => u.role === 'technician');
-                    handleAction('assigned', { 
-                      technicianId: tech?.id, 
-                      technicianName: tech?.name 
-                    });
-                  }}>
-                    Phân công cho Kỹ thuật
-                  </Button>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold">Chọn kỹ thuật viên phụ trách:</Label>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <Select onValueChange={setSelectedTechId} value={selectedTechId}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn nhân viên..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {technicians.map(t => (
+                              <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button 
+                        className="bg-primary gap-2" 
+                        disabled={!selectedTechId}
+                        onClick={() => {
+                          const tech = technicians.find(t => t.id === selectedTechId);
+                          handleAction('assigned', { 
+                            technicianId: tech?.id, 
+                            technicianName: tech?.name 
+                          });
+                        }}
+                      >
+                        <UserCheck className="h-4 w-4" /> Giao việc
+                      </Button>
+                    </div>
+                  </div>
                 )}
 
-                {/* Technician Actions */}
+                {/* Quản lý CSVC Nghiệm thu kỹ thuật */}
+                {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Bạn cần kiểm tra kết quả sửa chữa của kỹ thuật viên trước khi hoàn tất phiếu.</p>
+                    <div className="flex gap-3">
+                      <Button className="bg-emerald-600 gap-2" onClick={() => handleAction('verified')}>
+                        <CheckCircle2 className="h-4 w-4" /> Duyệt kết quả & Nghiệm thu
+                      </Button>
+                      <Button variant="outline" className="text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
+                        Yêu cầu kỹ thuật kiểm tra lại
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Kỹ thuật viên báo cáo */}
                 {currentUser?.role === 'technician' && req.status === 'assigned' && (
-                  <Button className="bg-amber-500" onClick={() => handleAction('in_progress')}>
-                    Bắt đầu thực hiện
-                  </Button>
+                  <Button className="bg-amber-500" onClick={() => handleAction('in_progress')}>Bắt đầu thực hiện</Button>
                 )}
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
-                  <div className="w-full space-y-3">
+                  <div className="space-y-3">
+                    <Label>Báo cáo kết quả xử lý:</Label>
                     <Textarea 
-                      placeholder="Nhập báo cáo kết quả thực hiện..." 
+                      placeholder="Ghi chú các linh kiện đã thay thế, kết quả kiểm tra..." 
                       className="min-h-[100px]"
                       value={report}
                       onChange={e => setReport(e.target.value)}
                     />
-                    <Button className="bg-emerald-600 w-full" onClick={() => handleAction('completed', { technicianReport: report })}>
-                      Xác nhận hoàn thành & Gửi báo cáo
+                    <Button 
+                      className="bg-emerald-600 w-full" 
+                      disabled={!report.trim()}
+                      onClick={() => handleAction('completed', { technicianReport: report })}
+                    >
+                      Báo cáo hoàn thành (Gửi Quản lý CSVC)
                     </Button>
                   </div>
                 )}
 
-                {/* Requester Validation */}
-                {currentUser?.role === 'requester' && req.status === 'completed' && (
-                  <>
-                    <Button className="bg-green-600" onClick={() => handleAction('verified')}>
-                      Xác nhận nghiệm thu
-                    </Button>
-                    <Button variant="outline" className="text-destructive border-destructive/20" onClick={() => handleAction('in_progress')}>
-                      Yêu cầu làm lại
-                    </Button>
-                  </>
+                {/* Người yêu cầu xác nhận cuối cùng (Nếu cần) */}
+                {currentUser?.role === 'requester' && req.status === 'verified' && (
+                   <div className="p-4 bg-green-50 rounded-lg text-green-700 text-sm flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" /> Phiếu đã được Quản lý CSVC nghiệm thu và đóng lại.
+                   </div>
                 )}
 
-                <div className="text-sm text-muted-foreground italic w-full">
-                  {!['pending_approval', 'approved', 'assigned', 'in_progress', 'completed'].includes(req.status) && "Trạng thái này không yêu cầu thêm thao tác."}
+                <div className="text-sm text-muted-foreground italic">
+                  {!['pending_approval', 'approved', 'assigned', 'in_progress', 'completed'].includes(req.status) && 
+                   req.status !== 'rejected' && req.status !== 'verified' && "Trạng thái này chưa yêu cầu thao tác từ bạn."}
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Sidebar Info */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader>
@@ -209,50 +257,25 @@ export default function RequestDetail() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-full">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Người yêu cầu</p>
-                  <p className="text-sm font-semibold">{req.requesterName}</p>
-                </div>
+                <div className="p-2 bg-muted rounded-full"><User className="h-4 w-4 text-muted-foreground" /></div>
+                <div><p className="text-xs text-muted-foreground">Người yêu cầu</p><p className="text-sm font-semibold">{req.requesterName}</p></div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-full">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Đơn vị</p>
-                  <p className="text-sm font-semibold">{req.unit}</p>
-                </div>
+                <div className="p-2 bg-muted rounded-full"><FileText className="h-4 w-4 text-muted-foreground" /></div>
+                <div><p className="text-xs text-muted-foreground">Đơn vị</p><p className="text-sm font-semibold">{req.unit}</p></div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-full">
-                  <HardDrive className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Thiết bị</p>
-                  <p className="text-sm font-semibold">{req.equipmentName}</p>
-                </div>
+                <div className="p-2 bg-muted rounded-full"><HardDrive className="h-4 w-4 text-muted-foreground" /></div>
+                <div><p className="text-xs text-muted-foreground">Thiết bị</p><p className="text-sm font-semibold">{req.equipmentName}</p></div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-full">
-                  <Wrench className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Kỹ thuật phụ trách</p>
-                  <p className="text-sm font-semibold">{req.technicianName || 'Chưa phân công'}</p>
-                </div>
+                <div className="p-2 bg-muted rounded-full"><Wrench className="h-4 w-4 text-muted-foreground" /></div>
+                <div><p className="text-xs text-muted-foreground">Kỹ thuật viên</p><p className="text-sm font-semibold text-primary">{req.technicianName || 'Đang chờ điều phối'}</p></div>
               </div>
               <Separator />
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-full">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Thời gian tạo</p>
-                  <p className="text-sm font-semibold">{new Date(req.createdAt).toLocaleDateString('vi-VN')}</p>
-                </div>
+                <div className="p-2 bg-muted rounded-full"><Calendar className="h-4 w-4 text-muted-foreground" /></div>
+                <div><p className="text-xs text-muted-foreground">Ngày khởi tạo</p><p className="text-sm font-semibold">{new Date(req.createdAt).toLocaleDateString('vi-VN')}</p></div>
               </div>
             </CardContent>
           </Card>
