@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -15,15 +16,15 @@ import {
   ChevronRight,
   User,
   Lock,
-  Star,
-  BarChart3,
   Smartphone,
   Apple,
   ArrowUpRight,
   Wrench,
   PlusCircle,
   Sparkles,
-  HardDrive
+  HardDrive,
+  Mail,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -48,41 +49,67 @@ import {
 } from "@/components/ui/table";
 
 export default function Overview() {
-  const { currentUser, login, requests, users, isInitialized } = useAppStore();
+  const { currentUser, login, register, resetPassword, requests, users, isInitialized } = useAppStore();
   const { toast } = useToast();
-  const [username, setUsername] = useState('');
+  
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [unit, setUnit] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isInitialized) return null;
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username) {
-      toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập tài khoản." });
+    if (!email || !password) {
+      toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập đầy đủ thông tin." });
       return;
     }
     
     setIsLoading(true);
-    setTimeout(() => {
-      if (username === 'requester') login('requester');
-      else if (username === 'leader') login('unit_leader');
-      else if (username === 'manager') login('csvc_manager');
-      else if (username === 'tech') login('technician');
-      else {
-        toast({ variant: "destructive", title: "Sai tài khoản", description: "Sử dụng: requester, leader, manager hoặc tech" });
-        setIsLoading(false);
-        return;
+    try {
+      if (authMode === 'login') {
+        await login(email, password);
+        toast({ title: "Đăng nhập thành công" });
+      } else {
+        if (!fullName || !unit) {
+          toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập Họ tên và Đơn vị." });
+          setIsLoading(false);
+          return;
+        }
+        await register(email, password, fullName, unit);
+        toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
+    } catch (error: any) {
+      toast({ 
+        variant: "destructive", 
+        title: "Lỗi xác thực", 
+        description: error.message || "Tài khoản hoặc mật khẩu không đúng." 
+      });
+    } finally {
       setIsLoading(false);
-      toast({ title: "Đăng nhập thành công" });
-    }, 800);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast({ variant: "destructive", title: "Lỗi", description: "Vui lòng nhập Email để đặt lại mật khẩu." });
+      return;
+    }
+    try {
+      await resetPassword(email);
+      toast({ title: "Đã gửi Email", description: "Vui lòng kiểm tra hộp thư của bạn." });
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Lỗi", description: error.message });
+    }
   };
 
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[400px] space-y-10 animate-in fade-in zoom-in duration-700">
+        <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-4">
              <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-4">
                 <Wrench className="h-10 w-10 text-primary p-1" />
@@ -94,23 +121,58 @@ export default function Overview() {
 
           <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-xl font-black text-slate-800">Chào mừng trở lại!</CardTitle>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đăng nhập để bắt đầu</p>
+              <CardTitle className="text-xl font-black text-slate-800">
+                {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
+              </CardTitle>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'Đăng ký để gửi yêu cầu sửa chữa'}
+              </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <form onSubmit={handleLogin} className="space-y-5">
+              <form onSubmit={handleAuth} className="space-y-5">
+                {authMode === 'register' && (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Họ và tên</Label>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                        <Input 
+                          placeholder="Nguyễn Văn A" 
+                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Đơn vị / Phòng ban</Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                        <Input 
+                          placeholder="Phòng Hành chính" 
+                          className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
+                          value={unit}
+                          onChange={(e) => setUnit(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Tên tài khoản</Label>
+                  <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Email tài khoản</Label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                     <Input 
-                      placeholder="VD: requester" 
+                      type="email"
+                      placeholder="example@due.edu.vn" 
                       className="pl-12 h-14 rounded-2xl bg-slate-50 border-none font-bold text-sm"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase tracking-widest">Mật khẩu</Label>
                   <div className="relative">
@@ -124,10 +186,28 @@ export default function Overview() {
                     />
                   </div>
                 </div>
+
                 <Button type="submit" className="w-full h-14 font-black rounded-2xl bg-primary hover:bg-primary/90 uppercase tracking-widest text-xs shadow-xl shadow-blue-100" disabled={isLoading}>
-                  {isLoading ? "Đang kết nối..." : "Đăng nhập ngay"}
+                  {isLoading ? "Đang xử lý..." : (authMode === 'login' ? "Đăng nhập ngay" : "Đăng ký ngay")}
                 </Button>
               </form>
+
+              <div className="flex items-center justify-between px-2">
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto text-[11px] font-black text-primary uppercase"
+                  onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                >
+                  {authMode === 'login' ? 'Đăng ký tài khoản' : 'Đã có tài khoản?'}
+                </Button>
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto text-[11px] font-black text-slate-400 uppercase"
+                  onClick={handleResetPassword}
+                >
+                  Quên mật khẩu?
+                </Button>
+              </div>
             </CardContent>
           </Card>
           

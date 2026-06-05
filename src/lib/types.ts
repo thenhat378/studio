@@ -18,6 +18,7 @@ export interface User {
   name: string;
   role: UserRole;
   unit?: string;
+  email?: string;
 }
 
 export interface Equipment {
@@ -40,7 +41,7 @@ export interface RepairRequest {
   technicianId?: string;
   technicianName?: string;
   createdAt: string;
-  completedAt?: string; // Thời gian kỹ thuật báo xong
+  completedAt?: string;
   aiSuggestions?: {
     causes: string[];
     recommendedEquipment: string[];
@@ -49,7 +50,7 @@ export interface RepairRequest {
   technicianReport?: string;
   rejectionReason?: string;
   unitFeedback?: string;
-  rating?: number; // 1 to 5 stars
+  rating?: number;
   requesterConfirmed?: boolean;
   csvcManagerApproved?: boolean;
 }

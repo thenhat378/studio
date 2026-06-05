@@ -3,13 +3,35 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User, UserRole, RepairRequest, Equipment } from './types';
+import { useFirebase } from '@/firebase';
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut,
+  sendPasswordResetEmail
+} from 'firebase/auth';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  collection, 
+  onSnapshot, 
+  query, 
+  orderBy,
+  addDoc,
+  updateDoc
+} from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 interface AppContextType {
   currentUser: User | null;
-  login: (role: UserRole) => void;
-  logout: () => void;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string, name: string, unit: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   requests: RepairRequest[];
-  addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => RepairRequest;
+  addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => void;
   updateRequestStatus: (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => void;
   equipment: Equipment[];
   users: User[];
@@ -17,13 +39,6 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-
-const MOCK_USERS: User[] = [
-  { id: 'u1', name: 'Nhân viên A', role: 'requester', unit: 'Phòng Hành chính' },
-  { id: 'u2', name: 'Lãnh đạo B', role: 'unit_leader', unit: 'Phòng Hành chính' },
-  { id: 'u3', name: 'Quản lý CSVC C', role: 'csvc_manager' },
-  { id: 'u4', name: 'Kỹ thuật viên D', role: 'technician' },
-];
 
 const MOCK_EQUIPMENT: Equipment[] = [
   { id: 'e1', name: 'Bàn ghế văn phòng', category: 'Furniture' },
@@ -34,85 +49,120 @@ const MOCK_EQUIPMENT: Equipment[] = [
   { id: 'e6', name: 'Lavabo Inax', category: 'Plumbing' },
 ];
 
-const INITIAL_REQUESTS: RepairRequest[] = [
-  {
-    id: 'REQ-1001',
-    title: 'Hỏng vòi nước Lavabo',
-    description: 'Vòi nước tại nhà vệ sinh tầng 2 bị rò rỉ mạnh không khóa được.',
-    equipmentId: 'e6',
-    equipmentName: 'Lavabo Inax',
-    category: 'Plumbing',
-    status: 'pending_approval',
-    requesterId: 'u1',
-    requesterName: 'Nhân viên A',
-    unit: 'Phòng Hành chính',
-    createdAt: new Date().toISOString(),
-  }
-];
-
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { auth, db } = useFirebase();
+  const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [requests, setRequests] = useState<RepairRequest[]>(INITIAL_REQUESTS);
+  const [requests, setRequests] = useState<RepairRequest[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Sync Auth State
   useEffect(() => {
-    const savedUser = localStorage.getItem('fixflow_user');
-    const savedRequests = localStorage.getItem('fixflow_requests');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    if (savedRequests) {
-      setRequests(JSON.parse(savedRequests));
-    }
-    setIsInitialized(true);
-  }, []);
+    if (!auth || !db) return;
 
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          setCurrentUser(userDoc.data() as User);
+        } else {
+          // Fallback if doc doesn't exist yet
+          setCurrentUser({
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName || 'Người dùng mới',
+            role: 'requester',
+            unit: 'Chưa cập nhật'
+          });
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setIsInitialized(true);
+    });
+
+    return () => unsubscribe();
+  }, [auth, db]);
+
+  // Sync Requests from Firestore
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('fixflow_requests', JSON.stringify(requests));
-    }
-  }, [requests, isInitialized]);
+    if (!db) return;
+    const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
+      setRequests(data);
+    });
+    return () => unsubscribe();
+  }, [db]);
 
-  const login = (role: UserRole) => {
-    const user = MOCK_USERS.find(u => u.role === role) || MOCK_USERS[0];
-    setCurrentUser(user);
-    localStorage.setItem('fixflow_user', JSON.stringify(user));
+  // Sync Users from Firestore
+  useEffect(() => {
+    if (!db) return;
+    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+      setUsers(data);
+    });
+    return () => unsubscribe();
+  }, [db]);
+
+  const login = async (email: string, pass: string) => {
+    if (!auth) return;
+    await signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('fixflow_user');
-  };
-
-  const addRequest = (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
-    const newReq: RepairRequest = {
-      ...req,
-      id: `REQ-${Math.floor(1000 + Math.random() * 9000)}`,
-      createdAt: new Date().toISOString(),
-      status: 'pending_approval',
+  const register = async (email: string, pass: string, name: string, unit: string) => {
+    if (!auth || !db) return;
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    const newUser: User = {
+      id: res.user.uid,
+      name,
+      role: 'requester',
+      unit,
+      email
     };
-    const updatedRequests = [newReq, ...requests];
-    setRequests(updatedRequests);
-    localStorage.setItem('fixflow_requests', JSON.stringify(updatedRequests));
-    return newReq;
+    await setDoc(doc(db, 'users', res.user.uid), newUser);
+    setCurrentUser(newUser);
   };
 
-  const updateRequestStatus = (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
-    const updated = requests.map(r => r.id === id ? { ...r, status, ...extra } : r);
-    setRequests(updated);
-    localStorage.setItem('fixflow_requests', JSON.stringify(updated));
+  const logout = async () => {
+    if (!auth) return;
+    await signOut(auth);
+  };
+
+  const resetPassword = async (email: string) => {
+    if (!auth) return;
+    await sendPasswordResetEmail(auth, email);
+  };
+
+  const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
+    if (!db) return;
+    await addDoc(collection(db, 'requests'), {
+      ...req,
+      createdAt: new Date().toISOString(),
+      status: 'pending_approval'
+    });
+  };
+
+  const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
+    if (!db) return;
+    await updateDoc(doc(db, 'requests', id), {
+      status,
+      ...extra
+    });
   };
 
   return (
     <AppContext.Provider value={{
       currentUser,
       login,
+      register,
       logout,
+      resetPassword,
       requests,
       addRequest,
       updateRequestStatus,
       equipment: MOCK_EQUIPMENT,
-      users: MOCK_USERS,
+      users,
       isInitialized
     }}>
       {children}
