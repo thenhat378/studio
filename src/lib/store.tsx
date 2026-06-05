@@ -63,11 +63,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
-          } else {
-            console.log("User doc not found, possibly first registration.");
           }
         } catch (e) {
-          console.error("Error fetching user doc:", e);
+          console.error("Error fetching user data from Firestore:", e);
         }
       } else {
         setCurrentUser(null);
@@ -98,19 +96,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const login = async (email: string, pass: string) => {
-    if (!auth) throw new Error("Hệ thống xác thực chưa sẵn sàng.");
+    if (!auth) throw new Error("Firebase Auth is not initialized");
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng.");
+    if (!auth || !db) throw new Error("Firebase services are not initialized");
     
+    // 1. Tạo tài khoản Authentication
     const res = await createUserWithEmailAndPassword(auth, email, pass);
     
+    // 2. Lưu hồ sơ người dùng vào Firestore
     const newUser: User = {
       id: res.user.uid,
       name,
-      role: 'requester',
+      role: 'requester', // Mặc định là nhân viên yêu cầu
       unit,
       email
     };

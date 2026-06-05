@@ -1,4 +1,3 @@
-
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
@@ -11,6 +10,7 @@ export function initializeFirebase(): {
   db: Firestore;
   auth: Auth;
 } {
+  // Đảm bảo không khởi tạo lại ứng dụng nếu đã tồn tại
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
