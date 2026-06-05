@@ -29,12 +29,21 @@ import { UserRole } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Overview() {
   const { 
     currentUser, 
     login,
     register,
+    resetPassword,
     requests, 
     isInitialized
   } = useAppStore();
@@ -56,6 +65,18 @@ export default function Overview() {
     role: 'requester' as UserRole
   });
 
+  // Forgot Password states
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [forgotData, setForgotData] = useState({
+    phone: '',
+    newPass: '',
+    confirmPass: ''
+  });
+  const [forgotPassValidation, setForgotPassValidation] = useState({
+    length: false,
+    special: false
+  });
+
   // Password validation states
   const [passValidation, setPassValidation] = useState({
     length: false,
@@ -69,6 +90,13 @@ export default function Overview() {
       special: /[!@#$%^&*(),.?":{}|<>]/.test(regData.pass)
     });
   }, [regData.pass]);
+
+  useEffect(() => {
+    setForgotPassValidation({
+      length: forgotData.newPass.length >= 8,
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(forgotData.newPass)
+    });
+  }, [forgotData.newPass]);
 
   if (!isInitialized) {
     return (
@@ -119,11 +147,9 @@ export default function Overview() {
         title: "Đăng ký thành công!", 
         description: "Vui lòng đăng nhập bằng tài khoản vừa tạo." 
       });
-      // Pre-fill login phone and switch to login tab
       setLoginPhone(regData.phone);
       setLoginPass('');
       setActiveTab('login');
-      // Reset registration form
       setRegData({
         name: '',
         phone: '',
@@ -137,6 +163,31 @@ export default function Overview() {
         title: "Không thể đăng ký", 
         description: error.message || "Đã xảy ra lỗi hệ thống." 
       });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (forgotData.newPass !== forgotData.confirmPass) {
+      toast({ variant: "destructive", title: "Lỗi", description: "Mật khẩu xác nhận không khớp." });
+      return;
+    }
+    if (!forgotPassValidation.length || !forgotPassValidation.special) {
+      toast({ variant: "destructive", title: "Lỗi", description: "Mật khẩu mới không đủ mạnh." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await resetPassword(forgotData.phone, forgotData.newPass);
+      toast({ title: "Thành công", description: "Mật khẩu đã được đặt lại." });
+      setIsForgotOpen(false);
+      setLoginPhone(forgotData.phone);
+      setForgotData({ phone: '', newPass: '', confirmPass: '' });
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Lỗi", description: error.message });
     } finally {
       setIsSubmitting(false);
     }
@@ -177,7 +228,16 @@ export default function Overview() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu</Label>
+                    <div className="flex justify-between items-center px-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Mật khẩu</Label>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsForgotOpen(true)}
+                        className="text-[10px] font-black text-primary uppercase hover:underline"
+                      >
+                        Quên mật khẩu?
+                      </button>
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
                       <Input 
@@ -299,6 +359,70 @@ export default function Overview() {
             </div>
           </div>
         </div>
+
+        {/* Forgot Password Dialog */}
+        <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
+          <DialogContent className="rounded-[3rem] p-10 border-none shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter">Đặt lại mật khẩu</DialogTitle>
+              <DialogDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Nhập số điện thoại và mật khẩu mới của bạn
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleResetPassword} className="space-y-5 py-4">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Số điện thoại</Label>
+                <Input 
+                  placeholder="09xx..." 
+                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                  value={forgotData.phone}
+                  onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Mật khẩu mới</Label>
+                <Input 
+                  type="password"
+                  placeholder="••••••••" 
+                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                  value={forgotData.newPass}
+                  onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))}
+                  required
+                />
+                <div className="flex gap-4 mt-2">
+                  <div className="flex items-center gap-1">
+                    {forgotPassValidation.length ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                    <span className="text-[9px] font-bold uppercase text-slate-400">8+ ký tự</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {forgotPassValidation.special ? <Check className="h-3 w-3 text-emerald-500" /> : <X className="h-3 w-3 text-rose-400" />}
+                    <span className="text-[9px] font-bold uppercase text-slate-400">Ký tự đặc biệt</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-2">Xác nhận mật khẩu mới</Label>
+                <Input 
+                  type="password"
+                  placeholder="••••••••" 
+                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold text-slate-700"
+                  value={forgotData.confirmPass}
+                  onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))}
+                  required
+                />
+              </div>
+              <DialogFooter className="pt-4">
+                <Button 
+                  className="w-full h-14 rounded-2xl bg-primary font-black uppercase tracking-widest text-xs"
+                  disabled={isSubmitting || !forgotPassValidation.length || !forgotPassValidation.special || forgotData.newPass !== forgotData.confirmPass}
+                >
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : "XÁC NHẬN ĐỔI MẬT KHẨU"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

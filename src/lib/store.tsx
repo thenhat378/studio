@@ -22,6 +22,7 @@ interface AppContextType {
   currentUser: User | null;
   login: (phone: string, pass: string) => Promise<void>;
   register: (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => Promise<void>;
+  resetPassword: (phone: string, newPass: string) => Promise<void>;
   logout: () => void;
   requests: RepairRequest[];
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
@@ -130,11 +131,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     try {
       await setDoc(doc(db, 'users', userId), userData);
-      // Removed automatic login to allow user to manually login after registration
     } catch (error: any) {
       console.error("Lỗi đăng ký:", error);
       throw new Error("Không thể lưu thông tin. Vui lòng thử lại.");
     }
+  };
+
+  const resetPassword = async (phone: string, newPass: string) => {
+    if (!db) throw new Error("Database chưa sẵn sàng.");
+    
+    const q = query(collection(db, 'users'), where('phoneNumber', '==', phone), limit(1));
+    const snap = await getDocs(q);
+    
+    if (snap.empty) {
+      throw new Error("Không tìm thấy tài khoản với số điện thoại này.");
+    }
+
+    const userId = snap.docs[0].id;
+    await updateDoc(doc(db, 'users', userId), { password: newPass });
   };
 
   const logout = () => {
@@ -161,6 +175,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       currentUser, 
       login,
       register,
+      resetPassword,
       logout,
       requests, 
       addRequest, 
