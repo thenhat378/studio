@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -6,10 +7,8 @@ import { useFirebase } from '@/firebase';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  signOut,
-  signInWithPhoneNumber,
-  RecaptchaVerifier,
-  ConfirmationResult
+  createUserWithEmailAndPassword,
+  signOut
 } from 'firebase/auth';
 import { 
   doc, 
@@ -25,10 +24,9 @@ import {
 
 interface AppContextType {
   currentUser: User | null;
-  login: (email: string, pass: string) => Promise<void>;
-  loginAsTestAccount: (role: UserRole, customUser?: User) => void;
-  sendOtp: (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => Promise<ConfirmationResult>;
-  verifyOtp: (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => Promise<void>;
+  login: (phone: string, pass: string) => Promise<void>;
+  register: (phone: string, pass: string, name: string, unit: string) => Promise<void>;
+  loginAsTestAccount: (role: UserRole) => void;
   logout: () => Promise<void>;
   requests: RepairRequest[];
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
@@ -56,12 +54,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('app_user_session');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
+  // Helper to convert phone to internal auth email
+  const phoneToEmail = (phone: string) => `${phone.trim()}@due-repair.vn`;
 
+  useEffect(() => {
     if (!auth || !db) {
       setIsInitialized(true);
       return;
@@ -72,17 +68,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
-            const userData = userDoc.data() as User;
-            setCurrentUser(userData);
-            localStorage.setItem('app_user_session', JSON.stringify(userData));
+            setCurrentUser(userDoc.data() as User);
           }
         } catch (e) {
-          console.error("Firestore user load error:", e);
+          console.error("User load error:", e);
         }
       } else {
-        if (!localStorage.getItem('is_test_mode')) {
-           setCurrentUser(null);
-           localStorage.removeItem('app_user_session');
+        const testUser = localStorage.getItem('test_user_session');
+        if (testUser) {
+          setCurrentUser(JSON.parse(testUser));
+        } else {
+          setCurrentUser(null);
         }
       }
       setIsInitialized(true);
@@ -94,81 +90,54 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
-      setRequests(data);
-    }, (error) => console.error("Firestore requests snapshot error:", error));
-    return () => unsubscribe();
+    return onSnapshot(q, (snapshot) => {
+      setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
+    });
   }, [db]);
 
   useEffect(() => {
     if (!db) return;
-    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
-      setUsers(data);
-    }, (error) => console.error("Firestore users snapshot error:", error));
-    return () => unsubscribe();
+    return onSnapshot(collection(db, 'users'), (snapshot) => {
+      setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User)));
+    });
   }, [db]);
 
-  const login = async (email: string, pass: string) => {
-    if (!auth) throw new Error("Auth service unavailable");
-    localStorage.removeItem('is_test_mode');
-    await signInWithEmailAndPassword(auth, email, pass);
+  const login = async (phone: string, pass: string) => {
+    if (!auth) throw new Error("Service unavailable");
+    localStorage.removeItem('test_user_session');
+    await signInWithEmailAndPassword(auth, phoneToEmail(phone), pass);
   };
 
-  const loginAsTestAccount = (role: UserRole, customUser?: User) => {
-    const testUsers: Record<UserRole, User> = {
-      'requester': { id: 'test-req', name: 'Nhân viên (Test)', role: 'requester', unit: 'Phòng Hành chính', email: 'req@test.com' },
-      'unit_leader': { id: 'test-leader', name: 'Lãnh đạo (Test)', role: 'unit_leader', unit: 'Phòng Hành chính', email: 'leader@test.com' },
-      'csvc_manager': { id: 'test-manager', name: 'Quản lý (Test)', role: 'csvc_manager', unit: 'Phòng CSVC', email: 'manager@test.com' },
-      'technician': { id: 'test-tech', name: 'Kỹ thuật (Test)', role: 'technician', unit: 'Tổ Kỹ thuật', email: 'tech@test.com' },
+  const register = async (phone: string, pass: string, name: string, unit: string) => {
+    if (!auth || !db) throw new Error("Service unavailable");
+    const result = await createUserWithEmailAndPassword(auth, phoneToEmail(phone), pass);
+    const newUser: User = {
+      id: result.user.uid,
+      name,
+      unit,
+      role: 'requester',
+      phoneNumber: phone
     };
-    const user = customUser || testUsers[role];
+    await setDoc(doc(db, 'users', result.user.uid), newUser);
+    setCurrentUser(newUser);
+  };
+
+  const loginAsTestAccount = (role: UserRole) => {
+    const testUsers: Record<UserRole, User> = {
+      'requester': { id: 'test-req', name: 'Nhân viên (Test)', role: 'requester', unit: 'Phòng Hành chính' },
+      'unit_leader': { id: 'test-leader', name: 'Lãnh đạo (Test)', role: 'unit_leader', unit: 'Phòng Hành chính' },
+      'csvc_manager': { id: 'test-manager', name: 'Quản lý (Test)', role: 'csvc_manager', unit: 'Phòng CSVC' },
+      'technician': { id: 'test-tech', name: 'Kỹ thuật (Test)', role: 'technician', unit: 'Tổ Kỹ thuật' },
+    };
+    const user = testUsers[role];
     setCurrentUser(user);
-    localStorage.setItem('is_test_mode', 'true');
-    localStorage.setItem('app_user_session', JSON.stringify(user));
-  };
-
-  const sendOtp = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
-    if (!auth) throw new Error("Dịch vụ xác thực không khả dụng.");
-    return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-  };
-
-  const verifyOtp = async (confirmationResult: ConfirmationResult, otp: string, userData?: { name: string, unit: string }) => {
-    if (!db) throw new Error("Firestore chưa được khởi tạo.");
-    const result = await confirmationResult.confirm(otp);
-    const user = result.user;
-    
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    
-    if (userDoc.exists()) {
-      const existingUser = userDoc.data() as User;
-      setCurrentUser(existingUser);
-      localStorage.setItem('app_user_session', JSON.stringify(existingUser));
-    } else if (userData) {
-      const newUser: User = { 
-        id: user.uid, 
-        name: userData.name, 
-        unit: userData.unit, 
-        role: 'requester', 
-        phoneNumber: user.phoneNumber || '' 
-      };
-      await setDoc(doc(db, 'users', user.uid), newUser);
-      setCurrentUser(newUser);
-      localStorage.setItem('app_user_session', JSON.stringify(newUser));
-    } else {
-      throw new Error("Thông tin người dùng không tìm thấy.");
-    }
-    localStorage.removeItem('is_test_mode');
+    localStorage.setItem('test_user_session', JSON.stringify(user));
   };
 
   const logout = async () => {
-    if (auth) {
-      try { await signOut(auth); } catch(e) {}
-    }
+    if (auth) await signOut(auth);
     setCurrentUser(null);
-    localStorage.removeItem('is_test_mode');
-    localStorage.removeItem('app_user_session');
+    localStorage.removeItem('test_user_session');
   };
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
@@ -182,36 +151,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
-    await updateDoc(doc(db, 'requests', id), {
-      status,
-      ...extra
-    });
+    await updateDoc(doc(db, 'requests', id), { status, ...extra });
   };
 
   return (
     <AppContext.Provider value={{
-      currentUser,
-      login,
-      loginAsTestAccount,
-      logout,
-      requests,
-      addRequest,
-      updateRequestStatus,
-      equipment: MOCK_EQUIPMENT,
-      users,
-      isInitialized,
-      sendOtp,
-      verifyOtp
+      currentUser, login, register, loginAsTestAccount, logout,
+      requests, addRequest, updateRequestStatus,
+      equipment: MOCK_EQUIPMENT, users, isInitialized
     }}>
       {children}
     </AppContext.Provider>
   );
 }
 
-export function useAppStore() {
+export const useAppStore = () => {
   const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppStore must be used within an AppProvider');
-  }
+  if (!context) throw new Error('useAppStore must be used within AppProvider');
   return context;
-}
+};
