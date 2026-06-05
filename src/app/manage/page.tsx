@@ -26,8 +26,8 @@ export default function ManagementPage() {
   // 1. Danh sách phiếu đã được lãnh đạo duyệt, đang chờ phân công
   const pendingAssignment = requests.filter(r => r.status === 'approved');
   
-  // 2. Danh sách phiếu kỹ thuật đã báo hoàn thành, chờ quản lý CSVC kiểm tra/duyệt
-  const pendingReview = requests.filter(r => r.status === 'completed');
+  // 2. Danh sách phiếu kỹ thuật đã báo hoàn thành, chờ lãnh đạo đơn vị nghiệm thu
+  const pendingConfirmation = requests.filter(r => r.status === 'completed');
 
   const technicians = users.filter(u => u.role === 'technician');
 
@@ -55,27 +55,10 @@ export default function ManagementPage() {
       description: `Phiếu đã được giao cho kỹ thuật viên: ${tech.name}`
     });
     
-    // Clear selection for this request
+    // Clear selection
     const newSelections = { ...selectedTechs };
     delete newSelections[requestId];
     setSelectedTechs(newSelections);
-  };
-
-  const handleVerify = (id: string) => {
-    updateRequestStatus(id, 'verified');
-    toast({
-      title: "Đã duyệt hoàn thành",
-      description: "Kết quả sửa chữa đã được xác nhận. Chờ đơn vị yêu cầu nghiệm thu cuối cùng."
-    });
-  };
-
-  const handleRejectTechnical = (id: string) => {
-    updateRequestStatus(id, 'in_progress');
-    toast({
-      variant: "destructive",
-      title: "Đã yêu cầu làm lại",
-      description: "Phiếu đã được chuyển về trạng thái 'Đang thực hiện' để kỹ thuật viên xử lý lại."
-    });
   };
 
   return (
@@ -86,7 +69,7 @@ export default function ManagementPage() {
             <ClipboardList className="h-6 w-6 text-accent" />
             Điều phối & Quản lý kỹ thuật
           </h1>
-          <p className="text-muted-foreground">Phân công nhân sự và kiểm soát chất lượng sửa chữa</p>
+          <p className="text-muted-foreground">Phân công nhân sự và theo dõi tiến độ sửa chữa</p>
         </div>
       </div>
 
@@ -100,21 +83,20 @@ export default function ManagementPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="review" className="gap-2">
-            Chờ duyệt kết quả
-            {pendingReview.length > 0 && (
-              <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
-                {pendingReview.length}
+          <TabsTrigger value="monitor" className="gap-2">
+            Đang theo dõi
+            {pendingConfirmation.length > 0 && (
+              <Badge variant="secondary" className="h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                {pendingConfirmation.length}
               </Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
-        {/* TAB 1: PHÂN CÔNG VIỆC */}
         <TabsContent value="assign" className="mt-6 space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <AlertCircle className="h-4 w-4 text-amber-500" />
-            <span className="text-sm font-medium">Có {pendingAssignment.length} yêu cầu mới cần giao việc.</span>
+            <span className="text-sm font-medium">Có {pendingAssignment.length} yêu cầu cần điều phối nhân sự.</span>
           </div>
           
           {pendingAssignment.map(req => (
@@ -148,7 +130,7 @@ export default function ManagementPage() {
                     </Select>
                   </div>
                   <Button 
-                    className="bg-primary gap-2"
+                    className="bg-primary gap-2 h-10 font-bold"
                     onClick={() => handleAssign(req.id)}
                     disabled={!selectedTechs[req.id]}
                   >
@@ -161,63 +143,44 @@ export default function ManagementPage() {
           {pendingAssignment.length === 0 && (
             <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
               <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-              <h3 className="text-lg font-semibold text-muted-foreground">Không có phiếu chờ điều phối</h3>
+              <h3 className="text-lg font-semibold text-muted-foreground">Không có phiếu chờ phân công</h3>
             </div>
           )}
         </TabsContent>
 
-        {/* TAB 2: KIỂM TRA & DUYỆT KẾT QUẢ */}
-        <TabsContent value="review" className="mt-6 space-y-4">
+        <TabsContent value="monitor" className="mt-6 space-y-4">
            <div className="flex items-center gap-2 mb-4 text-emerald-600">
             <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm font-medium">Có {pendingReview.length} phiếu đã hoàn thành cần duyệt hoàn thành.</span>
+            <span className="text-sm font-medium">Có {pendingConfirmation.length} phiếu đã sửa xong, chờ lãnh đạo đơn vị nghiệm thu.</span>
           </div>
 
-          {pendingReview.map(req => (
+          {pendingConfirmation.map(req => (
             <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-emerald-500">
               <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-lg">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật đã báo xong</Badge>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật đã hoàn thành</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Kỹ thuật viên: <span className="font-medium text-foreground">{req.technicianName}</span>
+                    Kỹ thuật viên: <span className="font-medium text-foreground">{req.technicianName}</span> | Đơn vị: <span className="font-medium text-foreground">{req.unit}</span>
                   </p>
-                  <div className="mt-2 p-3 bg-emerald-50/50 rounded-lg border border-emerald-100 italic text-sm text-emerald-800">
-                    "{req.technicianReport || 'Không có báo cáo chi tiết'}"
-                  </div>
                 </div>
                 
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
                     <Button variant="outline" size="sm" className="w-full gap-1">
-                      <Eye className="h-4 w-4" /> Chi tiết
+                      <Eye className="h-4 w-4" /> Xem báo cáo
                     </Button>
                   </Link>
-                  <Button 
-                    size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none"
-                    onClick={() => handleVerify(req.id)}
-                  >
-                    <CheckCircle2 className="h-4 w-4" /> Duyệt hoàn thành
-                  </Button>
-                  <Button 
-                    size="sm"
-                    variant="destructive"
-                    className="gap-1 flex-1 md:flex-none"
-                    onClick={() => handleRejectTechnical(req.id)}
-                  >
-                    Làm lại
-                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
-          {pendingReview.length === 0 && (
+          {pendingConfirmation.length === 0 && (
             <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
               <CheckCircle2 className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-              <h3 className="text-lg font-semibold text-muted-foreground">Không có phiếu cần duyệt kết quả</h3>
+              <h3 className="text-lg font-semibold text-muted-foreground">Không có phiếu đang chờ xác nhận kết quả</h3>
             </div>
           )}
         </TabsContent>

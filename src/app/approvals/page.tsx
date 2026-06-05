@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, FileText, CheckCircle2, Clock, Star } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, CheckCircle2, Clock, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -56,7 +56,7 @@ export default function ApprovalsPage() {
     updateRequestStatus(ratingId, 'closed', { rating: currentRating });
     toast({
       title: "Đã nghiệm thu",
-      description: "Đã xác nhận hoàn thành & Đóng phiếu yêu cầu."
+      description: "Đã xác nhận hoàn thành & Đóng phiếu yêu cầu. Kỹ thuật viên có thể thực hiện in phiếu."
     });
     setRatingId(null);
   };
@@ -82,7 +82,7 @@ export default function ApprovalsPage() {
             <ShieldCheck className="h-6 w-6 text-accent" />
             Xét duyệt & Nghiệm thu ({currentUser?.unit})
           </h1>
-          <p className="text-muted-foreground">Quản lý vòng đời phiếu yêu cầu tại đơn vị</p>
+          <p className="text-muted-foreground">Quản lý vòng đời phiếu yêu cầu tại đơn vị của bạn</p>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200">Đang chờ</Badge>
+                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200">Đang chờ duyệt</Badge>
                   </div>
                   <div className="flex flex-col gap-1 text-sm text-muted-foreground mt-1">
                     <p>Người yêu cầu: <span className="font-medium text-foreground">{req.requesterName}</span></p>
@@ -153,13 +153,13 @@ export default function ApprovalsPage() {
                     <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật báo xong</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Nhân viên kỹ thuật đã báo hoàn tất. Lãnh đạo vui lòng xác nhận kết quả.
+                    Nhân viên kỹ thuật đã sửa xong và báo cáo. Lãnh đạo vui lòng xác nhận kết quả.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
                     <Button variant="outline" size="sm" className="w-full gap-1">
-                      <Eye className="h-4 w-4" /> Xem kết quả
+                      <Eye className="h-4 w-4" /> Kết quả
                     </Button>
                   </Link>
                   <Button 
@@ -186,7 +186,7 @@ export default function ApprovalsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Xác nhận hoàn thành & Đóng phiếu</DialogTitle>
-            <DialogDescription>Hãy cho chúng tôi biết mức độ hài lòng về kết quả xử lý sự cố này.</DialogDescription>
+            <DialogDescription>Hãy đánh giá mức độ hài lòng về kết quả sửa chữa này.</DialogDescription>
           </DialogHeader>
           <div className="py-6 flex flex-col items-center gap-4">
             <div className="flex gap-2">
@@ -215,6 +215,7 @@ export default function ApprovalsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog Từ chối */}
       <Dialog open={!!rejectingId} onOpenChange={(open) => !open && setRejectingId(null)}>
         <DialogContent>
           <DialogHeader>
