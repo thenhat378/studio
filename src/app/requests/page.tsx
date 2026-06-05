@@ -6,15 +6,10 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, PlusCircle, Wrench, MoreHorizontal, Clock, ThumbsUp } from 'lucide-react';
+import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 export default function RequestsList() {
   const { requests, currentUser } = useAppStore();
@@ -26,77 +21,102 @@ export default function RequestsList() {
     (currentUser?.role === 'csvc_manager' ? true : r.requesterId === currentUser?.id || r.unit === currentUser?.unit)
   );
 
-  const getStatusBadge = (status: string) => {
+  const getStatusInfo = (status: string) => {
     switch(status) {
-      case 'pending_approval': return <Badge variant="outline" className="text-rose-600 bg-rose-50 border-rose-200">Chờ duyệt</Badge>;
-      case 'approved': return <Badge variant="outline" className="text-indigo-600 bg-indigo-50 border-indigo-200">Đã duyệt</Badge>;
-      case 'assigned': return <Badge variant="outline" className="text-blue-600 bg-blue-50 border-blue-200">Đã phân công</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="text-amber-600 bg-amber-50 border-amber-200">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="text-cyan-600 bg-cyan-50 border-cyan-200">Chờ CSVC duyệt</Badge>;
-      case 'verified': return <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200">Chờ nghiệm thu</Badge>;
-      case 'closed': return <Badge className="bg-green-700 text-white">Đã hoàn tất</Badge>;
-      case 'rejected': return <Badge variant="destructive">Đã từ chối</Badge>;
-      default: return <Badge variant="outline">{status}</Badge>;
+      case 'pending_approval': return { label: 'Chờ duyệt', color: 'text-rose-500', bg: 'bg-rose-50' };
+      case 'approved': return { label: 'Đã duyệt', color: 'text-indigo-500', bg: 'bg-indigo-50' };
+      case 'assigned': return { label: 'Giao việc', color: 'text-blue-500', bg: 'bg-blue-50' };
+      case 'in_progress': return { label: 'Đang làm', color: 'text-amber-600', bg: 'bg-amber-50' };
+      case 'completed': return { label: 'Xong kỹ thuật', color: 'text-cyan-600', bg: 'bg-cyan-50' };
+      case 'verified': return { label: 'Nghiệm thu', color: 'text-emerald-600', bg: 'bg-emerald-50' };
+      case 'closed': return { label: 'Hoàn tất', color: 'text-green-700', bg: 'bg-green-50' };
+      case 'rejected': return { label: 'Từ chối', color: 'text-red-600', bg: 'bg-red-50' };
+      default: return { label: status, color: 'text-slate-500', bg: 'bg-slate-50' };
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 pb-10">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Danh sách yêu cầu sửa chữa</h1>
-          <p className="text-muted-foreground">Theo dõi và thực hiện nghiệm thu hài lòng</p>
+          <h1 className="text-2xl font-black text-slate-800">Danh sách phiếu</h1>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Theo dõi tiến độ sửa chữa</p>
         </div>
-        {currentUser?.role === 'requester' && (
-          <Link href="/requests/new">
-            <Button className="bg-primary font-bold shadow-lg shadow-primary/20">
-              <PlusCircle className="mr-2 h-4 w-4" /> Tạo phiếu mới
-            </Button>
-          </Link>
+        
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Input 
+            placeholder="Tìm theo tiêu đề, thiết bị..." 
+            className="pl-12 h-14 rounded-2xl bg-white border-none shadow-sm font-bold text-sm"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {filteredRequests.map(req => {
+          const status = getStatusInfo(req.status);
+          return (
+            <Link key={req.id} href={`/requests/${req.id}`}>
+              <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden hover:scale-[1.01] transition-transform">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                      <HardDrive className="h-6 w-6 text-primary/30" />
+                    </div>
+                    <Badge className={cn("border-none font-black text-[9px] uppercase px-3 py-1", status.bg, status.color)}>
+                      {status.label}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h3 className="font-black text-lg text-slate-800 leading-tight">{req.title}</h3>
+                    <div className="flex flex-wrap gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                      <span className="flex items-center gap-1.5"><Wrench className="h-3.5 w-3.5" /> {req.equipmentName}</span>
+                      <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                     <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                           <User className="h-3 w-3 text-primary" />
+                        </div>
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">{req.requesterName}</span>
+                     </div>
+                     <ChevronRight className="h-5 w-5 text-slate-200" />
+                  </div>
+                  
+                  {req.status === 'verified' && !req.requesterConfirmed && currentUser?.role === 'requester' && (
+                    <div className="mt-4">
+                      <Button className="w-full bg-primary h-12 rounded-xl font-bold gap-2 text-xs uppercase tracking-widest shadow-lg shadow-blue-100">
+                        <ThumbsUp className="h-4 w-4" /> Xác nhận hài lòng
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
+        {filteredRequests.length === 0 && (
+          <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
+            <ClipboardList className="h-16 w-16 text-slate-100 mx-auto mb-6" />
+            <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Không tìm thấy phiếu nào</p>
+          </div>
         )}
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Tìm theo tiêu đề, thiết bị..." 
-          className="pl-9 h-11"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
-      <div className="grid gap-4">
-        {filteredRequests.map(req => (
-          <Card key={req.id} className="border-none shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-5 flex flex-col md:flex-row md:items-center gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="font-bold text-lg">{req.title}</h3>
-                  {getStatusBadge(req.status)}
-                </div>
-                <div className="flex gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><Wrench className="h-3 w-3" /> {req.equipmentName}</span>
-                  <span className="flex items-center gap-1 text-primary font-bold"><Clock className="h-3 w-3" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                {req.status === 'verified' && !req.requesterConfirmed && currentUser?.role === 'requester' && (
-                  <Link href={`/requests/${req.id}`}>
-                    <Button size="sm" className="bg-primary gap-1 font-bold">
-                      <ThumbsUp className="h-4 w-4" /> Xác nhận hài lòng
-                    </Button>
-                  </Link>
-                )}
-                <Link href={`/requests/${req.id}`}>
-                  <Button variant="secondary" size="sm">Chi tiết</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {currentUser?.role === 'requester' && (
+        <div className="fixed bottom-24 right-6 z-40 md:hidden">
+          <Link href="/requests/new">
+            <Button size="icon" className="h-16 w-16 rounded-full bg-[#0054A4] shadow-2xl shadow-blue-200 active:scale-90 transition-transform">
+              <PlusCircle className="h-8 w-8" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

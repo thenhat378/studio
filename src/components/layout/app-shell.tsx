@@ -12,7 +12,8 @@ import {
   Package,
   Menu,
   User,
-  X
+  Bell,
+  Search
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -38,112 +39,167 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const navigation = [
-    { name: 'Tổng quan', href: '/', icon: LayoutDashboard },
-    { name: 'Yêu cầu của tôi', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
-    { name: 'Duyệt yêu cầu', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
-    { name: 'Quản lý phiếu', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
+    { name: 'Home', href: '/', icon: LayoutDashboard },
+    { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
+    { name: 'Duyệt', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
+    { name: 'Quản lý', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
     { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['csvc_manager'] },
   ];
 
   const filteredNav = navigation.filter(item => !item.roles || item.roles.includes(currentUser.role));
 
-  const SidebarContent = ({ isMobile = false }) => (
-    <div className="flex h-full flex-col gap-4 no-print bg-white">
-      <div className="flex h-16 items-center px-6 border-b shrink-0">
-        <Link href="/" className="flex items-center gap-2 font-black text-lg text-primary tracking-tighter">
-          <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" />
-          <span>Sửa chữa DUE</span>
-        </Link>
-        {isMobile && (
-          <SheetClose asChild>
-            <Button variant="ghost" size="icon" className="ml-auto md:hidden">
-              <X className="h-5 w-5" />
-            </Button>
-          </SheetClose>
-        )}
-      </div>
-      <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <p className="text-[10px] font-black uppercase text-muted-foreground px-3 mb-3 tracking-widest">Menu</p>
-        {filteredNav.map((item) => (
-          <Link key={item.name} href={item.href}>
-            <Button
-              variant={pathname === item.href ? "secondary" : "ghost"}
-              className={cn(
-                "w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-xl",
-                pathname === item.href 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-slate-500 hover:bg-slate-50"
-              )}
-            >
-              <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-slate-400")} />
-              {item.name}
-            </Button>
-          </Link>
-        ))}
-      </div>
-      <div className="mt-auto p-4 border-t bg-slate-50/50 shrink-0">
-        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-white shadow-sm border mb-4">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white font-black text-lg">
-            {currentUser.name.charAt(0)}
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-xs font-black truncate">{currentUser.name}</span>
-            <span className="text-[10px] text-slate-400 font-bold uppercase truncate">{currentUser.role.replace('_', ' ')}</span>
-          </div>
-        </div>
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-rose-500 hover:text-rose-600 hover:bg-rose-50 h-12 rounded-xl font-bold" 
-          onClick={() => logout()}
-        >
-          <LogOut className="mr-3 h-5 w-5" /> Đăng xuất
-        </Button>
-      </div>
-    </div>
-  );
+  // Bottom Nav items (Max 5 for mobile)
+  const bottomNavItems = filteredNav.slice(0, 5);
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
-      {/* Desktop Sidebar */}
+    <div className="flex min-h-screen bg-[#F4F7FE]">
+      {/* Desktop Sidebar (Only visible on MD+) */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-white no-print fixed h-full z-40">
-        <SidebarContent />
+        <div className="flex h-16 items-center px-6 border-b shrink-0">
+          <Link href="/" className="flex items-center gap-2 font-black text-lg text-primary tracking-tighter">
+            <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg" />
+            <span>Sửa chữa DUE</span>
+          </Link>
+        </div>
+        <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
+          {filteredNav.map((item) => (
+            <Link key={item.name} href={item.href}>
+              <Button
+                variant={pathname === item.href ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl",
+                  pathname === item.href 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-slate-500 hover:bg-slate-50"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-slate-400")} />
+                {item.name}
+              </Button>
+            </Link>
+          ))}
+        </div>
+        <div className="p-4 border-t">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-rose-500 hover:bg-rose-50 h-12 rounded-2xl font-bold" 
+            onClick={() => logout()}
+          >
+            <LogOut className="mr-3 h-5 w-5" /> Đăng xuất
+          </Button>
+        </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 md:ml-64">
-        <header className="flex h-14 md:h-16 items-center gap-4 border-b bg-white/80 backdrop-blur-md px-4 md:px-8 no-print sticky top-0 z-30">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden rounded-xl h-10 w-10">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[85vw] max-w-[320px] p-0 border-r-none">
-              <SidebarContent isMobile />
-            </SheetContent>
-          </Sheet>
-          <div className="flex-1 md:hidden">
-            <Link href="/" className="font-black text-base text-primary flex items-center gap-1.5">
-               <Wrench className="h-4 w-4 p-0.5 bg-primary text-white rounded-md" /> 
-               <span className="tracking-tighter">DUE Sửa chữa</span>
-            </Link>
+        {/* Mobile Header (Fixed) */}
+        <header className="md:hidden glass-morphism fixed top-0 left-0 w-full h-16 flex items-center justify-between px-6 z-50">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary/30">
+              {currentUser.name.charAt(0)}
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">Xin chào,</p>
+              <p className="text-sm font-black text-slate-800">{currentUser.name.split(' ').pop()}</p>
+            </div>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-             <div className="hidden lg:flex flex-col items-end mr-2">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Date().toLocaleDateString('vi-VN', { weekday: 'short' })}</span>
-                <span className="text-[10px] font-mono text-slate-400">{new Date().toLocaleDateString('vi-VN')}</span>
-             </div>
-             <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-               <User className="h-5 w-5 text-slate-400" />
-             </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-full bg-slate-100/50">
+              <Bell className="h-5 w-5 text-slate-600" />
+            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full bg-slate-100/50">
+                  <Menu className="h-5 w-5 text-slate-600" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[80vw] rounded-l-[3rem] p-0 border-none">
+                <div className="flex flex-col h-full bg-white p-8">
+                  <div className="flex items-center gap-4 mb-8 pt-4">
+                    <div className="h-14 w-14 rounded-[2rem] bg-primary flex items-center justify-center text-white text-2xl font-black">
+                      {currentUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-black text-lg">{currentUser.name}</p>
+                      <p className="text-xs font-bold text-primary uppercase">{currentUser.role.replace('_', ' ')}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2 flex-1">
+                    {filteredNav.map((item) => (
+                      <SheetClose asChild key={item.name}>
+                        <Link href={item.href}>
+                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-slate-600">
+                            <item.icon className="h-5 w-5" /> {item.name}
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-rose-500 mt-auto"
+                    onClick={() => logout()}
+                  >
+                    <LogOut className="h-5 w-5" /> Đăng xuất
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
-          <div className="max-w-5xl mx-auto pb-20 md:pb-0">
+
+        {/* Desktop Header */}
+        <header className="hidden md:flex h-20 items-center justify-between px-8 bg-transparent no-print">
+          <h2 className="text-xl font-black text-slate-800">
+            {navigation.find(n => n.href === pathname)?.name || 'Dashboard'}
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input 
+                placeholder="Tìm kiếm nhanh..." 
+                className="bg-white border-none rounded-2xl h-11 pl-10 pr-4 w-64 shadow-sm text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+              />
+            </div>
+            <div className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center shadow-sm border">
+              <Bell className="h-5 w-5 text-slate-400" />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-4 pb-safe overflow-y-auto">
+          <div className="max-w-5xl mx-auto">
             {children}
           </div>
         </main>
+
+        {/* Mobile Bottom Navigation (Fixed) */}
+        <nav className="md:hidden glass-morphism fixed bottom-0 left-0 w-full h-20 px-6 flex items-center justify-between z-50 rounded-t-[2.5rem] card-shadow">
+          {bottomNavItems.map((item) => (
+            <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1 group">
+              <div className={cn(
+                "p-2 rounded-2xl transition-all duration-300",
+                pathname === item.href ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-slate-400"
+              )}>
+                <item.icon className="h-6 w-6" />
+              </div>
+              <span className={cn(
+                "text-[9px] font-black uppercase tracking-tighter",
+                pathname === item.href ? "text-primary" : "text-slate-400"
+              )}>
+                {item.name}
+              </span>
+            </Link>
+          ))}
+          {currentUser.role === 'requester' && (
+            <Link href="/requests/new" className="absolute -top-8 left-1/2 -translate-x-1/2">
+              <div className="h-16 w-16 rounded-full bg-[#F58220] flex items-center justify-center text-white shadow-xl shadow-orange-200 border-4 border-[#F4F7FE] active:scale-95 transition-transform">
+                <PlusCircle className="h-8 w-8" />
+              </div>
+            </Link>
+          )}
+        </nav>
       </div>
     </div>
   );

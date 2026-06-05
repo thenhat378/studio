@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell, Printer, Search, Clock } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Bell, Printer, Search, Clock, MapPin, HardDrive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +29,7 @@ import {
 import { RepairType } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 export default function TasksPage() {
   const { requests, currentUser, updateRequestStatus } = useAppStore();
@@ -51,10 +52,7 @@ export default function TasksPage() {
 
   const handleStart = (id: string) => {
     updateRequestStatus(id, 'in_progress');
-    toast({ 
-      title: "Đã bắt đầu", 
-      description: "Hệ thống đã ghi nhận bạn bắt đầu xử lý phiếu này." 
-    });
+    toast({ title: "Đã bắt đầu!", description: "Ghi nhận bắt đầu xử lý." });
   };
 
   const handleOpenReport = (id: string) => {
@@ -65,213 +63,188 @@ export default function TasksPage() {
 
   const handleSubmitReport = () => {
     if (!reportingId || !reportText.trim() || !repairType) return;
-
     updateRequestStatus(reportingId, 'completed', { 
       technicianReport: reportText,
       repairType: repairType as RepairType,
       completedAt: new Date().toISOString()
     });
-
-    toast({
-      title: "Đã gửi báo cáo hoàn thành",
-      description: "Thông báo đã được gửi đến Người yêu cầu và Quản lý CSVC."
-    });
-    
+    toast({ title: "Đã báo cáo hoàn thành" });
     setReportingId(null);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusInfo = (status: string) => {
     switch(status) {
-      case 'assigned': return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Mới nhận việc</Badge>;
-      case 'in_progress': return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Đang thực hiện</Badge>;
-      case 'completed': return <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Đã báo xong</Badge>;
-      case 'verified': return <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đang nghiệm thu</Badge>;
-      default: return <Badge variant="outline">{status}</Badge>;
+      case 'assigned': return { label: 'Mới nhận', color: 'text-blue-600', bg: 'bg-blue-50' };
+      case 'in_progress': return { label: 'Đang làm', color: 'text-amber-600', bg: 'bg-amber-50' };
+      case 'completed': return { label: 'Đã báo xong', color: 'text-cyan-600', bg: 'bg-cyan-50' };
+      case 'verified': return { label: 'Đang nghiệm thu', color: 'text-emerald-600', bg: 'bg-emerald-50' };
+      default: return { label: status, color: 'text-slate-500', bg: 'bg-slate-50' };
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 pb-20">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <Wrench className="h-6 w-6 text-accent" />
-            Nhiệm vụ của tôi
-          </h1>
-          <p className="text-muted-foreground">Theo dõi tiến độ xử lý và in phiếu báo cáo lưu trữ</p>
+          <h1 className="text-2xl font-black text-slate-800">Nhiệm vụ</h1>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Danh sách công việc cần xử lý</p>
+        </div>
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Input 
+            placeholder="Tìm theo tên, thiết bị..." 
+            className="pl-12 h-14 bg-white border-none shadow-sm rounded-2xl font-bold text-sm"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Tìm nhiệm vụ theo tên, thiết bị hoặc đơn vị..." 
-          className="pl-9 h-11 bg-white border-primary/20"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
       <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[500px] h-12 p-1 bg-muted/50">
-          <TabsTrigger value="active" className="gap-2 text-sm font-bold data-[state=active]:bg-white">
+        <TabsList className="grid w-full grid-cols-2 h-14 p-1 bg-white rounded-2xl shadow-sm border mb-6">
+          <TabsTrigger value="active" className="gap-2 text-xs font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
             Đang thực hiện
             {activeTasks.length > 0 && (
-              <Badge variant="destructive" className="ml-1 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+              <Badge variant="destructive" className="h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[10px] border-none">
                 {activeTasks.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="closed" className="gap-2 text-sm font-bold data-[state=active]:bg-white">
-            Đã hoàn tất & In phiếu
+          <TabsTrigger value="closed" className="gap-2 text-xs font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
+            Đã hoàn thành
             {closedTasks.length > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+              <Badge variant="secondary" className="h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[10px] border-none">
                 {closedTasks.length}
               </Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="active" className="space-y-4 mt-6">
-          {activeTasks.map(req => (
-            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-primary hover:shadow-md transition-shadow">
-              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                    {getStatusBadge(req.status)}
+        <TabsContent value="active" className="space-y-4">
+          {activeTasks.map(req => {
+            const status = getStatusInfo(req.status);
+            return (
+              <Card key={req.id} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0">
+                      <Wrench className="h-6 w-6 text-primary" />
+                    </div>
+                    <Badge className={cn("border-none font-black text-[9px] uppercase px-3 py-1", status.bg, status.color)}>
+                      {status.label}
+                    </Badge>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground mt-2">
-                    <p className="flex items-center gap-1.5"><span className="font-bold">Đơn vị:</span> {req.unit}</p>
-                    <p className="flex items-center gap-1.5"><span className="font-bold">Thiết bị:</span> {req.equipmentName}</p>
-                    <p className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> Báo hỏng: {new Date(req.createdAt).toLocaleDateString('vi-VN')}</p>
+
+                  <h3 className="font-black text-lg text-slate-800 leading-tight mb-4">{req.title}</h3>
+                  
+                  <div className="grid grid-cols-1 gap-3 mb-6">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                      <MapPin className="h-4 w-4 text-rose-400" /> {req.unit}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                      <HardDrive className="h-4 w-4 text-blue-400" /> {req.equipmentName}
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                      <Clock className="h-3.5 w-3.5" /> Báo hỏng: {new Date(req.createdAt).toLocaleDateString('vi-VN')}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
-                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
-                    <Button variant="outline" size="sm" className="w-full gap-1 font-bold">
-                      <Eye className="h-4 w-4" /> Chi tiết
-                    </Button>
-                  </Link>
+                  
+                  <div className="flex gap-2">
+                    <Link href={`/requests/${req.id}`} className="flex-1">
+                      <Button variant="ghost" className="w-full h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-2">Chi tiết</Button>
+                    </Link>
 
-                  {req.status === 'assigned' && (
-                    <Button 
-                      size="sm" 
-                      className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none font-bold" 
-                      onClick={() => handleStart(req.id)}
-                    >
-                      <Play className="h-4 w-4" /> Bắt đầu làm
-                    </Button>
-                  )}
+                    {req.status === 'assigned' && (
+                      <Button className="flex-[2] bg-primary h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-blue-100" onClick={() => handleStart(req.id)}>
+                        <Play className="h-4 w-4 fill-current" /> Bắt đầu
+                      </Button>
+                    )}
 
-                  {req.status === 'in_progress' && (
-                    <Button 
-                      size="sm" 
-                      className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none font-bold" 
-                      onClick={() => handleOpenReport(req.id)}
-                    >
-                      <ClipboardPen className="h-4 w-4" /> Báo cáo hoàn thành
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    {req.status === 'in_progress' && (
+                      <Button className="flex-[2] bg-emerald-600 h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg shadow-emerald-100" onClick={() => handleOpenReport(req.id)}>
+                        <ClipboardPen className="h-4 w-4" /> Báo cáo
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
           {activeTasks.length === 0 && (
-            <div className="text-center py-20 bg-card rounded-2xl border-2 border-dashed border-muted-foreground/20">
-              <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-              <h3 className="text-lg font-semibold text-muted-foreground">Hiện tại không có nhiệm vụ mới</h3>
+            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
+              <CheckCircle2 className="h-16 w-16 text-slate-100 mx-auto mb-6" />
+              <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Không có nhiệm vụ</p>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="closed" className="space-y-4 mt-6">
+        <TabsContent value="closed" className="space-y-4">
           {closedTasks.map(req => (
-            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-emerald-500">
-              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg truncate">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Đã hoàn thành</Badge>
+            <Link key={req.id} href={`/requests/${req.id}`}>
+              <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+                <CardContent className="p-6 flex items-center justify-between gap-4">
+                  <div className="flex gap-4 items-center min-w-0">
+                    <div className="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-black text-sm text-slate-800 truncate mb-0.5">{req.title}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Hoàn thành: {req.completedAt && new Date(req.completedAt).toLocaleDateString('vi-VN')}</p>
+                    </div>
                   </div>
-                  <div className="mt-2 space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-bold">Nghiệm thu lúc:</span> {req.completedAt && new Date(req.completedAt).toLocaleString('vi-VN')}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-bold">Đánh giá:</span> {req.rating || 0}/5 sao
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 w-full md:w-auto">
-                  <Link href={`/requests/${req.id}`} className="w-full">
-                    <Button variant="default" className="w-full bg-primary hover:bg-primary/90 gap-1 font-bold">
-                      <Printer className="h-4 w-4" /> Xem & In phiếu
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                  <Printer className="h-5 w-5 text-slate-300" />
+                </CardContent>
+              </Card>
+            </Link>
           ))}
-          {closedTasks.length === 0 && (
-            <div className="text-center py-20 bg-card rounded-2xl border-2 border-dashed border-muted-foreground/20">
-              <CheckCircle2 className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-              <h3 className="text-lg font-semibold text-muted-foreground">Chưa có nhiệm vụ nào được đóng</h3>
-            </div>
-          )}
         </TabsContent>
       </Tabs>
 
-      {/* Dialog Báo cáo - Dành cho in-progress */}
+      {/* Dialog Báo cáo */}
       <Dialog open={!!reportingId} onOpenChange={(open) => !open && setReportingId(null)}>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl">
+        <DialogContent className="rounded-[3rem] p-8 border-none shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 uppercase tracking-tighter font-black text-xl">
-              <ClipboardPen className="h-6 w-6 text-primary" />
-              Báo cáo hoàn thành công việc
-            </DialogTitle>
-            <DialogDescription>Chọn hình thức xử lý và mô tả chi tiết công việc đã thực hiện.</DialogDescription>
+            <DialogTitle className="text-xl font-black text-primary uppercase tracking-tighter">Báo cáo kết quả</DialogTitle>
+            <DialogDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest">Cập nhật nội dung sửa chữa</DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-6">
-            <div className="space-y-3">
-              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức sửa chữa</Label>
+          <div className="py-6 space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hình thức xử lý</Label>
               <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
-                <SelectTrigger className="h-12 border-primary/20 rounded-xl">
-                  <SelectValue placeholder="Chọn hình thức xử lý..." />
+                <SelectTrigger className="h-14 border-none bg-slate-50 rounded-2xl font-bold">
+                  <SelectValue placeholder="Chọn hình thức..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-2xl border-none shadow-xl">
                   <SelectItem value="replacement">Thay mới thiết bị</SelectItem>
-                  <SelectItem value="backup_replacement">Thay bằng thiết bị dự phòng</SelectItem>
-                  <SelectItem value="repair_only">Sửa chữa không thay thế</SelectItem>
+                  <SelectItem value="backup_replacement">Dùng thiết bị dự phòng</SelectItem>
+                  <SelectItem value="repair_only">Sửa chữa tại chỗ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-3">
-              <Label htmlFor="report" className="text-xs font-black uppercase text-muted-foreground tracking-widest">Chi tiết nội dung xử lý</Label>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nội dung chi tiết</Label>
               <Textarea 
-                id="report"
-                placeholder="Mô tả cụ thể những gì đã làm, vật tư đã sử dụng..." 
+                placeholder="Mô tả công việc đã làm..." 
                 value={reportText}
                 onChange={(e) => setReportText(e.target.value)}
-                className="min-h-[150px] border-primary/20 rounded-xl"
+                className="min-h-[150px] border-none bg-slate-50 rounded-2xl font-bold p-4"
               />
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-2xl flex items-start gap-3 border border-blue-100">
+            <div className="bg-blue-50 p-5 rounded-[1.5rem] flex items-start gap-4">
                <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-               <p className="text-xs text-blue-700 font-bold">Hệ thống sẽ thông báo cho Người yêu cầu và Quản lý ngay khi bạn gửi báo cáo này.</p>
+               <p className="text-[11px] text-blue-700 font-bold leading-relaxed">Thông báo sẽ được gửi cho Quản lý và Người yêu cầu ngay khi bạn xác nhận.</p>
             </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" className="h-12 px-6 rounded-xl font-bold" onClick={() => setReportingId(null)}>Hủy</Button>
+          <DialogFooter className="flex flex-row gap-3">
+            <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest border-2" onClick={() => setReportingId(null)}>Hủy</Button>
             <Button 
-              className="bg-emerald-600 hover:bg-emerald-700 h-12 px-8 rounded-xl font-bold text-white shadow-lg shadow-emerald-100" 
+              className="flex-[2] bg-emerald-600 h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white shadow-xl shadow-emerald-100" 
               onClick={handleSubmitReport} 
               disabled={!reportText.trim() || !repairType}
             >
-              Gửi báo cáo hoàn thành
+              Gửi báo cáo
             </Button>
           </DialogFooter>
         </DialogContent>

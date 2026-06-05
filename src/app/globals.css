@@ -24,29 +24,7 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 210 100% 33%;
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 100% 33%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 149 100% 33%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 28 92% 54%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 210 100% 33%;
+    --radius: 1.25rem;
   }
 }
 
@@ -55,21 +33,16 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
+    @apply bg-[#F4F7FE] text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
     -webkit-tap-highlight-color: transparent;
+    user-select: none; /* Prevent text selection on UI elements for app feel */
   }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  width: 0px;
+  background: transparent;
 }
 
 @media print {
@@ -82,16 +55,6 @@
   body {
     background: white !important;
   }
-  .max-w-4xl, .max-w-3xl, .max-w-5xl {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .shadow-sm, .shadow-lg, .shadow-xl, .shadow-2xl {
-    box-shadow: none !important;
-    border: 1px solid #ddd !important;
-  }
 }
 
 .print-only {
@@ -100,9 +63,23 @@
 
 /* Mobile optimizations */
 input, select, textarea {
-  @apply !text-base md:!text-sm; /* Prevent iOS auto-zoom */
+  @apply !text-base md:!text-sm;
+  user-select: text;
 }
 
-.rounded-mobile {
-  @apply rounded-2xl md:rounded-3xl;
+/* Safe area for mobile with bottom nav */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);
+}
+
+.glass-morphism {
+  @apply bg-white/80 backdrop-blur-lg border-t border-white/20;
+}
+
+.card-shadow {
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+.active-nav-item {
+  @apply text-primary scale-110 transition-all duration-300;
 }
