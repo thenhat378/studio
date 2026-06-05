@@ -13,6 +13,7 @@ import {
   orderBy,
   addDoc,
   updateDoc,
+  deleteDoc,
   getDocs,
   where,
   limit
@@ -28,6 +29,9 @@ interface AppContextType {
   addRequest: (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   updateRequestStatus: (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => Promise<void>;
   equipment: Equipment[];
+  addEquipment: (data: Omit<Equipment, 'id'>) => Promise<void>;
+  updateEquipment: (id: string, data: Partial<Equipment>) => Promise<void>;
+  deleteEquipment: (id: string) => Promise<void>;
   users: User[];
   isInitialized: boolean;
   loading: boolean;
@@ -35,19 +39,11 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const MOCK_EQUIPMENT: Equipment[] = [
-  { id: 'e1', name: 'Bàn ghế văn phòng', category: 'Furniture' },
-  { id: 'e2', name: 'Máy chiếu Sony', category: 'IT' },
-  { id: 'e3', name: 'Cáp HDMI 5m', category: 'IT' },
-  { id: 'e4', name: 'Cáp VGA 3m', category: 'IT' },
-  { id: 'e5', name: 'Bồn cầu Viglacera', category: 'Plumbing' },
-  { id: 'e6', name: 'Lavabo Inax', category: 'Plumbing' },
-];
-
 export function AppProvider({ children }: { children: ReactNode }) {
   const { db } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<RepairRequest[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -84,6 +80,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
+  useEffect(() => {
+    if (!db) return;
+    const unsub = onSnapshot(collection(db, 'equipment'), (snapshot) => {
+      setEquipment(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Equipment)));
+    });
+    return () => unsub();
+  }, [db]);
+
   const login = async (phone: string, pass: string) => {
     if (!db) throw new Error("Database chưa sẵn sàng. Vui lòng thử lại sau giây lát.");
     
@@ -92,7 +96,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
-      // Trong môi trường kiểm thử này, chúng ta cho phép pass '123' hoặc pass thật
       if (userData.password === pass || pass === '123') { 
         setCurrentUser(userData);
         localStorage.setItem('due_user', JSON.stringify(userData));
@@ -107,7 +110,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     
-    // Kiểm tra xem SĐT đã tồn tại chưa
     const q = query(collection(db, 'users'), where('phoneNumber', '==', data.phone), limit(1));
     const snap = await getDocs(q);
     if (!snap.empty) {
@@ -154,7 +156,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     
-    // Loại bỏ các trường undefined để tránh lỗi Firestore
     const cleanData = JSON.parse(JSON.stringify(req));
 
     await addDoc(collection(db, 'requests'), {
@@ -174,6 +175,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await updateDoc(doc(db, 'requests', id), updateData);
   };
 
+  const addEquipment = async (data: Omit<Equipment, 'id'>) => {
+    if (!db) return;
+    await addDoc(collection(db, 'equipment'), data);
+  };
+
+  const updateEquipment = async (id: string, data: Partial<Equipment>) => {
+    if (!db) return;
+    await updateDoc(doc(db, 'equipment', id), data);
+  };
+
+  const deleteEquipment = async (id: string) => {
+    if (!db) return;
+    await deleteDoc(doc(db, 'equipment', id));
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser, 
@@ -184,7 +200,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       requests, 
       addRequest, 
       updateRequestStatus,
-      equipment: MOCK_EQUIPMENT, 
+      equipment,
+      addEquipment,
+      updateEquipment,
+      deleteEquipment,
       users, 
       isInitialized,
       loading
