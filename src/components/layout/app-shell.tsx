@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Tổng quan', href: '/', icon: LayoutDashboard },
     { name: 'Yêu cầu của tôi', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
     { name: 'Duyệt yêu cầu', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
     { name: 'Quản lý phiếu', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },

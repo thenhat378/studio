@@ -51,7 +51,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default function Dashboard() {
+export default function Overview() {
   const { currentUser, login, logout, requests, users, isInitialized } = useAppStore();
   const { toast } = useToast();
   const [username, setUsername] = useState('');
