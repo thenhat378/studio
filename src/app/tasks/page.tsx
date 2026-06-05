@@ -40,8 +40,8 @@ export default function TasksPage() {
   const handleStart = (id: string) => {
     updateRequestStatus(id, 'in_progress');
     toast({ 
-      title: "Đã nhận việc", 
-      description: "Trạng thái đã chuyển sang 'Đang thực hiện'. Hãy cập nhật kết quả khi hoàn tất." 
+      title: "Đã bắt đầu xử lý", 
+      description: "Trạng thái đã chuyển sang 'Đang thực hiện'. Vui lòng báo cáo khi hoàn tất." 
     });
   };
 
@@ -59,7 +59,6 @@ export default function TasksPage() {
       repairType: repairType as RepairType
     });
 
-    // Mô phỏng gửi thông báo
     toast({
       title: "Đã báo cáo hoàn thành",
       description: "Hệ thống đã tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC."
@@ -134,7 +133,7 @@ export default function TasksPage() {
                     className="bg-primary hover:bg-primary/90 gap-1 flex-1 md:flex-none" 
                     onClick={() => handleStart(req.id)}
                   >
-                    <Play className="h-4 w-4" /> Nhận việc
+                    <Play className="h-4 w-4" /> Bắt đầu làm
                   </Button>
                 )}
 
@@ -144,7 +143,7 @@ export default function TasksPage() {
                     className="bg-emerald-600 hover:bg-emerald-700 gap-1 flex-1 md:flex-none" 
                     onClick={() => handleOpenReport(req.id)}
                   >
-                    <ClipboardPen className="h-4 w-4" /> Báo cáo công việc
+                    <ClipboardPen className="h-4 w-4" /> Báo cáo hoàn thành
                   </Button>
                 )}
               </div>
@@ -165,7 +164,7 @@ export default function TasksPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 uppercase tracking-tight font-black">
               <ClipboardPen className="h-5 w-5 text-primary" />
-              Báo cáo công việc sửa chữa
+              Báo cáo hoàn thành sửa chữa
             </DialogTitle>
             <DialogDescription>
               Vui lòng chọn hình thức xử lý và mô tả chi tiết kết quả. Thông báo sẽ tự động gửi đến Người yêu cầu & Quản lý sau khi lưu.
@@ -173,7 +172,7 @@ export default function TasksPage() {
           </DialogHeader>
           <div className="py-4 space-y-6">
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức xử lý (Listbox)</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground tracking-widest">Hình thức xử lý</Label>
               <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                 <SelectTrigger className="h-12 border-primary/20">
                   <SelectValue placeholder="Chọn hình thức..." />

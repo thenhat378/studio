@@ -64,7 +64,7 @@ export default function RequestDetail() {
     
     if (status === 'closed') {
        toast({
-         title: "Hoàn tất yêu cầu",
+         title: "Đã xác nhận hoàn thành",
          description: "Cảm ơn bạn đã phản hồi. Phiếu yêu cầu hiện đã được đóng."
        });
     } else if (status === 'completed') {
@@ -243,7 +243,7 @@ export default function RequestDetail() {
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2 font-bold uppercase tracking-tight">
                  <ShieldAlert className="h-5 w-5 text-accent" /> 
-                 {isRequesterOrLeader && req.status === 'verified' ? 'Hoàn tất quy trình' : 'Thao tác xử lý'}
+                 Thao tác thực hiện
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -324,7 +324,7 @@ export default function RequestDetail() {
                 {currentUser?.role === 'technician' && req.status === 'in_progress' && (
                   <div className="space-y-6">
                     <div className="space-y-3">
-                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức xử lý (Listbox)</Label>
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Hình thức xử lý</Label>
                       <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
                         <SelectTrigger className="h-12 border-primary/20">
                           <SelectValue placeholder="Chọn hình thức..." />
@@ -344,7 +344,7 @@ export default function RequestDetail() {
 
                     <div className="bg-blue-50 p-4 rounded-xl flex items-start gap-3 border border-blue-100">
                        <Bell className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn gửi báo cáo.</p>
+                       <p className="text-xs text-blue-700 font-medium">Lưu ý: Hệ thống sẽ tự động gửi thông báo đến Người yêu cầu và Quản lý CSVC ngay khi bạn báo cáo hoàn thành.</p>
                     </div>
 
                     <Button 
@@ -352,7 +352,7 @@ export default function RequestDetail() {
                       disabled={!report.trim() || !repairType} 
                       onClick={() => handleAction('completed', { technicianReport: report, repairType })}
                     >
-                      <CheckCircle2 className="h-5 w-5" /> Gửi báo cáo & Thông báo hoàn thành
+                      <CheckCircle2 className="h-5 w-5" /> Báo cáo hoàn thành & Thông báo các bên
                     </Button>
                   </div>
                 )}
