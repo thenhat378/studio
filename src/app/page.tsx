@@ -25,7 +25,6 @@ import {
   Mail,
   Building2,
   BarChart3,
-  ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -84,26 +83,15 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
-      console.error("Auth error details:", error);
-      let message = error.message || "Có lỗi xảy ra trong quá trình xác thực.";
-      
+      console.error("Auth error:", error);
+      let message = "Có lỗi xảy ra trong quá trình xác thực.";
       if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
       if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
-      if (error.code === 'auth/email-already-in-use') message = "Email này đã được đăng ký sử dụng.";
+      if (error.code === 'auth/email-already-in-use') message = "Email này đã được sử dụng.";
       if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
-      if (error.code === 'auth/invalid-email') message = "Định dạng Email không hợp lệ.";
-      if (error.code === 'auth/api-key-not-valid' || error.code === 'auth/invalid-api-key') {
-        message = "LỖI CẤU HÌNH: API Key Firebase không hợp lệ. Vui lòng kiểm tra và dán thông số thật vào tệp src/firebase/config.ts.";
-      }
-      if (error.code === 'auth/operation-not-allowed') {
-        message = "LỖI SERVER: Vui lòng BẬT 'Email/Password' trong mục Authentication -> Sign-in method trên Firebase Console.";
-      }
+      if (error.code === 'auth/api-key-not-valid') message = "Lỗi hệ thống: API Key không hợp lệ.";
       
-      toast({ 
-        variant: "destructive", 
-        title: "Lỗi hệ thống Firebase", 
-        description: message 
-      });
+      toast({ variant: "destructive", title: "Lỗi", description: message });
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +129,7 @@ export default function Overview() {
                 {authMode === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
               </CardTitle>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'ĐĂNG KÝ ĐỂ GỬI YÊU CẦU SỬA CHỮA'}
+                {authMode === 'login' ? 'Đăng nhập để bắt đầu' : 'Đăng ký để gửi yêu cầu sửa chữa'}
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -288,7 +276,6 @@ export default function Overview() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      {/* Welcome Banner */}
       <div className="relative overflow-hidden bg-primary rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-100 md:hidden">
          <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
          <p className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-1">Requisition form DUE</p>
@@ -299,7 +286,6 @@ export default function Overview() {
          </div>
       </div>
 
-      {/* Quick Action for Requester */}
       {currentUser.role === 'requester' && (
         <Link href="/requests/new">
           <Card className="border-none bg-white rounded-[2rem] card-shadow overflow-hidden group active:scale-95 transition-all">
@@ -323,7 +309,6 @@ export default function Overview() {
         </Link>
       )}
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow">
@@ -367,7 +352,6 @@ export default function Overview() {
         </Card>
       )}
 
-      {/* Recent Activity List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
            <h3 className="text-lg font-black text-slate-800">Hoạt động gần đây</h3>

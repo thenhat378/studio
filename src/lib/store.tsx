@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -65,7 +64,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setCurrentUser(userDoc.data() as User);
           } else {
-            // Fallback for direct auth creation without firestore profile
             const newUser: User = {
               id: firebaseUser.uid,
               name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Unknown',
@@ -112,12 +110,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (email: string, pass: string, name: string, unit: string) => {
-    if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng. Vui lòng kiểm tra cấu hình.");
+    if (!auth || !db) throw new Error("Hệ thống Firebase chưa sẵn sàng.");
     
-    // 1. Create User in Auth
     const res = await createUserWithEmailAndPassword(auth, email, pass);
     
-    // 2. Create Profile in Firestore
     const newUser: User = {
       id: res.user.uid,
       name,
@@ -126,14 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       email
     };
     
-    try {
-      await setDoc(doc(db, 'users', res.user.uid), newUser);
-    } catch (fsError) {
-      console.error("Firestore Profile Error:", fsError);
-      // Even if Firestore fails, the user is created in Auth. 
-      // We should ideally clean up or notify.
-    }
-    
+    await setDoc(doc(db, 'users', res.user.uid), newUser);
     setCurrentUser(newUser);
   };
 
