@@ -173,7 +173,7 @@ export default function EquipmentCatalog() {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            </Header>
+            </CardHeader>
             <CardContent className="p-6 pt-0">
               <CardTitle className="text-lg font-black text-slate-800 mb-3">{item.name}</CardTitle>
               <div className="flex items-center justify-between">
@@ -240,3 +240,4 @@ export default function EquipmentCatalog() {
     </div>
   );
 }
+
