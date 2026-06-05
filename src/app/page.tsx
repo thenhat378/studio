@@ -115,11 +115,22 @@ export default function Overview() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Mật khẩu</Label>
+                  <Label htmlFor="password">Mật khẩu</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="pl-10 h-11"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-end mt-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="link" className="px-0 font-normal text-xs text-primary h-auto">
+                        <Button variant="link" className="px-0 font-normal text-xs text-primary h-auto py-0">
                           Quên mật khẩu?
                         </Button>
                       </DialogTrigger>
@@ -144,17 +155,6 @@ export default function Overview() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      placeholder="••••••••" 
-                      className="pl-10 h-11"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
                   </div>
                 </div>
                 <Button type="submit" className="w-full h-11 font-bold bg-primary" disabled={isLoading}>
@@ -291,7 +291,7 @@ export default function Overview() {
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-accent" />
-                Hiệu suất xử lý của Kỹ thuật viên
+                Mức độ xử lý công việc của Kỹ thuật viên
               </CardTitle>
               <CardDescription>Cơ sở để đánh giá năng suất và chất lượng phục vụ</CardDescription>
             </div>
