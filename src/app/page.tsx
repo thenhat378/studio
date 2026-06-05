@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   UserCheck,
   Phone,
+  Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -34,6 +35,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import { RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Overview() {
   const { 
@@ -55,11 +57,10 @@ export default function Overview() {
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [authErrorCode, setAuthErrorCode] = useState<string | null>(null);
   
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
-  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
-  // Khởi tạo Recaptcha hiển thị (Normal) để ổn định token hơn
   useEffect(() => {
     if (auth && !recaptchaRef.current && !showOtpInput && !currentUser) {
       try {
@@ -67,6 +68,7 @@ export default function Overview() {
           size: 'normal',
           callback: () => {
             console.log("Recaptcha verified");
+            setAuthErrorCode(null);
           },
           'expired-callback': () => {
             toast({ 
@@ -96,6 +98,8 @@ export default function Overview() {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthErrorCode(null);
+    
     if (!phoneNumber) {
       toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập số điện thoại." });
       return;
@@ -121,10 +125,14 @@ export default function Overview() {
       toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn SMS." });
     } catch (error: any) {
       console.error("Send OTP error:", error);
+      setAuthErrorCode(error.code);
+      
       let msg = "Không thể gửi OTP. Vui lòng thử lại.";
       if (error.code === 'auth/api-key-not-valid') msg = "Lỗi API Key không hợp lệ. Vui lòng kiểm tra Firebase Console.";
       if (error.code === 'auth/invalid-phone-number') msg = "Số điện thoại không đúng định dạng.";
-      if (error.code === 'auth/firebase-app-check-token-is-invalid') msg = "Lỗi token bảo mật. Hãy chắc chắn bạn đã tích vào ô xác thực.";
+      if (error.code === 'auth/firebase-app-check-token-is-invalid' || error.code === 'auth/unauthorized-domain') {
+        msg = "Tên miền chưa được cấp phép trong Firebase Console.";
+      }
       
       toast({ 
         variant: "destructive", 
@@ -163,9 +171,9 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-700">
-          <div className="text-center space-y-4">
-             <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-4">
+        <div className="w-full max-w-[420px] space-y-6 animate-in fade-in zoom-in duration-700">
+          <div className="text-center space-y-2">
+             <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-2">
                 <Wrench className="h-10 w-10 text-primary p-1" />
              </div>
             <h1 className="text-2xl font-black tracking-tighter text-primary uppercase leading-tight">
@@ -173,13 +181,26 @@ export default function Overview() {
             </h1>
           </div>
 
+          {(authErrorCode === 'auth/unauthorized-domain' || authErrorCode === 'auth/firebase-app-check-token-is-invalid') && (
+            <Alert variant="destructive" className="rounded-2xl border-none shadow-lg bg-rose-50 text-rose-900">
+              <Info className="h-4 w-4 text-rose-600" />
+              <AlertTitle className="font-black text-xs uppercase mb-1">Hướng dẫn cấu hình</AlertTitle>
+              <AlertDescription className="text-[10px] leading-relaxed">
+                Bạn cần thêm tên miền hiện tại vào <b>Authorized domains</b> trong Firebase Console: 
+                <br/> 1. Vào <b>Authentication</b> &gt; <b>Settings</b>.
+                <br/> 2. Tìm mục <b>Authorized domains</b> ở menu trái.
+                <br/> 3. Thêm tên miền đang chạy ứng dụng này vào.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Card className="border-none shadow-2xl bg-white overflow-hidden rounded-[3rem] p-4">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-xl font-black text-slate-800">
                 {showOtpInput ? 'Xác thực OTP' : 'Đăng nhập SĐT'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 pt-6">
+            <CardContent className="space-y-6 pt-4">
               {!showOtpInput ? (
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div className="space-y-1">
@@ -218,7 +239,9 @@ export default function Overview() {
                     />
                   </div>
 
-                  <div id="recaptcha-container" className="flex justify-center my-4 overflow-hidden rounded-xl"></div>
+                  <div className="flex justify-center my-2 overflow-hidden rounded-xl border bg-slate-50/50 p-2">
+                    <div id="recaptcha-container"></div>
+                  </div>
 
                   <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
                     {isLoading ? "Đang gửi SMS..." : "Gửi mã xác nhận"}
