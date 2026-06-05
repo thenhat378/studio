@@ -85,7 +85,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           console.error("Firestore error loading user profile:", e);
         }
       } else {
-        // Only reset if not in test mode
         const storedUser = localStorage.getItem('test_user');
         if (storedUser) {
           setCurrentUser(JSON.parse(storedUser));
@@ -127,7 +126,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loginWithGoogle = async () => {
     if (!auth) throw new Error("Firebase Auth chưa khởi tạo.");
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    const res = await signInWithPopup(auth, provider);
     localStorage.removeItem('test_user');
   };
 
