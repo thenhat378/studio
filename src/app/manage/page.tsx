@@ -4,7 +4,19 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ClipboardList, UserCheck, Wrench, CheckCircle2, AlertCircle, Eye, ShieldCheck } from 'lucide-react';
+import { 
+  ClipboardList, 
+  UserCheck, 
+  Wrench, 
+  CheckCircle2, 
+  AlertCircle, 
+  Eye, 
+  ShieldCheck,
+  History,
+  Star,
+  Clock,
+  User
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -17,6 +29,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from 'next/link';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function ManagementPage() {
   const { requests, users, updateRequestStatus } = useAppStore();
@@ -29,6 +42,9 @@ export default function ManagementPage() {
   // 2. Chờ duyệt hoàn thành (Kỹ thuật đã báo xong)
   const pendingVerification = requests.filter(r => r.status === 'completed');
 
+  // 3. Lịch sử các phiếu đã đóng (Để xem thời gian xử lý và đánh giá)
+  const historyRequests = requests.filter(r => r.status === 'closed');
+
   const technicians = users.filter(u => u.role === 'technician');
 
   const handleAssign = (requestId: string) => {
@@ -37,7 +53,7 @@ export default function ManagementPage() {
       toast({
         variant: "destructive",
         title: "Thông báo",
-        description: "Vui lòng chọn kỹ thuật viên trước khi giao việc."
+        description: "Vui lòng chọn nhân viên trước khi giao việc."
       });
       return;
     }
@@ -52,7 +68,7 @@ export default function ManagementPage() {
 
     toast({
       title: "Đã phân công",
-      description: `Phiếu đã được giao cho kỹ thuật viên: ${tech.name}`
+      description: `Phiếu đã được giao cho nhân viên: ${tech.name}`
     });
     
     const newSelections = { ...selectedTechs };
@@ -68,68 +84,87 @@ export default function ManagementPage() {
     });
   };
 
+  // Hàm tính thời gian xử lý
+  const getProcessingTime = (start: string, end?: string) => {
+    if (!end) return 'N/A';
+    const startTime = new Date(start).getTime();
+    const endTime = new Date(end).getTime();
+    const diffMs = endTime - startTime;
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (diffHrs > 0) return `${diffHrs} giờ ${diffMins} phút`;
+    return `${diffMins} phút`;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-accent" />
-            Điều phối & Quản lý kỹ thuật
+          <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
+            <ClipboardList className="h-7 w-7 text-primary" />
+            Điều phối & Quản lý
           </h1>
-          <p className="text-muted-foreground">Phân công nhân sự và phê duyệt hoàn thành kỹ thuật</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Hệ thống giám sát thực hiện và đánh giá nhân sự</p>
         </div>
       </div>
 
       <Tabs defaultValue="assign" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
-          <TabsTrigger value="assign" className="gap-2">
+        <TabsList className="grid w-full grid-cols-3 max-w-[500px] h-14 p-1 bg-white rounded-2xl shadow-sm border mb-6">
+          <TabsTrigger value="assign" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
             Chờ phân công
             {pendingAssignment.length > 0 && (
-              <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+              <Badge variant="destructive" className="h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[9px] border-none">
                 {pendingAssignment.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="verify" className="gap-2">
+          <TabsTrigger value="verify" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
             Duyệt hoàn thành
             {pendingVerification.length > 0 && (
-              <Badge variant="secondary" className="h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+              <Badge className="bg-cyan-500 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[9px] border-none text-white">
                 {pendingVerification.length}
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
+            Lịch sử & Đánh giá
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="assign" className="mt-6 space-y-4">
+        <TabsContent value="assign" className="space-y-4">
           {pendingAssignment.map(req => (
-            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-indigo-500">
-              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg">{req.title}</h3>
-                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200">Chờ giao việc</Badge>
+            <Card key={req.id} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden border-l-8 border-l-indigo-500">
+              <CardContent className="p-7 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
+                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 text-[9px] font-black uppercase">Chờ giao việc</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">Đơn vị: {req.unit} | Thiết bị: {req.equipmentName}</p>
+                  <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                    <p>Đơn vị: <span className="text-slate-800">{req.unit}</span></p>
+                    <p>Thiết bị: <span className="text-slate-800">{req.equipmentName}</span></p>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                  <div className="min-w-[200px]">
+                  <div className="min-w-[180px] flex-1">
                     <Select 
                       value={selectedTechs[req.id] || ""} 
                       onValueChange={(val) => setSelectedTechs(prev => ({ ...prev, [req.id]: val }))}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn kỹ thuật viên..." />
+                      <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs">
+                        <SelectValue placeholder="Chọn nhân viên..." />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl border-none shadow-2xl">
                         {technicians.map(t => (
-                          <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                          <SelectItem key={t.id} value={t.id} className="font-bold">{t.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <Button 
-                    className="bg-primary gap-2 font-bold"
+                    className="bg-primary hover:bg-primary/90 h-12 rounded-xl text-white font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none shadow-lg shadow-blue-100"
                     onClick={() => handleAssign(req.id)}
                     disabled={!selectedTechs[req.id]}
                   >
@@ -140,45 +175,131 @@ export default function ManagementPage() {
             </Card>
           ))}
           {pendingAssignment.length === 0 && (
-            <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
-              <p className="text-muted-foreground">Không có phiếu chờ phân công</p>
+            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed">
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ phân công</p>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="verify" className="mt-6 space-y-4">
+        <TabsContent value="verify" className="space-y-4">
           {pendingVerification.map(req => (
-            <Card key={req.id} className="border-none shadow-sm overflow-hidden border-l-4 border-l-emerald-500">
-              <CardContent className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg">{req.title}</h3>
-                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Kỹ thuật báo xong</Badge>
+            <Card key={req.id} className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden border-l-8 border-l-cyan-500">
+              <CardContent className="p-7 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
+                    <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200 text-[9px] font-black uppercase">Nhân viên báo xong</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">Kỹ thuật viên: {req.technicianName} | Đơn vị: {req.unit}</p>
+                  <div className="flex flex-col gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                    <p>Thực hiện: <span className="text-slate-800">{req.technicianName}</span></p>
+                    <p>Hình thức: <span className="text-primary">{req.repairType === 'replacement' ? 'Thay mới' : 'Sửa chữa'}</span></p>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-2 w-full md:w-auto">
-                  <Link href={`/requests/${req.id}`}>
-                    <Button variant="outline" size="sm"><Eye className="h-4 w-4 mr-1" /> Chi tiết</Button>
+                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
+                    <Button variant="ghost" size="sm" className="w-full h-12 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest">
+                      <Eye className="h-4 w-4 mr-2" /> Xem báo cáo
+                    </Button>
                   </Link>
                   <Button 
-                    className="bg-emerald-600 hover:bg-emerald-700 font-bold gap-1"
+                    className="bg-emerald-600 hover:bg-emerald-700 h-12 rounded-xl text-white font-black text-[10px] uppercase tracking-widest gap-2 flex-1 md:flex-none shadow-lg shadow-emerald-100"
                     onClick={() => handleVerify(req.id)}
                   >
-                    <ShieldCheck className="h-4 w-4" /> Duyệt hoàn thành kỹ thuật
+                    <ShieldCheck className="h-4 w-4" /> Duyệt hoàn thành
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
           {pendingVerification.length === 0 && (
-            <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed">
-              <p className="text-muted-foreground">Không có phiếu chờ duyệt hoàn thành kỹ thuật</p>
+            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed">
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ duyệt hoàn thành</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          {historyRequests.map(req => (
+            <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden group hover:bg-slate-50 transition-all">
+              <CardContent className="p-7">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-3">
+                       <h3 className="font-black text-base text-slate-800">{req.title}</h3>
+                       <div className="flex gap-0.5">
+                          {[1,2,3,4,5].map(s => (
+                            <Star key={s} className={cn("h-3 w-3", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />
+                          ))}
+                       </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nhân viên thực hiện</p>
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
+                             <User className="h-3.5 w-3.5 text-primary" /> {req.technicianName}
+                          </div>
+                       </div>
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian xử lý</p>
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+                             <Clock className="h-3.5 w-3.5" /> {getProcessingTime(req.createdAt, req.completedAt)}
+                          </div>
+                       </div>
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đơn vị yêu cầu</p>
+                          <div className="text-[11px] font-bold text-slate-700">{req.unit}</div>
+                       </div>
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đánh giá hài lòng</p>
+                          <Badge className={cn(
+                            "text-[9px] font-black uppercase px-2 py-0.5 border-none",
+                            (req.rating || 0) >= 4 ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                          )}>
+                            {(req.rating || 0)} sao
+                          </Badge>
+                       </div>
+                    </div>
+                  </div>
+                  
+                  <Link href={`/requests/${req.id}`}>
+                    <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12 bg-slate-100 text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
+                       <ChevronRight className="h-6 w-6" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {historyRequests.length === 0 && (
+            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
+              <History className="h-16 w-16 text-slate-100 mx-auto mb-6" />
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có dữ liệu lịch sử đánh giá</p>
             </div>
           )}
         </TabsContent>
       </Tabs>
     </div>
   );
+}
+
+// Helper icon
+function ChevronRight(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  )
 }
