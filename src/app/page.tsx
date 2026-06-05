@@ -194,6 +194,16 @@ export default function Overview() {
     }
   };
 
+  const getRoleLabel = (role: UserRole) => {
+    switch(role) {
+      case 'requester': return 'Nhân viên / Giảng viên';
+      case 'unit_leader': return 'Lãnh đạo đơn vị';
+      case 'csvc_manager': return 'Quản lý CSVC';
+      case 'technician': return 'Nhân viên';
+      default: return role;
+    }
+  };
+
   if (!currentUser) {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center p-6 overflow-hidden bg-[#F4F7FE]">
@@ -204,9 +214,9 @@ export default function Overview() {
           <div className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] rounded-full bg-primary/15 blur-[120px] animate-pulse" />
         </div>
 
-        <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-700">
-          <div className="text-center space-y-3">
-            <h1 className="text-5xl font-black tracking-tighter drop-shadow-sm">
+        <div className="w-full max-w-[480px] space-y-8 animate-in fade-in zoom-in duration-700 text-center">
+          <div className="space-y-3">
+            <h1 className="text-4xl font-black tracking-tighter drop-shadow-sm">
               <span className="text-slate-800 mr-2">Requisition Form</span>
               <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
             </h1>
@@ -215,7 +225,7 @@ export default function Overview() {
             </p>
           </div>
 
-          <Card className="border border-white/50 shadow-2xl rounded-[3.5rem] overflow-hidden bg-white/70 backdrop-blur-2xl card-shadow">
+          <Card className="border border-white/50 shadow-2xl rounded-[3.5rem] overflow-hidden bg-white/70 backdrop-blur-2xl card-shadow text-left">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-20 bg-transparent border-b border-white/20 p-0">
                 <TabsTrigger value="login" className="h-full rounded-none font-black text-xs uppercase tracking-widest data-[state=active]:border-b-4 data-[state=active]:border-primary data-[state=active]:bg-white/40 data-[state=active]:shadow-none transition-all">Đăng nhập</TabsTrigger>
@@ -348,7 +358,7 @@ export default function Overview() {
                         <SelectItem value="requester">Nhân viên / Giảng viên</SelectItem>
                         <SelectItem value="unit_leader">Lãnh đạo đơn vị</SelectItem>
                         <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
-                        <SelectItem value="technician">Kỹ thuật viên</SelectItem>
+                        <SelectItem value="technician">Nhân viên</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -477,7 +487,6 @@ export default function Overview() {
          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
          <div className="relative z-10 flex justify-between items-start">
             <div className="space-y-1">
-              <p className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">Dashboard</p>
               <h1 className="text-3xl font-black">Chào, {currentUser.name.split(' ').pop()}!</h1>
               <div className="flex items-center gap-2 pt-2">
                  <Building className="h-4 w-4 opacity-60" />
@@ -485,7 +494,7 @@ export default function Overview() {
               </div>
             </div>
             <Badge className="bg-white/20 border-none font-black text-[11px] uppercase tracking-tighter px-5 py-2 rounded-full">
-              {currentUser.role.replace('_', ' ')}
+              {getRoleLabel(currentUser.role)}
             </Badge>
          </div>
       </div>
