@@ -24,7 +24,8 @@ import {
   Sparkles,
   HardDrive,
   Mail,
-  Building2
+  Building2,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -83,10 +84,17 @@ export default function Overview() {
         toast({ title: "Đăng ký thành công", description: "Chào mừng bạn đến với hệ thống!" });
       }
     } catch (error: any) {
+      let message = "Có lỗi xảy ra trong quá trình xác thực.";
+      if (error.code === 'auth/user-not-found') message = "Tài khoản không tồn tại.";
+      if (error.code === 'auth/wrong-password') message = "Mật khẩu không chính xác.";
+      if (error.code === 'auth/email-already-in-use') message = "Email này đã được đăng ký sử dụng.";
+      if (error.code === 'auth/weak-password') message = "Mật khẩu phải có ít nhất 6 ký tự.";
+      if (error.code === 'auth/invalid-email') message = "Định dạng Email không hợp lệ.";
+      
       toast({ 
         variant: "destructive", 
         title: "Lỗi xác thực", 
-        description: error.message || "Tài khoản hoặc mật khẩu không đúng." 
+        description: message 
       });
     } finally {
       setIsLoading(false);
