@@ -243,7 +243,7 @@ export default function RequestDetail() {
             <CardHeader className="bg-accent/5 pb-4">
               <CardTitle className="text-lg flex items-center gap-2 font-bold uppercase tracking-tight">
                  <ShieldAlert className="h-5 w-5 text-accent" /> 
-                 Thao tác thực hiện
+                 Xử lý yêu cầu
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
