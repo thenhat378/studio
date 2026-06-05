@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -18,7 +19,6 @@ import {
   PlusCircle,
   Sparkles,
   HardDrive,
-  BarChart3,
   ArrowUpRight,
   ShieldCheck,
   UserCheck,
@@ -32,7 +32,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useFirebase } from '@/firebase';
 import { RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
 
@@ -58,45 +57,57 @@ export default function Overview() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
-  // Khởi tạo Recaptcha tàng hình
+  // Khởi tạo Recaptcha hiển thị (Normal) để ổn định token hơn
   useEffect(() => {
-    if (auth && !recaptchaRef.current) {
+    if (auth && !recaptchaRef.current && !showOtpInput && !currentUser) {
       try {
         recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible',
-          'callback': () => {
-            // Recaptcha resolved
+          size: 'normal',
+          callback: () => {
+            console.log("Recaptcha verified");
+          },
+          'expired-callback': () => {
+            toast({ 
+              variant: "destructive", 
+              title: "Hết hạn xác thực", 
+              description: "Vui lòng xác nhận lại 'Tôi không phải là người máy'." 
+            });
+            recaptchaRef.current?.reset();
           }
         });
+        recaptchaRef.current.render();
       } catch (e) {
         console.error("Recaptcha init error:", e);
       }
     }
     return () => {
       if (recaptchaRef.current) {
-        recaptchaRef.current.clear();
-        recaptchaRef.current = null;
+        try {
+          recaptchaRef.current.clear();
+          recaptchaRef.current = null;
+        } catch (e) {}
       }
     };
-  }, [auth]);
+  }, [auth, showOtpInput, currentUser, toast]);
 
   if (!isInitialized) return null;
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber || !recaptchaRef.current) {
-      toast({ 
-        variant: "destructive", 
-        title: "Thiếu thông tin", 
-        description: "Vui lòng nhập số điện thoại hoặc chờ hệ thống khởi tạo Recaptcha." 
-      });
+    if (!phoneNumber) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập số điện thoại." });
+      return;
+    }
+
+    if (!fullName || !unit) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng nhập đầy đủ Họ tên và Đơn vị." });
       return;
     }
     
     setIsLoading(true);
     try {
-      // Chuẩn hóa định dạng số điện thoại Việt Nam
       let formattedPhone = phoneNumber.trim();
       if (formattedPhone.startsWith('0')) {
         formattedPhone = `+84${formattedPhone.slice(1)}`;
@@ -104,16 +115,16 @@ export default function Overview() {
         formattedPhone = `+84${formattedPhone}`;
       }
 
-      const result = await sendOtp(formattedPhone, recaptchaRef.current);
+      const result = await sendOtp(formattedPhone, recaptchaRef.current!);
       setConfirmationResult(result);
       setShowOtpInput(true);
       toast({ title: "Đã gửi mã OTP", description: "Vui lòng kiểm tra tin nhắn SMS." });
     } catch (error: any) {
       console.error("Send OTP error:", error);
       let msg = "Không thể gửi OTP. Vui lòng thử lại.";
-      if (error.code === 'auth/api-key-not-valid') msg = "Lỗi cấu hình: API Key không hợp lệ. Vui lòng liên hệ Admin.";
+      if (error.code === 'auth/api-key-not-valid') msg = "Lỗi API Key không hợp lệ. Vui lòng kiểm tra Firebase Console.";
       if (error.code === 'auth/invalid-phone-number') msg = "Số điện thoại không đúng định dạng.";
-      if (error.code === 'auth/too-many-requests') msg = "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.";
+      if (error.code === 'auth/firebase-app-check-token-is-invalid') msg = "Lỗi token bảo mật. Hãy chắc chắn bạn đã tích vào ô xác thực.";
       
       toast({ 
         variant: "destructive", 
@@ -121,11 +132,8 @@ export default function Overview() {
         description: msg 
       });
       
-      // Reset Recaptcha nếu lỗi token
       if (recaptchaRef.current) {
-        recaptchaRef.current.render().then(widgetId => {
-          recaptchaRef.current?.reset(widgetId);
-        });
+        recaptchaRef.current.reset();
       }
     } finally {
       setIsLoading(false);
@@ -142,14 +150,10 @@ export default function Overview() {
       toast({ title: "Đăng nhập thành công", description: "Chào mừng bạn quay trở lại!" });
     } catch (error: any) {
       console.error("Verify OTP error:", error);
-      let msg = "Mã xác thực không chính xác hoặc đã hết hạn.";
-      if (error.code === 'auth/invalid-verification-code') msg = "Mã OTP không đúng.";
-      if (error.code === 'auth/code-expired') msg = "Mã OTP đã hết hạn. Vui lòng gửi lại mã.";
-      
       toast({ 
         variant: "destructive", 
-        title: `Lỗi xác thực: ${error.code}`, 
-        description: msg 
+        title: "Lỗi xác thực", 
+        description: "Mã OTP không chính xác hoặc đã hết hạn." 
       });
     } finally {
       setIsLoading(false);
@@ -159,7 +163,6 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div id="recaptcha-container"></div>
         <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-700">
           <div className="text-center space-y-4">
              <div className="inline-flex p-4 bg-white rounded-[2.5rem] shadow-xl mb-4">
@@ -184,7 +187,7 @@ export default function Overview() {
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input 
-                        placeholder="Số điện thoại của bạn" 
+                        placeholder="Số điện thoại" 
                         className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm pl-11"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
@@ -194,24 +197,28 @@ export default function Overview() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên (Chỉ dành cho lần đầu)</Label>
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Họ và tên</Label>
                     <Input 
                       placeholder="Nguyễn Văn A" 
                       className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị (Chỉ dành cho lần đầu)</Label>
+                    <Label className="text-[10px] font-black text-slate-400 ml-1 uppercase">Đơn vị</Label>
                     <Input 
                       placeholder="Khoa / Phòng ban" 
                       className="h-12 rounded-xl bg-slate-50 border-none font-bold text-sm"
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
+                      required
                     />
                   </div>
+
+                  <div id="recaptcha-container" className="flex justify-center my-4 overflow-hidden rounded-xl"></div>
 
                   <Button type="submit" className="w-full h-12 font-black rounded-xl bg-primary uppercase tracking-widest text-[10px] shadow-lg" disabled={isLoading}>
                     {isLoading ? "Đang gửi SMS..." : "Gửi mã xác nhận"}
@@ -241,7 +248,7 @@ export default function Overview() {
                     className="w-full text-[10px] font-black uppercase text-slate-400"
                     onClick={() => setShowOtpInput(false)}
                   >
-                    Đổi số điện thoại khác
+                    Đổi thông tin khác
                   </Button>
                 </form>
               )}
@@ -273,7 +280,6 @@ export default function Overview() {
     );
   }
 
-  // Dashboard View logic remains same...
   const roleFilteredRequests = requests.filter(r => {
     if (currentUser.role === 'requester') return r.requesterId === currentUser.id;
     if (currentUser.role === 'unit_leader') return r.unit === currentUser.unit;

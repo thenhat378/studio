@@ -78,15 +78,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const userData = userDoc.data() as User;
             setCurrentUser(userData);
             localStorage.setItem('app_user_session', JSON.stringify(userData));
-          } else {
-            // Trường hợp user có trong Auth nhưng chưa có trong Firestore (đang đăng ký bằng phone)
-            // Không set currentUser ngay để tránh lỗi thiếu thông tin name/unit
           }
         } catch (e) {
           console.error("Firestore user load error:", e);
         }
       } else {
-        // Clear session if not logged in via Firebase
         if (!localStorage.getItem('is_test_mode')) {
            setCurrentUser(null);
            localStorage.removeItem('app_user_session');
@@ -148,6 +144,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const sendOtp = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
     if (!auth) throw new Error("Auth service unavailable");
+    // Đảm bảo recaptcha được render trước khi gửi
+    await recaptchaVerifier.render();
     return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
   };
 
@@ -156,7 +154,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const result = await confirmationResult.confirm(otp);
     const user = result.user;
     
-    // Kiểm tra xem user đã tồn tại trong Firestore chưa
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     
     if (userDoc.exists()) {
@@ -164,7 +161,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setCurrentUser(existingUser);
       localStorage.setItem('app_user_session', JSON.stringify(existingUser));
     } else if (userData) {
-      // Nếu là user mới đăng ký bằng phone
       const newUser: User = { 
         id: user.uid, 
         name: userData.name, 
@@ -176,7 +172,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setCurrentUser(newUser);
       localStorage.setItem('app_user_session', JSON.stringify(newUser));
     } else {
-      throw new Error("Vui lòng nhập đầy đủ thông tin Họ tên và Đơn vị để hoàn tất đăng ký.");
+      throw new Error("Thông tin người dùng không tìm thấy.");
     }
     localStorage.removeItem('is_test_mode');
   };
