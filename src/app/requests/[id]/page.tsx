@@ -83,9 +83,9 @@ export default function RequestDetail() {
 
   const getRepairTypeText = (type?: RepairType) => {
     switch(type) {
-      case 'replacement': return 'Thay mới';
-      case 'backup_replacement': return 'Dự phòng';
-      case 'repair_only': return 'Sửa chữa';
+      case 'replacement': return 'Thay mới thiết bị';
+      case 'backup_replacement': return 'Thay bằng thiết bị dự phòng';
+      case 'repair_only': return 'Sửa chữa tại chỗ';
       default: return 'N/A';
     }
   };
@@ -269,8 +269,9 @@ export default function RequestDetail() {
                       <Select onValueChange={(val) => setRepairType(val as RepairType)}>
                         <SelectTrigger className="h-12 rounded-xl bg-white"><SelectValue placeholder="Hình thức xử lý..." /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="replacement">Thay mới</SelectItem>
-                          <SelectItem value="repair_only">Sửa chữa</SelectItem>
+                          <SelectItem value="repair_only">Sửa chữa tại chỗ</SelectItem>
+                          <SelectItem value="replacement">Thay mới thiết bị</SelectItem>
+                          <SelectItem value="backup_replacement">Thay bằng thiết bị dự phòng</SelectItem>
                         </SelectContent>
                       </Select>
                       <Textarea placeholder="Chi tiết nội dung đã làm..." className="min-h-[100px] rounded-xl bg-white" value={report} onChange={e => setReport(e.target.value)} />
