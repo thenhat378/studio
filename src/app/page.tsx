@@ -235,14 +235,6 @@ export default function Dashboard() {
               </Button>
              </Link>
           )}
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="border-destructive/20 text-destructive hover:bg-destructive/10 gap-2 font-bold"
-            onClick={() => logout()}
-          >
-            <LogOut className="h-5 w-5" /> Đăng xuất
-          </Button>
         </div>
       </div>
 
