@@ -195,20 +195,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db || !currentUser) return;
     
     try {
-      // 1. Lấy tất cả các phiếu yêu cầu và tạo danh sách các tác vụ xóa
+      const batch = writeBatch(db);
+
+      // 1. Xóa tất cả các phiếu yêu cầu
       const requestSnap = await getDocs(collection(db, 'requests'));
-      const deleteRequestPromises = requestSnap.docs.map(docSnap => deleteDoc(doc(db, 'requests', docSnap.id)));
-      
-      // 2. Lấy tất cả người dùng và lọc bỏ tài khoản Admin hiện tại
+      requestSnap.docs.forEach(docSnap => {
+        batch.delete(docSnap.ref);
+      });
+
+      // 2. Xóa tất cả người dùng ngoại trừ Admin hiện tại
       const userSnap = await getDocs(collection(db, 'users'));
-      const deleteUserPromises = userSnap.docs
-        .filter(docSnap => docSnap.id !== currentUser.id)
-        .map(docSnap => deleteDoc(doc(db, 'users', docSnap.id)));
+      userSnap.docs.forEach(docSnap => {
+        if (docSnap.id !== currentUser.id) {
+          batch.delete(docSnap.ref);
+        }
+      });
+
+      // 3. Thực thi batch
+      await batch.commit();
       
-      // 3. Thực thi tất cả các tác vụ xóa đồng thời
-      await Promise.all([...deleteRequestPromises, ...deleteUserPromises]);
-      
-      // Thành công - bảng thiết bị được giữ nguyên theo yêu cầu
+      console.log("System reset successfully. Requests and other users cleared.");
     } catch (error) {
       console.error("Reset system error:", error);
       throw error;
