@@ -388,9 +388,9 @@ export default function Overview() {
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 space-y-1">
                     <p className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">[{req.location}] {req.technicianName}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                       <div className="h-1.5 w-1.5 rounded-full bg-slate-300" /> {req.unit}
-                    </p>
+                    </div>
                   </div>
                   {req.status === 'closed' && req.rating && (
                     <div className="flex gap-1 bg-amber-50 px-3 py-1.5 rounded-full">

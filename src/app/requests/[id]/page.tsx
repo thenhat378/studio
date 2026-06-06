@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -488,7 +487,7 @@ export default function RequestDetail() {
                         value={feedback}
                         onChange={e => setFeedback(e.target.value)}
                       />
-                      <Button className="w-full bg-primary h-16 rounded-[1.8rem] text-white font-black uppercase tracking-widest gap-2 shadow-2xl shadow-primary/20 active:scale-95 transition-all" onClick={handleRequesterConfirm}>
+                      <Button className="w-full bg-primary h-16 rounded-[1.8rem] text-white font-black uppercase tracking-widest gap-2 shadow-2xl shadow-primary/20 active-scale" onClick={handleRequesterConfirm}>
                         <ThumbsUp className="h-5 w-5" /> Xác nhận hài lòng
                       </Button>
                     </div>
