@@ -168,13 +168,11 @@ export default function RequestDetail() {
     }
   };
 
-  // Helper function to format numeric-like sequence ID for the report
   const getFormattedSequenceId = (fullId: string) => {
     const numericPart = fullId.replace(/\D/g, '');
     if (numericPart.length > 0) {
       return numericPart.slice(-7).padStart(7, '0');
     }
-    // Fallback if no numeric parts found
     let hash = 0;
     for (let i = 0; i < fullId.length; i++) {
       hash = ((hash << 5) - hash) + fullId.charCodeAt(i);
@@ -197,14 +195,13 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* Print Interface - Times New Roman Word-like layout */}
+      {/* Print Interface - Times New Roman Word-like layout with Table */}
       <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
         <div className="flex justify-between items-start">
           <div className="text-center w-[45%] space-y-1">
             <p className="font-normal text-[13px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
             <p className="font-bold text-[14px] uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
             <div className="w-32 h-[1px] bg-black mx-auto mt-1" />
-            <p className="text-[11px] pt-1 font-normal">Mã phiếu: {getFormattedSequenceId(req.id)}</p>
           </div>
           <div className="text-center w-[55%] space-y-1">
             <p className="font-bold text-[14px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
@@ -216,53 +213,93 @@ export default function RequestDetail() {
 
         <div className="text-center space-y-2 pt-10">
           <h1 className="text-xl font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-[12px] italic font-normal">(Hồ sơ lưu trữ Phòng Cơ sở vật chất)</p>
+          <p className="text-[12px] font-normal">Số phiếu: {getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <div className="space-y-6 pt-6 text-[14px] leading-relaxed">
-          <div className="space-y-3">
-            <p><span className="font-bold">I. THÔNG TIN NGƯỜI YÊU CẦU</span></p>
-            <div className="pl-6 space-y-2">
-              <p>- Họ và tên: {req.requesterName}</p>
-              <p>- Đơn vị công tác: {req.unit.toUpperCase()}</p>
-              <p>- Nội dung yêu cầu: {req.title}</p>
-              <p>- Mô tả chi tiết sự cố: {req.description}</p>
-              <p>- Thời điểm báo hỏng: {formatDate(req.createdAt)}</p>
-            </div>
-          </div>
+        {/* Main Content Table */}
+        <table className="w-full border-collapse border border-black text-[14px]">
+          <tbody>
+            <tr>
+              <td colSpan={2} className="border border-black p-4 bg-gray-50">
+                <p className="font-bold uppercase">I. THÔNG TIN NGƯỜI YÊU CẦU</p>
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3 w-1/3">Họ và tên:</td>
+              <td className="border border-black p-3">{req.requesterName}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Đơn vị công tác:</td>
+              <td className="border border-black p-3">{req.unit.toUpperCase()}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Nội dung yêu cầu:</td>
+              <td className="border border-black p-3">{req.title}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Mô tả sự cố:</td>
+              <td className="border border-black p-3">{req.description}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Thời điểm báo:</td>
+              <td className="border border-black p-3">{formatDate(req.createdAt)}</td>
+            </tr>
 
-          <div className="space-y-3">
-            <p><span className="font-bold">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</span></p>
-            <div className="pl-6 space-y-2">
-              <p>- Thiết bị xử lý: {req.equipmentName}</p>
-              <p>- Nhân viên thực hiện: {req.technicianName || 'N/A'}</p>
-              <p>- Hình thức xử lý: {getRepairTypeText(req.repairType)}</p>
-              <p>- Nội dung công việc: {req.technicianReport || 'Chưa cập nhật'}</p>
-              <div className="grid grid-cols-2 gap-4">
-                <p>- Thời gian nhận việc: {formatDate(req.assignedAt)}</p>
-                <p>- Thời gian báo xong: {formatDate(req.completedAt)}</p>
-              </div>
-              <p>- Tổng thời gian thực hiện: <span className="font-bold">{getDuration(req.assignedAt, req.completedAt)}</span></p>
-            </div>
-          </div>
+            <tr>
+              <td colSpan={2} className="border border-black p-4 bg-gray-50">
+                <p className="font-bold uppercase">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</p>
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Thiết bị xử lý:</td>
+              <td className="border border-black p-3">{req.equipmentName}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Nhân viên kỹ thuật:</td>
+              <td className="border border-black p-3">{req.technicianName || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Hình thức xử lý:</td>
+              <td className="border border-black p-3">{getRepairTypeText(req.repairType)}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Nội dung đã làm:</td>
+              <td className="border border-black p-3">{req.technicianReport || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Thời gian thực hiện:</td>
+              <td className="border border-black p-3">
+                Từ {formatDate(req.assignedAt)} đến {formatDate(req.completedAt)}
+                <br />
+                (Tổng thời gian: {getDuration(req.assignedAt, req.completedAt)})
+              </td>
+            </tr>
 
-          <div className="space-y-3">
-            <p><span className="font-bold">III. ĐÁNH GIÁ CỦA ĐƠN VỊ SỬ DỤNG</span></p>
-            <div className="pl-6 space-y-2">
-              <p>- Mức độ hài lòng: {req.rating ? `${req.rating}/5 sao` : 'Đã xác nhận hài lòng'}</p>
-              <p>- Ý kiến phản hồi: {req.requesterFeedback || 'Không có ý kiến thêm'}</p>
-            </div>
-          </div>
-        </div>
+            <tr>
+              <td colSpan={2} className="border border-black p-4 bg-gray-50">
+                <p className="font-bold uppercase">III. Ý KIẾN NGHIỆM THU</p>
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Đánh giá hài lòng:</td>
+              <td className="border border-black p-3">{req.rating ? `${req.rating}/5 sao` : 'Đã xác nhận hài lòng'}</td>
+            </tr>
+            <tr>
+              <td className="border border-black p-3">Phản hồi thêm:</td>
+              <td className="border border-black p-3">{req.requesterFeedback || 'Không'}</td>
+            </tr>
+          </tbody>
+        </table>
 
+        {/* Signature Section */}
         <div className="grid grid-cols-2 gap-4 pt-20 text-center text-[14px]">
           <div className="space-y-24">
             <p className="font-bold uppercase">PHÒNG TCHC</p>
-            <p className="italic font-normal text-[12px]">(Ký và ghi rõ họ tên)</p>
+            <p className="italic font-normal text-[12px]">(Ký tên và đóng dấu)</p>
           </div>
           <div className="space-y-24">
             <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p className="italic font-normal text-[12px]">(Ký và ghi rõ họ tên)</p>
+            <p className="italic font-normal text-[12px]">(Ký tên và đóng dấu)</p>
           </div>
         </div>
       </div>
