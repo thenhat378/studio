@@ -54,12 +54,6 @@ const cleanObject = (obj: any) => {
   return newObj;
 };
 
-// Hàm chuẩn hóa tên đơn vị
-const normalizeUnit = (unit?: string) => {
-  if (!unit) return "";
-  return unit.trim().toLowerCase();
-};
-
 export function AppProvider({ children }: { children: ReactNode }) {
   const { db } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -142,7 +136,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: userId,
       name: data.name.trim(),
       role: data.role,
-      unit: data.unit.trim(), // Lưu đơn vị nguyên bản nhưng đã trim
+      unit: data.unit.trim(),
       phoneNumber: data.phone,
       password: data.pass
     };
@@ -200,22 +194,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const resetSystem = async () => {
     if (!db || !currentUser) return;
-    
     try {
       const batch = writeBatch(db);
       const requestSnap = await getDocs(collection(db, 'requests'));
-      requestSnap.docs.forEach(docSnap => {
-        batch.delete(docSnap.ref);
-      });
+      requestSnap.docs.forEach(docSnap => batch.delete(docSnap.ref));
       const userSnap = await getDocs(collection(db, 'users'));
       userSnap.docs.forEach(docSnap => {
-        if (docSnap.id !== currentUser.id) {
-          batch.delete(docSnap.ref);
-        }
+        if (docSnap.id !== currentUser.id) batch.delete(docSnap.ref);
       });
       await batch.commit();
     } catch (error) {
-      console.error("Reset system error:", error);
+      console.error("Reset error:", error);
       throw error;
     }
   };
