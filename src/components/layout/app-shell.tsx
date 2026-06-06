@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useMemo } from 'react';
@@ -85,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: 'Trang chủ', href: '/', icon: LayoutDashboard },
     { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader', 'csvc_manager'] },
-    { name: 'Duyệt đơn vị', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
+    { name: 'Phê duyệt phiếu', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
     { name: 'Quản lý CSVC', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
     { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['admin'] },

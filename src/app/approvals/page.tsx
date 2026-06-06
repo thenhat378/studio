@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -87,7 +86,7 @@ export default function ApprovalsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
             <ShieldCheck className="h-7 w-7 text-primary" />
-            Duyệt đơn vị
+            Phê duyệt Phiếu yêu cầu
           </h1>
           <div className="flex items-center gap-2">
             <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3">
@@ -243,4 +242,3 @@ export default function ApprovalsPage() {
     </div>
   );
 }
-
