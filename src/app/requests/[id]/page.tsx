@@ -62,6 +62,7 @@ export default function RequestDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: '',
+    location: '',
     description: '',
     equipmentId: ''
   });
@@ -73,6 +74,7 @@ export default function RequestDetail() {
     if (req) {
       setEditData({
         title: req.title,
+        location: req.location || '',
         description: req.description,
         equipmentId: req.equipmentId
       });
@@ -103,7 +105,7 @@ export default function RequestDetail() {
   };
 
   const handleResend = () => {
-    if (!editData.title || !editData.description || !editData.equipmentId) {
+    if (!editData.title || !editData.location || !editData.description || !editData.equipmentId) {
       toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ thông tin trước khi gửi lại." });
       return;
     }
@@ -112,6 +114,7 @@ export default function RequestDetail() {
     
     updateRequestStatus(req.id, 'pending_approval', {
       title: editData.title,
+      location: editData.location,
       description: editData.description,
       equipmentId: editData.equipmentId,
       equipmentName: equip?.name || req.equipmentName,
@@ -233,11 +236,15 @@ export default function RequestDetail() {
               <td className="border border-black p-3">{req.unit.toUpperCase()}</td>
             </tr>
             <tr>
+              <td className="border border-black p-3">Vị trí sự cố:</td>
+              <td className="border border-black p-3">{req.location}</td>
+            </tr>
+            <tr>
               <td className="border border-black p-3">Nội dung yêu cầu:</td>
               <td className="border border-black p-3">{req.title}</td>
             </tr>
             <tr>
-              <td className="border border-black p-3">Mô tả sự cố:</td>
+              <td className="border border-black p-3">Mô tả hỏng hóc:</td>
               <td className="border border-black p-3">{req.description}</td>
             </tr>
             <tr>
@@ -311,14 +318,30 @@ export default function RequestDetail() {
             <div className="flex justify-between items-start gap-6">
               <div className="space-y-4 flex-1">
                 {isEditing ? (
-                  <Input 
-                    value={editData.title}
-                    onChange={e => setEditData(prev => ({ ...prev, title: e.target.value }))}
-                    className="h-14 text-lg font-black bg-white rounded-2xl border-primary/20"
-                    placeholder="Tiêu đề mới..."
-                  />
+                  <div className="space-y-3">
+                    <Input 
+                      value={editData.title}
+                      onChange={e => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                      className="h-14 text-lg font-black bg-white rounded-2xl border-primary/20"
+                      placeholder="Nội dung yêu cầu..."
+                    />
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
+                      <Input 
+                        value={editData.location}
+                        onChange={e => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                        className="h-12 text-sm font-bold bg-white rounded-xl border-primary/20 pl-11"
+                        placeholder="Vị trí cụ thể..."
+                      />
+                    </div>
+                  </div>
                 ) : (
-                  <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight tracking-tight">{req.title}</CardTitle>
+                  <div className="space-y-2">
+                    <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3 py-1 flex items-center gap-1.5 w-fit">
+                      <MapPin className="h-3.5 w-3.5" /> {req.location}
+                    </Badge>
+                    <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight tracking-tight">{req.title}</CardTitle>
+                  </div>
                 )}
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/60 p-5 rounded-[2rem] border border-white">
@@ -377,7 +400,7 @@ export default function RequestDetail() {
           </CardHeader>
           <CardContent className="space-y-8 p-8 md:p-10 pt-0">
             <div className="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100">
-              <Label className="text-[10px] font-black uppercase text-slate-400 mb-3 block tracking-widest ml-1">Mô tả sự cố từ {req.requesterName}:</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400 mb-3 block tracking-widest ml-1">Mô tả cụ thể từ {req.requesterName}:</Label>
               {isEditing ? (
                 <Textarea 
                   value={editData.description}

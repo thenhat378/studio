@@ -6,7 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList, Plus, FileText } from 'lucide-react';
+import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList, Plus, FileText, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ export default function RequestsList() {
 
   const filteredRequests = requests.filter(r => 
     (r.title.toLowerCase().includes(search.toLowerCase()) || 
+     r.location.toLowerCase().includes(search.toLowerCase()) ||
      r.equipmentName.toLowerCase().includes(search.toLowerCase())) &&
     (currentUser?.role === 'csvc_manager' ? true : r.requesterId === currentUser?.id || r.unit === currentUser?.unit)
   );
@@ -55,7 +56,7 @@ export default function RequestsList() {
         <div className="relative">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
           <Input 
-            placeholder="Tìm theo tiêu đề, thiết bị..." 
+            placeholder="Tìm theo tiêu đề, vị trí, thiết bị..." 
             className="pl-14 h-16 rounded-[1.8rem] bg-white border-none shadow-sm font-bold text-sm text-slate-700 placeholder:text-slate-300 focus-visible:ring-2 focus-visible:ring-primary/10"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -80,6 +81,11 @@ export default function RequestsList() {
                   </div>
                   
                   <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3 py-1 flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5" /> {req.location}
+                      </Badge>
+                    </div>
                     <h3 className="font-black text-xl text-slate-800 leading-tight tracking-tight">{req.title}</h3>
                     <div className="flex flex-wrap gap-5 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
                       <span className="flex items-center gap-2"><Wrench className="h-4 w-4 text-primary/30" /> {req.equipmentName}</span>
@@ -98,14 +104,6 @@ export default function RequestsList() {
                         <ChevronRight className="h-6 w-6" />
                      </div>
                   </div>
-                  
-                  {req.status === 'verified' && !req.requesterConfirmed && currentUser?.role === 'requester' && (
-                    <div className="mt-6">
-                      <Button className="w-full bg-primary h-14 rounded-2xl font-black gap-2 text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-primary/90 transition-all">
-                        <ThumbsUp className="h-4 w-4" /> Xác nhận hài lòng
-                      </Button>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -121,7 +119,6 @@ export default function RequestsList() {
         )}
       </div>
 
-      {/* Mobile Floating Action Button */}
       {currentUser?.role === 'requester' && (
         <div className="fixed bottom-24 right-6 z-40 md:hidden">
           <Link href="/requests/new">

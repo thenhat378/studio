@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -8,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera, AlertCircle, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +25,7 @@ export default function NewRequest() {
   
   const [formData, setFormData] = useState({
     title: '',
+    location: '',
     description: '',
     equipmentId: '',
   });
@@ -108,7 +110,7 @@ export default function NewRequest() {
       return;
     }
 
-    if (!formData.title || !formData.description || !formData.equipmentId) {
+    if (!formData.title || !formData.location || !formData.description || !formData.equipmentId) {
       toast({
         variant: "destructive",
         title: "Thiếu thông tin",
@@ -122,6 +124,7 @@ export default function NewRequest() {
     
     const requestData: any = {
       title: formData.title.trim(),
+      location: formData.location.trim(),
       description: formData.description.trim(),
       equipmentId: formData.equipmentId,
       equipmentName: equip?.name || 'Thiết bị không xác định',
@@ -191,10 +194,10 @@ export default function NewRequest() {
             </CardHeader>
             <CardContent className="space-y-8 p-8">
               <div className="space-y-3">
-                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tiêu đề ngắn gọn</Label>
+                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tiêu đề nội dung</Label>
                 <Input 
                   id="title" 
-                  placeholder="Ví dụ: Máy chiếu phòng 302 không lên" 
+                  placeholder="Ví dụ: Máy chiếu không lên hình" 
                   className="h-16 rounded-2xl bg-slate-50 border-none font-bold p-6"
                   value={formData.title}
                   onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -203,8 +206,23 @@ export default function NewRequest() {
               </div>
 
               <div className="space-y-3">
+                <Label htmlFor="location" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Vị trí hư hỏng (Tiêu đề ngắn)</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                  <Input 
+                    id="location" 
+                    placeholder="Ví dụ: Phòng 302, Hội trường A..." 
+                    className="h-16 rounded-2xl bg-slate-50 border-none font-bold pl-14 pr-6"
+                    value={formData.location}
+                    onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <Label htmlFor="description" className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Mô tả chi tiết</Label>
+                  <Label htmlFor="description" className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Mô tả chi tiết lỗi</Label>
                   <Button 
                     type="button" 
                     variant="ghost" 
@@ -219,7 +237,7 @@ export default function NewRequest() {
                 </div>
                 <Textarea 
                   id="description" 
-                  placeholder="Mô tả cụ thể tình trạng lỗi..." 
+                  placeholder="Mô tả cụ thể tình trạng lỗi để AI hỗ trợ..." 
                   className="min-h-[160px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed"
                   value={formData.description}
                   onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -298,7 +316,7 @@ export default function NewRequest() {
               </CardHeader>
               <CardContent className="space-y-4 p-8 pt-0">
                 <div className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] shadow-sm">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Nguyên nhân dự kiến:</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Gợi ý phân loại & nguyên nhân:</p>
                   <ul className="space-y-2">
                     {aiSuggestions.causes.map((cause, i) => (
                       <li key={i} className="text-xs font-bold flex items-start gap-3 text-slate-700 leading-snug">

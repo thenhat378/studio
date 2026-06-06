@@ -32,6 +32,7 @@ export interface Equipment {
 export interface RepairRequest {
   id: string;
   title: string;
+  location: string; // Vị trí hư hỏng (Tiêu đề ngắn)
   description: string;
   equipmentId: string;
   equipmentName: string;
