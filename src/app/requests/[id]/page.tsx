@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -103,7 +102,6 @@ export default function RequestDetail() {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      // Tăng giới hạn lên 500MB (500 * 1024 * 1024 bytes)
       if (file.size > 500 * 1024 * 1024) {
         toast({
           variant: "destructive",
@@ -171,9 +169,9 @@ export default function RequestDetail() {
 
   const getRepairTypeText = (type?: RepairType) => {
     switch(type) {
-      case 'repair_only': return 'Sửa chữa, khắc phục không cần thay thế thiết bị';
+      case 'repair_only': return 'Sửa chữa, khắc phục tại chỗ';
       case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
-      case 'pending_purchase': return 'Chờ thiết bị mua mới';
+      case 'pending_purchase': return 'Chờ mua sắm thiết bị mới';
       default: return 'Chưa xác định';
     }
   };
@@ -213,11 +211,10 @@ export default function RequestDetail() {
     return Math.abs(hash).toString().slice(-7).padStart(7, '0');
   };
 
-  // 5 Steps Progress Tracking
   const steps = [
     { label: 'Tạo phiếu', active: true, done: true },
-    { label: 'Đơn vị Duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', done: !['pending_approval', 'rejected'].includes(req.status) },
-    { label: 'CSVC Giao việc', active: !!req.technicianId, done: !!req.technicianId },
+    { label: 'Phê duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', done: !['pending_approval', 'rejected'].includes(req.status) },
+    { label: 'Giao việc', active: !!req.technicianId, done: !!req.technicianId },
     { label: 'Kỹ thuật xong', active: ['completed', 'verified', 'closed'].includes(req.status), done: ['completed', 'verified', 'closed'].includes(req.status) },
     { label: 'Nghiệm thu', active: req.status === 'closed', done: req.status === 'closed' }
   ];
@@ -235,109 +232,64 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* Print View Hidden on Screen */}
-      <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
-        <div className="flex justify-between items-start">
+      {/* RE-DESIGNED PRINT VIEW FOR A4 */}
+      <div className="print-only bg-white text-black" style={{ padding: '0 10mm' }}>
+        <div className="flex justify-between items-start mb-10">
           <div className="text-center w-[45%] space-y-1">
-            <p className="font-normal text-[13px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
-            <p className="font-bold text-[14px] uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div className="w-32 h-[1px] bg-black mx-auto mt-1" />
+            <p className="font-normal text-[12px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-[13px] uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div className="w-24 h-[1px] bg-black mx-auto mt-1" />
           </div>
           <div className="text-center w-[55%] space-y-1">
-            <p className="font-bold text-[14px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p className="font-bold text-[14px]">Độc lập - Tự do - Hạnh phúc</p>
-            <div className="w-40 h-[1px] bg-black mx-auto mt-1" />
-            <p className="text-[12px] italic pt-3 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <p className="font-bold text-[13px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-[13px]">Độc lập - Tự do - Hạnh phúc</p>
+            <div className="w-36 h-[1px] bg-black mx-auto mt-1" />
+            <p className="text-[11px] italic pt-3 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center space-y-2 pt-10">
+        <div className="text-center space-y-2 mb-10">
           <h1 className="text-xl font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-[12px] font-normal">Số phiếu: {getFormattedSequenceId(req.id)}</p>
+          <p className="text-[12px] font-normal italic">Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <table className="w-full border-collapse border border-black text-[14px]">
-          <tbody>
-            <tr>
-              <td colSpan={2} className="border border-black p-4 bg-gray-50">
-                <p className="font-bold uppercase">I. THÔNG TIN NGƯỜI YÊU CẦU</p>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3 w-1/3">Họ và tên:</td>
-              <td className="border border-black p-3">{req.requesterName}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Đơn vị công tác:</td>
-              <td className="border border-black p-3">{req.unit.toUpperCase()}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Vị trí sự cố:</td>
-              <td className="border border-black p-3">{req.location}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Mô tả hỏng hóc:</td>
-              <td className="border border-black p-3">{req.description}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Thời điểm báo:</td>
-              <td className="border border-black p-3">{formatDate(req.createdAt)}</td>
-            </tr>
-
-            <tr>
-              <td colSpan={2} className="border border-black p-4 bg-gray-50">
-                <p className="font-bold uppercase">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</p>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Thiết bị xử lý:</td>
-              <td className="border border-black p-3">{req.equipmentName}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Nhân viên kỹ thuật:</td>
-              <td className="border border-black p-3">{req.technicianName || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Hình thức xử lý:</td>
-              <td className="border border-black p-3">{getRepairTypeText(req.repairType)}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Nội dung đã làm:</td>
-              <td className="border border-black p-3">{req.technicianReport || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Thời gian thực hiện:</td>
-              <td className="border border-black p-3">
-                Từ {formatDate(req.assignedAt)} đến {formatDate(req.completedAt)}
-                <br />
-                (Tổng thời gian: {getDuration(req.assignedAt, req.completedAt)})
-              </td>
-            </tr>
-
-            <tr>
-              <td colSpan={2} className="border border-black p-4 bg-gray-50">
-                <p className="font-bold uppercase">III. Ý KIẾN NGHIỆM THU</p>
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Đánh giá hài lòng:</td>
-              <td className="border border-black p-3">{req.rating ? `${req.rating}/5 sao` : 'Đã xác nhận hài lòng'}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Phản hồi thêm:</td>
-              <td className="border border-black p-3">{req.requesterFeedback || 'Không'}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className="grid grid-cols-2 gap-4 pt-20 text-center text-[14px]">
-          <div className="space-y-24">
-            <p className="font-bold uppercase">PHÒNG TCHC</p>
-            <p className="italic font-normal text-[12px]">(Ký tên và đóng dấu)</p>
+        <div className="space-y-6">
+          {/* Section I */}
+          <div className="print-section-title">I. Thông tin người yêu cầu</div>
+          <div className="space-y-2 pt-2">
+            <div className="print-row"><span className="print-label">Họ và tên:</span><span className="print-value">{req.requesterName}</span></div>
+            <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
+            <div className="print-row"><span className="print-label">Vị trí sự cố:</span><span className="print-value">{req.location}</span></div>
+            <div className="print-row"><span className="print-label">Thời gian báo:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
+            <div className="py-2"><span className="print-label block mb-1">Mô tả hỏng hóc:</span><p className="italic">{req.description}</p></div>
           </div>
-          <div className="space-y-24">
+
+          {/* Section II */}
+          <div className="print-section-title">II. Kết quả xử lý kỹ thuật</div>
+          <div className="space-y-2 pt-2">
+            <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
+            <div className="print-row"><span className="print-label">Nhân viên kỹ thuật:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
+            <div className="print-row"><span className="print-label">Hình thức xử lý:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
+            <div className="print-row"><span className="print-label">Thời gian hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
+            <div className="py-2"><span className="print-label block mb-1">Nội dung công việc đã thực hiện:</span><p className="italic">{req.technicianReport || 'N/A'}</p></div>
+          </div>
+
+          {/* Section III */}
+          <div className="print-section-title">III. Nghiệm thu & Đánh giá</div>
+          <div className="space-y-2 pt-2">
+            <div className="print-row"><span className="print-label">Mức độ hài lòng:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đã nghiệm thu'}</span></div>
+            <div className="py-2"><span className="print-label block mb-1">Phản hồi của đơn vị:</span><p className="italic">{req.requesterFeedback || 'Đạt yêu cầu.'}</p></div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-20 text-center text-[13px]">
+          <div className="space-y-20">
+            <p className="font-bold uppercase">NGƯỜI YÊU CẦU</p>
+            <p className="font-normal italic text-[11px]">(Ký và ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-20">
             <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p className="italic font-normal text-[12px]">(Ký tên và đóng dấu)</p>
+            <p className="font-normal italic text-[11px]">(Ký và đóng dấu)</p>
           </div>
         </div>
       </div>
@@ -484,7 +436,6 @@ export default function RequestDetail() {
               </div>
             )}
 
-            {/* Stepper Progress Bar */}
             <div className="flex justify-between gap-1 pt-6 px-2 relative">
               <div className="absolute top-[calc(1.5rem+6px)] left-8 right-8 h-[2px] bg-slate-100 z-0" />
               {steps.map((step, i) => (
@@ -505,7 +456,6 @@ export default function RequestDetail() {
           </CardContent>
         </Card>
 
-        {/* Action Controls Card */}
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-accent/10">
           <CardHeader className="bg-slate-50/50 py-6 px-8 md:px-10">
             <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 text-slate-800">
@@ -517,16 +467,16 @@ export default function RequestDetail() {
               {currentUser?.role === 'requester' && req.requesterId === currentUser.id && (
                 <>
                   {(req.status === 'pending_approval' || req.status === 'rejected') && (
-                    <div className="space-y-4">
+                    <div className="flex gap-4">
                       {isEditing ? (
-                        <div className="flex gap-4">
+                        <>
                           <Button className="flex-1 bg-secondary hover:bg-secondary/90 h-16 font-black rounded-[1.8rem] text-white shadow-xl gap-2 transition-all active:scale-95" onClick={handleResend}>
                             <Send className="h-5 w-5" /> CẬP NHẬT & GỬI LẠI
                           </Button>
                           <Button variant="ghost" className="h-16 w-16 rounded-[1.8rem] text-slate-400 bg-slate-100" onClick={() => setIsEditing(false)}>
                             <X className="h-6 w-6" />
                           </Button>
-                        </div>
+                        </>
                       ) : (
                         <Button variant="outline" className="w-full border-2 border-primary text-primary hover:bg-primary/5 h-16 font-black rounded-[1.8rem] shadow-sm gap-2 transition-all active:scale-95" onClick={() => setIsEditing(true)}>
                           <Edit3 className="h-5 w-5" /> CHỈNH SỬA & GỬI LẠI PHIẾU
@@ -602,7 +552,7 @@ export default function RequestDetail() {
                             <SelectValue placeholder="Chọn hình thức..." />
                           </SelectTrigger>
                           <SelectContent className="rounded-2xl">
-                            <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa, khắc phục không cần thay thế thiết bị</SelectItem>
+                            <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa, khắc phục tại chỗ</SelectItem>
                             <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay mới bằng thiết bị dự phòng</SelectItem>
                             <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ thiết bị mua mới</SelectItem>
                           </SelectContent>

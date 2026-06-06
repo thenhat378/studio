@@ -61,7 +61,7 @@
   }
   body {
     background: white !important;
-    font-size: 12pt !important;
+    font-size: 13pt !important;
     color: black !important;
   }
   .card-shadow {
@@ -76,7 +76,32 @@
     max-width: 100% !important;
   }
   @page {
-    margin: 1.5cm;
+    size: A4;
+    margin: 20mm 15mm 20mm 20mm;
+  }
+  .print-section-title {
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    padding: 8px 0;
+    margin-top: 20px;
+    border-bottom: 2px solid black;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .print-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted #ccc;
+  }
+  .print-label {
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+  .print-value {
+    flex-grow: 1;
+    text-align: right;
   }
 }
 
