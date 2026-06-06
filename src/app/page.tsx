@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -184,91 +183,93 @@ export default function Overview() {
       <div className="relative flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
         <div className="w-full max-w-[480px] space-y-8 text-center animate-slide-up">
           <div className="flex flex-col items-center gap-2 mb-8">
-            <div className="h-20 w-20 bg-primary rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/20">
-              <Wrench className="h-10 w-10 text-white" />
+            <div className="h-24 w-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 active-scale">
+              <Wrench className="h-12 w-12 text-white" />
             </div>
-            <h1 className="text-3xl font-black tracking-tighter mt-4">
+            <h1 className="text-4xl font-black tracking-tighter mt-4 leading-none">
               <span className="text-slate-800">Requisition Form</span>
-              <span className="text-accent ml-1">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
+              <div className="mt-2">
+                <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
+              </div>
             </h1>
           </div>
           
-          <Card className="rounded-[3rem] overflow-hidden bg-white card-shadow text-left border-none">
+          <Card className="rounded-[3.5rem] overflow-hidden bg-white card-shadow text-left border-none">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 h-16 bg-slate-50 p-1">
-                <TabsTrigger value="login" className="h-full rounded-2xl font-black text-[11px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-2xl font-black text-[11px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng ký</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-20 bg-slate-50 p-2">
+                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng ký</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="login" className="p-8 md:p-10 space-y-6">
+              <TabsContent value="login" className="p-8 md:p-12 space-y-8">
                 <form onSubmit={handleLogin} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Số điện thoại</Label>
+                  <div className="space-y-3">
+                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Số điện thoại</Label>
                     <div className="relative">
-                      <Phone className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                      <Input placeholder="Số điện thoại" className="pl-14 h-16 rounded-2xl bg-slate-50 border-none font-bold" value={loginPhone} onChange={e => setLoginPhone(e.target.value)} required />
+                      <Phone className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
+                      <Input placeholder="Số điện thoại" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPhone} onChange={e => setLoginPhone(e.target.value)} required />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Mật khẩu</Label>
+                  <div className="space-y-3">
+                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Mật khẩu</Label>
                     <div className="relative">
-                      <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                      <Input type="password" placeholder="••••••••" className="pl-14 h-16 rounded-2xl bg-slate-50 border-none font-bold" value={loginPass} onChange={e => setLoginPass(e.target.value)} required />
+                      <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
+                      <Input type="password" placeholder="••••••••" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPass} onChange={e => setLoginPass(e.target.value)} required />
                     </div>
-                    <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[10px] font-black text-primary hover:underline uppercase float-right pr-4 tracking-tighter">Quên mật khẩu?</button>
+                    <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[11px] font-black text-primary hover:underline uppercase float-right pr-4 tracking-tighter">Quên mật khẩu?</button>
                   </div>
-                  <Button className="w-full h-16 rounded-2xl bg-primary text-white font-black uppercase tracking-widest mt-4 shadow-xl shadow-primary/20 active:scale-95 transition-all" disabled={isSubmitting}>
+                  <Button className="w-full h-20 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-primary/20 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "Vào hệ thống"}
                   </Button>
                 </form>
               </TabsContent>
 
-              <TabsContent value="register" className="p-8 md:p-10 space-y-5">
+              <TabsContent value="register" className="p-8 md:p-12 space-y-6">
                 <form onSubmit={handleRegister} className="space-y-5">
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Họ và tên</Label>
-                    <Input placeholder="Nguyễn Văn A" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.name} onChange={e => setRegData(prev => ({...prev, name: e.target.value}))} required />
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Họ và tên</Label>
+                    <Input placeholder="Nguyễn Văn A" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.name} onChange={e => setRegData(prev => ({...prev, name: e.target.value}))} required />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">SĐT</Label>
-                      <Input placeholder="Số điện thoại" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.phone} onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))} required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">SĐT</Label>
+                      <Input placeholder="Số điện thoại" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.phone} onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))} required />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Mật khẩu</Label>
-                      <Input type="password" placeholder="••••" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.pass} onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))} required onFocus={() => setShowPassHint(true)} />
+                    <div className="space-y-2">
+                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Mật khẩu</Label>
+                      <Input type="password" placeholder="••••" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.pass} onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))} required onFocus={() => setShowPassHint(true)} />
                     </div>
                   </div>
                   {showPassHint && (
-                    <div className="p-4 bg-slate-50 rounded-2xl border text-[10px] space-y-1.5 font-bold uppercase tracking-tighter">
-                      <div className="flex items-center gap-2">
-                        <div className={cn("h-3 w-3 rounded-full shrink-0", passValidation.length ? "bg-emerald-500" : "bg-slate-200")} />
+                    <div className="p-5 bg-slate-50 rounded-[2rem] border text-[11px] space-y-2 font-bold uppercase tracking-tighter">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.length ? "bg-emerald-500" : "bg-slate-200")} />
                         <span className={passValidation.length ? "text-emerald-600" : "text-slate-400"}>Tối thiểu 8 ký tự</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={cn("h-3 w-3 rounded-full shrink-0", passValidation.special ? "bg-emerald-500" : "bg-slate-200")} />
+                      <div className="flex items-center gap-3">
+                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.special ? "bg-emerald-500" : "bg-slate-200")} />
                         <span className={passValidation.special ? "text-emerald-600" : "text-slate-400"}>Có ký tự đặc biệt (!@#...)</span>
                       </div>
                     </div>
                   )}
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Đơn vị / Khoa / Phòng</Label>
-                    <Input placeholder="Ví dụ: Phòng CSVC, Khoa CNTT..." className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.unit} onChange={e => setRegData(prev => ({...prev, unit: e.target.value}))} required />
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Đơn vị công tác</Label>
+                    <Input placeholder="Ví dụ: Phòng CSVC, Khoa CNTT..." className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.unit} onChange={e => setRegData(prev => ({...prev, unit: e.target.value}))} required />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Chức danh</Label>
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Chức danh</Label>
                     <Select value={regData.role} onValueChange={(val: any) => setRegData(prev => ({...prev, role: val}))}>
-                      <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold"><SelectValue /></SelectTrigger>
-                      <SelectContent className="rounded-2xl border-none shadow-xl">
-                        <SelectItem value="requester">Nhân viên / Giảng viên</SelectItem>
-                        <SelectItem value="unit_leader">Quản lý đơn vị</SelectItem>
-                        <SelectItem value="csvc_manager">Quản lý CSVC</SelectItem>
-                        <SelectItem value="technician">Nhân viên kỹ thuật</SelectItem>
-                        <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
+                      <SelectTrigger className="h-16 rounded-3xl bg-slate-50 border-none font-bold shadow-none"><SelectValue /></SelectTrigger>
+                      <SelectContent className="rounded-[2rem] border-none shadow-2xl p-2">
+                        <SelectItem value="requester" className="rounded-xl h-12 font-bold">Nhân viên / Giảng viên</SelectItem>
+                        <SelectItem value="unit_leader" className="rounded-xl h-12 font-bold">Quản lý đơn vị</SelectItem>
+                        <SelectItem value="csvc_manager" className="rounded-xl h-12 font-bold">Quản lý CSVC</SelectItem>
+                        <SelectItem value="technician" className="rounded-xl h-12 font-bold">Nhân viên kỹ thuật</SelectItem>
+                        <SelectItem value="admin" className="rounded-xl h-12 font-bold">Quản trị viên (Admin)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full h-16 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest mt-4 shadow-xl shadow-emerald-100" disabled={isSubmitting}>
+                  <Button className="w-full h-20 rounded-[2rem] bg-emerald-600 text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-emerald-100 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận đăng ký"}
                   </Button>
                 </form>
@@ -278,13 +279,22 @@ export default function Overview() {
         </div>
 
         <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
-          <DialogContent className="rounded-[3rem] p-8 md:p-10 border-none shadow-2xl">
-            <DialogHeader><DialogTitle className="uppercase font-black text-primary tracking-tighter">Đặt lại mật khẩu</DialogTitle></DialogHeader>
-            <form onSubmit={handleResetPassword} className="space-y-4 mt-4">
-              <Input placeholder="Số điện thoại" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={forgotData.phone} onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))} required />
-              <Input type="password" placeholder="Mật khẩu mới" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={forgotData.newPass} onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))} required />
-              <Input type="password" placeholder="Xác nhận mật khẩu" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={forgotData.confirmPass} onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))} required />
-              <Button className="w-full h-16 rounded-2xl bg-primary text-white font-black uppercase tracking-widest mt-4" disabled={isSubmitting || !forgotPassValidation.match}>Đặt lại mật khẩu</Button>
+          <DialogContent className="rounded-[3.5rem] p-10 border-none shadow-2xl max-w-lg">
+            <DialogHeader><DialogTitle className="uppercase font-black text-primary text-xl tracking-tighter">Đặt lại mật khẩu</DialogTitle></DialogHeader>
+            <form onSubmit={handleResetPassword} className="space-y-5 mt-6">
+              <div className="space-y-2">
+                <Label className="text-[11px] font-black uppercase text-slate-400 ml-4">Số điện thoại</Label>
+                <Input placeholder="Số điện thoại" className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6" value={forgotData.phone} onChange={e => setForgotData(prev => ({...prev, phone: e.target.value}))} required />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[11px] font-black uppercase text-slate-400 ml-4">Mật khẩu mới</Label>
+                <Input type="password" placeholder="Mật khẩu mới" className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6" value={forgotData.newPass} onChange={e => setForgotData(prev => ({...prev, newPass: e.target.value}))} required />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[11px] font-black uppercase text-slate-400 ml-4">Xác nhận mật khẩu</Label>
+                <Input type="password" placeholder="Xác nhận mật khẩu" className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6" value={forgotData.confirmPass} onChange={e => setForgotData(prev => ({...prev, confirmPass: e.target.value}))} required />
+              </div>
+              <Button className="w-full h-20 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-6 active-scale" disabled={isSubmitting || !forgotPassValidation.match}>Xác nhận đặt lại</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -323,37 +333,40 @@ export default function Overview() {
 
   return (
     <div className="space-y-8 pb-safe">
-      <div className="bg-primary rounded-[3rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
-         <div className="relative z-10 flex justify-between items-start">
-            <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase opacity-60 tracking-[0.2em]">Hệ thống DUE</p>
-              <h1 className="text-3xl font-black leading-none">Chào, {currentUser.name.split(' ').pop()}!</h1>
-              <div className="flex items-center gap-2 pt-2">
-                 <Building className="h-4 w-4 opacity-60" />
-                 <p className="text-sm font-bold opacity-80 uppercase">{currentUser.unit}</p>
+      <div className="bg-primary rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
+         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-3">
+              <p className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">HỆ THỐNG QUẢN LÝ DUE</p>
+              <h1 className="text-4xl font-black leading-none tracking-tight">Chào, {currentUser.name.split(' ').pop()}!</h1>
+              <div className="flex items-center gap-3 pt-2">
+                 <div className="p-2 bg-white/10 rounded-xl">
+                   <Building className="h-4 w-4 opacity-80" />
+                 </div>
+                 <p className="text-sm font-bold opacity-90 uppercase tracking-tight">{currentUser.unit}</p>
               </div>
             </div>
-            <Badge className="bg-white/20 border-none font-black text-[10px] uppercase tracking-tighter px-4 py-2 rounded-full">
+            <Badge className="bg-white/20 hover:bg-white/30 text-white border-none font-black text-[11px] uppercase tracking-widest px-6 py-3 rounded-full backdrop-blur-md">
               {getRoleLabel(currentUser.role)}
             </Badge>
          </div>
-         <div className="absolute -right-10 -bottom-10 h-40 w-40 bg-white/5 rounded-full blur-2xl" />
+         <div className="absolute -right-20 -bottom-20 h-64 w-64 bg-white/5 rounded-full blur-3xl" />
+         <div className="absolute -left-20 -top-20 h-40 w-40 bg-accent/10 rounded-full blur-2xl" />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {[
-          { label: 'Tất cả phiếu', value: roleFilteredRequests.length, icon: UserCircle2, color: 'text-blue-500' },
-          { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Wrench, color: 'text-amber-500' },
-          { label: 'Hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-500' },
-          { label: 'Cần duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval' || r.status === 'verified').length, icon: ShieldCheck, color: 'text-rose-500' },
+          { label: 'Tất cả phiếu', value: roleFilteredRequests.length, icon: UserCircle2, color: 'text-blue-500', bg: 'bg-blue-50' },
+          { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Wrench, color: 'text-amber-500', bg: 'bg-amber-50' },
+          { label: 'Hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+          { label: 'Cần duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval' || r.status === 'verified').length, icon: ShieldCheck, color: 'text-rose-500', bg: 'bg-rose-50' },
         ].map((stat, i) => (
-          <Card key={i} className="rounded-[2.5rem] bg-white border-none card-shadow group hover:bg-slate-50 transition-all active:scale-95">
-            <CardContent className="p-6 flex flex-col items-center text-center space-y-2">
-              <div className={cn("p-3 rounded-2xl bg-slate-50", stat.color.replace('text', 'bg').replace('500', '50'))}>
-                <stat.icon className={cn("h-6 w-6", stat.color)} />
+          <Card key={i} className="rounded-[2.5rem] bg-white border-none card-shadow group hover:bg-slate-50 transition-all active-scale">
+            <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
+              <div className={cn("p-4 rounded-2xl transition-transform group-hover:scale-110 duration-300", stat.bg)}>
+                <stat.icon className={cn("h-7 w-7", stat.color)} />
               </div>
-              <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
                 <p className="text-3xl font-black text-slate-800 tracking-tighter">{stat.value}</p>
               </div>
             </CardContent>
@@ -363,47 +376,59 @@ export default function Overview() {
 
       {currentUser.role === 'csvc_manager' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between px-4">
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" /> Hiệu suất kỹ thuật chi tiết
+          <div className="flex items-center justify-between px-6">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] flex items-center gap-3">
+              <div className="p-2 bg-primary/5 rounded-lg"><BarChart3 className="h-4 w-4 text-primary" /></div>
+              Báo cáo hiệu suất kỹ thuật
             </h3>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {roleFilteredRequests.filter(r => r.technicianId && (r.status === 'closed' || r.status === 'verified' || r.status === 'completed')).slice(0, 4).map(req => (
-              <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-8 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0">
-                    <p className="font-black text-base text-slate-800 truncate uppercase">[{req.location}] {req.technicianName}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase">Nhân viên thực hiện / {req.unit}</p>
+          <div className="grid gap-6 md:grid-cols-2 px-4 md:px-0">
+            {roleFilteredRequests.filter(r => r.technicianId && (['closed', 'verified', 'completed'].includes(r.status))).slice(0, 4).map(req => (
+              <Card key={req.id} className="rounded-[3rem] bg-white border-none card-shadow p-10 space-y-6 border-t-8 border-t-primary/5">
+                <div className="flex items-start justify-between">
+                  <div className="min-w-0 space-y-1">
+                    <p className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">[{req.location}] {req.technicianName}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-slate-300" /> {req.unit}
+                    </p>
                   </div>
-                  {req.status === 'closed' && (
-                    <div className="flex gap-0.5">
-                      {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3.5 w-3.5", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />)}
+                  {req.status === 'closed' && req.rating && (
+                    <div className="flex gap-1 bg-amber-50 px-3 py-1.5 rounded-full">
+                      {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3.5 w-3.5", s <= req.rating! ? "fill-amber-400 text-amber-400" : "text-slate-200")} />)}
                     </div>
                   )}
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                  <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Nhận việc lúc</p>
-                    <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                      <Clock className="h-3 w-3 text-blue-500" /> {formatDate(req.assignedAt)}
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/80 rounded-[2rem] p-6 border border-slate-100">
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận việc lúc</p>
+                    <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
+                      <Clock className="h-3.5 w-3.5 text-blue-500" />
+                      <span className="text-[11px] font-bold text-slate-700">{formatDate(req.assignedAt)}</span>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Báo xong lúc</p>
-                    <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3 w-3" /> {formatDate(req.completedAt)}
-                    </p>
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Báo xong lúc</p>
+                    <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                      <span className="text-[11px] font-bold text-emerald-600">{formatDate(req.completedAt)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-2">
-                    <Timer className="h-4 w-4 text-blue-500" />
-                    <span className="text-xs font-black text-slate-700 uppercase tracking-tighter">Xử lý trong: {getDuration(req.assignedAt, req.completedAt)}</span>
+                <div className="flex items-center justify-between px-2 pt-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                      <Timer className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <span className="text-xs font-black text-slate-700 uppercase tracking-tight">Xử lý trong: {getDuration(req.assignedAt, req.completedAt)}</span>
                   </div>
-                  <Badge className="bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase border-none">{req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}</Badge>
+                  <Badge className={cn(
+                    "text-[9px] font-black uppercase border-none px-4 py-1.5 rounded-lg",
+                    req.status === 'closed' ? "bg-emerald-50 text-emerald-600" : "bg-cyan-50 text-cyan-600"
+                  )}>
+                    {req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}
+                  </Badge>
                 </div>
               </Card>
             ))}
@@ -412,34 +437,38 @@ export default function Overview() {
       )}
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between px-4">
-          <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Hoạt động gần đây</h3>
-          <Link href="/requests" className="text-[10px] font-black text-primary uppercase hover:underline">Xem tất cả</Link>
+        <div className="flex items-center justify-between px-6">
+          <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">Hoạt động gần đây</h3>
+          <Link href="/requests" className="text-[11px] font-black text-primary uppercase hover:underline tracking-widest bg-white px-4 py-2 rounded-full shadow-sm">Tất cả</Link>
         </div>
-        <div className="grid gap-4">
-          {roleFilteredRequests.slice(0, 5).map(req => (
-            <Link key={req.id} href={`/requests/${req.id}`} className="active:scale-95 transition-all">
-               <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30">
-                  <CardContent className="p-7 flex items-center justify-between">
-                     <div className="space-y-2">
-                        <p className="font-black text-base text-slate-800 tracking-tight leading-tight uppercase">[{req.location}] {req.equipmentName}</p>
-                        <div className="flex items-center gap-2">
-                           <Badge variant="secondary" className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 border-none">
+        <div className="grid gap-4 px-4 md:px-0">
+          {roleFilteredRequests.slice(0, 6).map(req => (
+            <Link key={req.id} href={`/requests/${req.id}`} className="active-scale">
+               <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30 group">
+                  <CardContent className="p-8 flex items-center justify-between">
+                     <div className="space-y-3 min-w-0">
+                        <p className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase truncate">
+                          <span className="text-primary/40 mr-2 font-black">#</span>[{req.location}] {req.equipmentName}
+                        </p>
+                        <div className="flex items-center gap-3">
+                           <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 bg-slate-100 text-slate-500 border-none rounded-lg">
                              {req.unit}
                            </Badge>
-                           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</p>
+                           <div className="h-1 w-1 rounded-full bg-slate-200" />
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</p>
                         </div>
                      </div>
-                     <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300">
-                        <ChevronRight className="h-5 w-5" />
+                     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary/5 group-hover:text-primary transition-all ml-4 shrink-0">
+                        <ChevronRight className="h-6 w-6" />
                      </div>
                   </CardContent>
                </Card>
             </Link>
           ))}
           {roleFilteredRequests.length === 0 && (
-            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có hoạt động nào</p>
+            <div className="text-center py-24 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100 mx-4 md:mx-0">
+              <Info className="h-16 w-16 text-slate-100 mx-auto mb-6" />
+              <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">KHÔNG CÓ HOẠT ĐỘNG NÀO</p>
             </div>
           )}
         </div>
@@ -447,4 +476,3 @@ export default function Overview() {
     </div>
   );
 }
-

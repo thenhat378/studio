@@ -41,6 +41,7 @@
   body {
     @apply bg-[#F4F7FE] text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
 
@@ -85,12 +86,12 @@
 
 /* Mobile optimizations */
 input, select, textarea {
-  @apply !text-base md:!text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none;
+  @apply !text-base md:!text-sm focus:ring-4 focus:ring-primary/5 transition-all outline-none;
 }
 
 /* Safe area for mobile with bottom nav */
 .pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 7rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);
 }
 
 .glass-morphism {
@@ -101,8 +102,8 @@ input, select, textarea {
   box-shadow: 0px 15px 35px rgba(0, 84, 164, 0.05);
 }
 
-.active-nav-item {
-  @apply text-primary scale-110 transition-all duration-300;
+.active-scale {
+  @apply active:scale-95 transition-all duration-200;
 }
 
 /* Animations */
@@ -113,4 +114,15 @@ input, select, textarea {
 @keyframes slide-up {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Smooth layout transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
 }
