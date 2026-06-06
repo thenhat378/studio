@@ -204,8 +204,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ...userSnap.docs.filter(d => d.id !== currentUser.id).map(d => d.ref)
       ];
 
-      // Firestore Batch has a limit of 500 operations.
-      // We chunk the deletions into batches of 400 to be safe.
+      // Cơ chế xóa theo Batch để tránh giới hạn 500 bản ghi của Firestore
       for (let i = 0; i < refsToDelete.length; i += 400) {
         const batch = writeBatch(db);
         const chunk = refsToDelete.slice(i, i + 400);
