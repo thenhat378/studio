@@ -115,7 +115,7 @@ export default function Overview() {
     setIsSubmitting(true);
     try {
       await login(loginPhone, loginPass);
-      toast({ title: "Chào mừng trở lại!", description: "Đăng nhập thành công." });
+      // Removed toast notification for faster UX as requested
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -215,7 +215,7 @@ export default function Overview() {
               <TabsContent value="login" className="p-8 md:p-12 space-y-8">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Số điện thoại</Label>
+                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">SỐ ĐIỆN THOẠI</Label>
                     <div className="relative">
                       <Phone className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
                       <Input placeholder="Số điện thoại" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPhone} onChange={e => setLoginPhone(e.target.value)} required />

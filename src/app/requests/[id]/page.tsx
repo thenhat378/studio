@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -220,57 +221,57 @@ export default function RequestDetail() {
 
       {/* RE-DESIGNED PRINT VIEW FOR A4 - SINGLE PAGE ONLY */}
       <div className="print-only bg-white text-black text-[11pt]" style={{ padding: '0 5mm' }}>
-        <div className="flex justify-between items-start mb-6">
-          <div className="text-center w-[45%] space-y-0.5">
-            <p className="font-normal text-[10pt] uppercase leading-tight">ĐẠI HỌC ĐÀ NẴNG</p>
-            <p className="font-bold text-[11pt] uppercase leading-tight">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div className="w-20 h-[0.5px] bg-black mx-auto mt-0.5" />
+        <div className="flex justify-between items-start mb-10 border-b pb-6">
+          <div className="text-center w-[45%] space-y-1">
+            <p className="font-bold text-[12pt] uppercase leading-tight">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-extrabold text-[13pt] uppercase leading-tight">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div className="w-24 h-[1.5px] bg-black mx-auto mt-1" />
           </div>
-          <div className="text-center w-[55%] space-y-0.5">
+          <div className="text-center w-[55%] space-y-1">
             <p className="font-bold text-[11pt] uppercase leading-tight">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
             <p className="font-bold text-[11pt] leading-tight">Độc lập - Tự do - Hạnh phúc</p>
-            <div className="w-32 h-[0.5px] bg-black mx-auto mt-0.5" />
-            <p className="text-[10pt] italic pt-2 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <div className="w-32 h-[1px] bg-black mx-auto mt-1" />
+            <p className="text-[10pt] italic pt-3 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center space-y-1 mb-6">
-          <h1 className="text-[16pt] font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-[10pt] font-normal italic">Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-[18pt] font-extrabold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p className="text-[11pt] font-medium italic">Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="print-section-title">I. Thông tin người yêu cầu</div>
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-2 pt-1">
             <div className="print-row"><span className="print-label">Họ và tên:</span><span className="print-value">{req.requesterName}</span></div>
             <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
             <div className="print-row"><span className="print-label">Vị trí sự cố:</span><span className="print-value">{req.location}</span></div>
             <div className="print-row"><span className="print-label">Thời gian báo:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
-            <div className="py-1"><span className="print-label block">Mô tả hỏng hóc:</span><p className="italic text-[10.5pt]">{req.description}</p></div>
+            <div className="py-2"><span className="print-label block mb-1">Mô tả hỏng hóc:</span><p className="italic text-[11pt] border-l-2 border-slate-200 pl-4 py-1">{req.description}</p></div>
           </div>
 
           <div className="print-section-title">II. Kết quả xử lý kỹ thuật</div>
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-2 pt-1">
             <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
             <div className="print-row"><span className="print-label">Nhân viên kỹ thuật:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
             <div className="print-row"><span className="print-label">Hình thức xử lý:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
             <div className="print-row"><span className="print-label">Thời gian hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
-            <div className="py-1"><span className="print-label block">Nội dung công việc đã thực hiện:</span><p className="italic text-[10.5pt]">{req.technicianReport || 'N/A'}</p></div>
+            <div className="py-2"><span className="print-label block mb-1">Nội dung công việc đã thực hiện:</span><p className="italic text-[11pt] border-l-2 border-slate-200 pl-4 py-1">{req.technicianReport || 'N/A'}</p></div>
           </div>
 
           <div className="print-section-title">III. Nghiệm thu & Đánh giá</div>
-          <div className="space-y-1.5 pt-1">
-            <div className="print-row"><span className="print-label">Mức độ hài lòng:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đã nghiệm thu'}</span></div>
-            <div className="py-1"><span className="print-label block">Phản hồi của đơn vị:</span><p className="italic text-[10.5pt]">{req.requesterFeedback || 'Đạt yêu cầu.'}</p></div>
+          <div className="space-y-2 pt-1">
+            <div className="print-row"><span className="print-label">Mức độ hài lòng:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đạt yêu cầu'}</span></div>
+            <div className="py-2"><span className="print-label block mb-1">Phản hồi của đơn vị:</span><p className="italic text-[11pt] border-l-2 border-slate-200 pl-4 py-1">{req.requesterFeedback || 'Thiết bị đã hoạt động ổn định.'}</p></div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-8 text-center text-[11pt]">
-          <div className="space-y-14">
+        <div className="grid grid-cols-2 gap-4 mt-12 text-center text-[11pt]">
+          <div className="space-y-20">
             <p className="font-bold uppercase">NGƯỜI YÊU CẦU</p>
             <p className="font-normal italic text-[10pt]">(Ký và ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-14">
+          <div className="space-y-20">
             <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
             <p className="font-normal italic text-[10pt]">(Ký và đóng dấu)</p>
           </div>
