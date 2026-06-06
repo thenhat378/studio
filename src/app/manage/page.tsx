@@ -41,7 +41,7 @@ export default function ManagementPage() {
 
   const pendingAssignment = useMemo(() => requests.filter(r => r.status === 'approved'), [requests]);
   const pendingVerification = useMemo(() => requests.filter(r => r.status === 'completed'), [requests]);
-  const historyRequests = useMemo(() => requests.filter(r => ['closed', 'verified', 'completed'].includes(r.status)), [requests]);
+  const historyRequests = useMemo(() => requests.filter(r => r.technicianId && ['closed', 'verified', 'completed'].includes(r.status)), [requests]);
 
   const technicians = useMemo(() => users.filter(u => u.role === 'technician'), [users]);
 
@@ -128,7 +128,7 @@ export default function ManagementPage() {
                   <h3 className="font-black text-lg text-slate-800 truncate mb-2">{req.title}</h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> Báo hỏng: {formatDate(req.createdAt)}</span>
-                    <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {req.unit}</span>
+                    <span className="flex items-center gap-1.5 uppercase"><User className="h-3.5 w-3.5" /> {req.unit}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">

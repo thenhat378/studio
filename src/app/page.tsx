@@ -329,7 +329,7 @@ export default function Overview() {
               <h1 className="text-3xl font-black leading-none">Chào, {currentUser.name.split(' ').pop()}!</h1>
               <div className="flex items-center gap-2 pt-2">
                  <Building className="h-4 w-4 opacity-60" />
-                 <p className="text-sm font-bold opacity-80">{currentUser.unit}</p>
+                 <p className="text-sm font-bold opacity-80 uppercase">{currentUser.unit}</p>
               </div>
             </div>
             <Badge className="bg-white/20 border-none font-black text-[10px] uppercase tracking-tighter px-4 py-2 rounded-full">
@@ -368,7 +368,7 @@ export default function Overview() {
             </h3>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {roleFilteredRequests.filter(r => r.status === 'closed' || r.status === 'verified').slice(0, 4).map(req => (
+            {roleFilteredRequests.filter(r => r.technicianId && (r.status === 'closed' || r.status === 'verified' || r.status === 'completed')).slice(0, 4).map(req => (
               <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-8 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
@@ -384,13 +384,13 @@ export default function Overview() {
                 
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-100">
                   <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase">Nhận việc lúc</p>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Nhận việc lúc</p>
                     <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                       <Clock className="h-3 w-3 text-blue-500" /> {formatDate(req.assignedAt)}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase">Báo xong lúc</p>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Báo xong lúc</p>
                     <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5">
                       <CheckCircle2 className="h-3 w-3" /> {formatDate(req.completedAt)}
                     </p>

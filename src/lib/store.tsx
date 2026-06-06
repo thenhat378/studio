@@ -133,7 +133,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: userId,
       name: data.name.trim(),
       role: data.role,
-      unit: data.unit.trim(),
+      unit: data.unit.trim().toLowerCase(),
       phoneNumber: data.phone,
       password: data.pass
     };
@@ -157,7 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     const rawData = {
       ...req,
-      unit: req.unit.trim(),
+      unit: req.unit.trim().toLowerCase(),
       createdAt: new Date().toISOString(),
       status: 'pending_approval' as const
     };
@@ -166,10 +166,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
+    const now = new Date().toISOString();
     const updateData: any = { status };
+    
+    // Auto-timestamps
     if (status === 'assigned') {
-      updateData.assignedAt = new Date().toISOString();
+      updateData.assignedAt = now;
     }
+    if (status === 'completed') {
+      updateData.completedAt = now;
+    }
+    
     if (extra) Object.assign(updateData, extra);
     await updateDoc(doc(db, 'requests', id), cleanObject(updateData));
   };
