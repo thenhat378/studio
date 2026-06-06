@@ -4,13 +4,6 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    
     /* DUE Blue - Primary (Chữ E) */
     --primary: 209 100% 32%;
     --primary-foreground: 210 40% 98%;
@@ -22,6 +15,13 @@
     /* DUE Orange - Accent (Chữ D) */
     --accent: 28 92% 54%;
     --accent-foreground: 210 40% 98%;
+
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
     
     --muted: 210 40% 96.1%;
     --muted-foreground: 215 16% 47%;

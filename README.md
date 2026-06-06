@@ -1,4 +1,3 @@
-
 # 🚀 Hướng Dẫn Bảo Trì & Tiếp Tục Dự Án (Lưu Trữ An Toàn)
 
 Dự án **Requisition Form DUE** của bạn đã được cập nhật bản chuẩn nhất. Để không mất công làm lại khi bạn tắt máy, hãy thực hiện theo hướng dẫn này.
@@ -23,11 +22,11 @@ Dự án **Requisition Form DUE** của bạn đã được cập nhật bản c
 ## 💾 CÁCH LƯU TRỮ CÔNG VIỆC ĐỂ TẮT MÁY
 
 ### 1. Tải về máy tính (Khuyên dùng)
-Hãy nhấn nút **"Download Project"** (Biểu tượng mũi tên đi xuống hoặc biểu tượng nén tập tin) ở thanh công cụ phía trên cùng bên phải màn hình IDE.
+Hãy nhấn nút **"Download Project"** ở thanh công cụ phía trên cùng bên phải màn hình IDE.
 - Việc này sẽ tải về tệp `.zip` chứa toàn bộ mã nguồn hiện tại.
-- Ngày mai, bạn chỉ cần mở lại Studio và "Import" thư mục này hoặc mở trực tiếp để tiếp tục.
+- Bạn có thể giải nén và mở bằng VS Code để tiếp tục phát triển hoặc triển khai lên hosting riêng.
 
-### 2. Sử dụng GitHub (Dành cho lập trình viên)
+### 2. Sử dụng GitHub
 Nếu bạn có tài khoản GitHub, hãy đẩy mã nguồn lên Repo cá nhân thông qua thanh công cụ Git trong IDE.
 
 ---
@@ -45,9 +44,10 @@ Hệ thống đã được làm sạch dữ liệu. Bạn hãy thực hiện the
 
 ---
 
-## 🔑 Lưu ý quan trọng
+## 🔑 Lưu ý quan trọng trước khi Deploy
 - **Mật khẩu**: Yêu cầu 8 ký tự và ít nhất 1 ký tự đặc biệt (!@#...).
-- **Nút Reset**: Trong mục **Người dùng** của Admin, có nút **"Dọn dẹp Phiếu & Người dùng"** để bạn xóa sạch mọi dữ liệu và bắt đầu lại bất cứ lúc nào.
+- **Làm sạch dữ liệu**: Trong mục **Người dùng** của Admin, hãy nhấn nút **"Dọn dẹp Phiếu & Người dùng"** để xóa toàn bộ dữ liệu rác trước khi bàn giao chính thức.
+- **Tài khoản mặc định**: Sau khi dọn dẹp, hệ thống sẽ chỉ giữ lại tài khoản của chính bạn (Admin).
 
 ---
-*Hệ thống đã sẵn sàng. Chúc bạn có một buổi kiểm thử thành công!*
+*Hệ thống đã sẵn sàng cho giai đoạn triển khai chính thức. Chúc bạn có một buổi vận hành thành công!*
