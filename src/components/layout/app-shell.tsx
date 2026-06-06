@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useMemo } from 'react';
@@ -115,7 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex w-72 flex-col border-r bg-white no-print fixed h-full z-40 shadow-sm">
         <div className="flex h-20 items-center px-8 border-b shrink-0">
           <Link href="/" className="flex items-center gap-3 font-black text-sm tracking-tighter uppercase">
-            <div className="h-10 w-10 bg-primary rounded-[1.2rem] flex items-center justify-center text-white shadow-lg shadow-primary/20">
+            <div className="h-10 w-10 bg-accent rounded-[1.2rem] flex items-center justify-center text-white shadow-lg shadow-accent/20">
               <Wrench className="h-6 w-6" />
             </div>
             <div className="flex flex-col leading-none">
@@ -150,7 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
           {currentUser.role === 'requester' && (
             <Link href="/requests/new" className="block pt-4">
-              <Button className="w-full justify-start gap-4 h-14 px-5 text-[13px] font-black rounded-[1.2rem] bg-accent text-white hover:bg-accent/90 shadow-lg shadow-orange-100">
+              <Button className="w-full justify-start gap-4 h-14 px-5 text-[13px] font-black rounded-[1.2rem] bg-secondary text-white hover:bg-secondary/90 shadow-lg shadow-green-100">
                 <PlusCircle className="h-5 w-5" />
                 Tạo phiếu mới
               </Button>
@@ -184,7 +185,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile Header */}
         <header className="md:hidden glass-morphism fixed top-0 left-0 w-full h-20 flex items-center justify-between px-6 z-50 shadow-sm border-none">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-[1.5rem] bg-primary flex items-center justify-center text-white font-black text-xl shadow-xl shadow-primary/20">
+            <div className="h-12 w-12 rounded-[1.5rem] bg-accent flex items-center justify-center text-white font-black text-xl shadow-xl shadow-accent/20">
               {currentUser.name.charAt(0)}
             </div>
             <div className="flex flex-col">
@@ -208,7 +209,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SheetContent side="right" className="w-[85vw] rounded-l-[3.5rem] p-0 border-none shadow-2xl">
                 <div className="flex flex-col h-full bg-white p-10">
                   <div className="flex items-center gap-5 mb-10 pt-4">
-                    <div className="h-16 w-16 rounded-[2rem] bg-primary flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-primary/20">
+                    <div className="h-16 w-16 rounded-[2rem] bg-accent flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-accent/20">
                       {currentUser.name.charAt(0)}
                     </div>
                     <div>
@@ -237,7 +238,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {currentUser.role === 'requester' && (
                       <SheetClose asChild>
                         <Link href="/requests/new">
-                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-accent hover:bg-orange-50 transition-all">
+                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-secondary hover:bg-green-50 transition-all">
                             <PlusCircle className="h-6 w-6" /> Tạo phiếu mới
                           </Button>
                         </Link>
@@ -310,7 +311,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
           {currentUser.role === 'requester' && (
             <Link href="/requests/new" className="absolute -top-10 left-1/2 -translate-x-1/2 active:scale-90 transition-all">
-              <div className="h-20 w-20 rounded-full bg-accent flex items-center justify-center text-white shadow-2xl shadow-orange-200 border-[6px] border-[#F4F7FE]">
+              <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center text-white shadow-2xl shadow-green-200 border-[6px] border-[#F4F7FE]">
                 <PlusCircle className="h-10 w-10" />
               </div>
             </Link>

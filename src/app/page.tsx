@@ -194,7 +194,7 @@ export default function Overview() {
       <div className="relative flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
         <div className="w-full max-w-[480px] space-y-8 text-center animate-slide-up">
           <div className="flex flex-col items-center gap-2 mb-8">
-            <div className="h-24 w-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 active-scale">
+            <div className="h-24 w-24 bg-accent rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-accent/30 active-scale">
               <Wrench className="h-12 w-12 text-white" />
             </div>
             <h1 className="text-4xl font-black tracking-tighter mt-4 leading-none uppercase">
@@ -208,8 +208,8 @@ export default function Overview() {
           <Card className="rounded-[3.5rem] overflow-hidden bg-white card-shadow text-left border-none">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-20 bg-slate-50 p-2">
-                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary">Đăng ký</TabsTrigger>
+                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-accent">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-secondary">Đăng ký</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login" className="p-8 md:p-12 space-y-8">
@@ -299,7 +299,7 @@ export default function Overview() {
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
               © 2026 Hệ thống quản lý Phiếu yêu cầu, cáp phát sửa chữa v1.0
             </div>
-            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
+            <div className="text-[9px] font-bold text-primary uppercase tracking-widest opacity-60">
               Phát triển bởi Phòng Cơ sở vật chất
             </div>
           </footer>
@@ -308,7 +308,7 @@ export default function Overview() {
         <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
           <DialogContent className="rounded-[3.5rem] p-8 md:p-12 border-none shadow-2xl max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="uppercase font-black text-primary text-2xl tracking-tighter flex items-center gap-3">
+              <DialogTitle className="uppercase font-black text-accent text-2xl tracking-tighter flex items-center gap-3">
                 <BookOpen className="h-7 w-7 text-secondary" /> Hướng dẫn quy trình
               </DialogTitle>
             </DialogHeader>
@@ -325,7 +325,7 @@ export default function Overview() {
                 ].map((item, i) => (
                   <div key={i} className="flex gap-5 group">
                     <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center font-black text-xs text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                      <div className="h-10 w-10 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center font-black text-xs text-accent group-hover:bg-accent group-hover:text-white transition-all">
                         {i + 1}
                       </div>
                       {i < 6 && <div className="w-[2px] h-full bg-slate-50" />}
@@ -340,8 +340,8 @@ export default function Overview() {
                   </div>
                 ))}
               </div>
-              <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10">
-                <div className="text-[10px] font-black uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
+              <div className="p-6 bg-accent/5 rounded-[2rem] border border-accent/10">
+                <div className="text-[10px] font-black uppercase text-accent tracking-widest mb-2 flex items-center gap-2">
                    <Info className="h-4 w-4" /> Lưu ý quan trọng
                 </div>
                 <div className="text-xs font-bold text-slate-600 leading-relaxed italic">
@@ -410,7 +410,7 @@ export default function Overview() {
 
   return (
     <div className="space-y-8 pb-safe">
-      <div className="bg-primary rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
+      <div className="bg-accent rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="space-y-3">
               <div className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">HỆ THỐNG QUẢN LÝ DUE</div>
@@ -427,7 +427,7 @@ export default function Overview() {
             </Badge>
          </div>
          <div className="absolute -right-20 -bottom-20 h-64 w-64 bg-white/5 rounded-full blur-3xl" />
-         <div className="absolute -left-20 -top-20 h-40 w-40 bg-accent/10 rounded-full blur-2xl" />
+         <div className="absolute -left-20 -top-20 h-40 w-40 bg-secondary/10 rounded-full blur-2xl" />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -455,13 +455,13 @@ export default function Overview() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-6">
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] flex items-center gap-3">
-              <div className="p-2 bg-primary/5 rounded-lg"><BarChart3 className="h-4 w-4 text-primary" /></div>
+              <div className="p-2 bg-secondary/5 rounded-lg"><BarChart3 className="h-4 w-4 text-secondary" /></div>
               Báo cáo hiệu suất kỹ thuật
             </h3>
           </div>
           <div className="grid gap-6 md:grid-cols-2 px-4 md:px-0">
             {roleFilteredRequests.filter(r => r.technicianId && (['closed', 'verified', 'completed'].includes(r.status))).slice(0, 4).map(req => (
-              <Card key={req.id} className="rounded-[3rem] bg-white border-none card-shadow p-10 space-y-6 border-t-8 border-t-primary/5">
+              <Card key={req.id} className="rounded-[3rem] bg-white border-none card-shadow p-10 space-y-6 border-t-8 border-t-secondary/5">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 space-y-1">
                     <div className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">[{req.location}] {req.technicianName}</div>
@@ -480,7 +480,7 @@ export default function Overview() {
                   <div className="space-y-2">
                     <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận việc lúc</div>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
-                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      <Clock className="h-3.5 w-3.5 text-accent" />
                       <span className="text-[11px] font-bold text-slate-700">{formatDate(req.assignedAt)}</span>
                     </div>
                   </div>
@@ -495,14 +495,14 @@ export default function Overview() {
 
                 <div className="flex items-center justify-between px-2 pt-2">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/5 rounded-lg">
-                      <Timer className="h-4 w-4 text-primary" />
+                    <div className="p-2 bg-accent/5 rounded-lg">
+                      <Timer className="h-4 w-4 text-accent" />
                     </div>
                     <span className="text-xs font-black text-slate-700 uppercase tracking-tight">Xử lý trong: {getDuration(req.assignedAt, req.completedAt)}</span>
                   </div>
                   <Badge className={cn(
                     "text-[9px] font-black uppercase border-none px-4 py-1.5 rounded-lg",
-                    req.status === 'closed' ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"
+                    req.status === 'closed' ? "bg-secondary/10 text-secondary" : "bg-accent/10 text-accent"
                   )}>
                     {req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}
                   </Badge>
@@ -521,11 +521,11 @@ export default function Overview() {
         <div className="grid gap-4 px-4 md:px-0">
           {roleFilteredRequests.slice(0, 6).map(req => (
             <Link key={req.id} href={`/requests/${req.id}`} className="active-scale">
-               <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30 group">
+               <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-accent/30 group">
                   <CardContent className="p-8 flex items-center justify-between">
                      <div className="space-y-3 min-w-0">
                         <div className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase truncate">
-                          <span className="text-primary/40 mr-2 font-black">#</span>[{req.location}] {req.equipmentName}
+                          <span className="text-accent/40 mr-2 font-black">#</span>[{req.location}] {req.equipmentName}
                         </div>
                         <div className="flex items-center gap-3">
                            <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 bg-slate-100 text-slate-500 border-none rounded-lg">
@@ -535,19 +535,13 @@ export default function Overview() {
                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</div>
                         </div>
                      </div>
-                     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary/5 group-hover:text-primary transition-all ml-4 shrink-0">
+                     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-accent/5 group-hover:text-accent transition-all ml-4 shrink-0">
                         <ChevronRight className="h-6 w-6" />
                      </div>
                   </CardContent>
                </Card>
             </Link>
           ))}
-          {roleFilteredRequests.length === 0 && (
-            <div className="text-center py-24 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100 mx-4 md:mx-0">
-              <Info className="h-16 w-16 text-slate-100 mx-auto mb-6" />
-              <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">KHÔNG CÓ HOẠT ĐỘNG NÀO</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
