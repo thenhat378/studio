@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Clock, MapPin, HardDrive } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Clock, MapPin, HardDrive, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -140,10 +140,10 @@ export default function TasksPage() {
                 <SelectTrigger className="h-14 bg-slate-50 border-none rounded-2xl font-bold">
                   <SelectValue placeholder="Chọn hình thức..." />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="repair_only">Sửa chữa tại chỗ</SelectItem>
-                  <SelectItem value="replacement">Thay mới thiết bị</SelectItem>
-                  <SelectItem value="backup_replacement">Dùng thiết bị dự phòng</SelectItem>
+                <SelectContent className="rounded-2xl">
+                  <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa, khắc phục không cần thay thế thiết bị</SelectItem>
+                  <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay mới bằng thiết bị dự phòng</SelectItem>
+                  <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ thiết bị mua mới</SelectItem>
                 </SelectContent>
               </Select>
             </div>

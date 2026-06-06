@@ -11,7 +11,7 @@ export type RequestStatus =
   | 'closed'
   | 'rejected';
 
-export type RepairType = 'replacement' | 'backup_replacement' | 'repair_only';
+export type RepairType = 'repair_only' | 'backup_replacement' | 'pending_purchase';
 
 export interface User {
   id: string;

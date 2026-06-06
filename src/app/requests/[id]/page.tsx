@@ -139,9 +139,9 @@ export default function RequestDetail() {
 
   const getRepairTypeText = (type?: RepairType) => {
     switch(type) {
-      case 'repair_only': return 'Sửa chữa tại chỗ';
-      case 'replacement': return 'Thay mới thiết bị';
-      case 'backup_replacement': return 'Thay thiết bị dự phòng';
+      case 'repair_only': return 'Sửa chữa, khắc phục không cần thay thế thiết bị';
+      case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
+      case 'pending_purchase': return 'Chờ thiết bị mua mới';
       default: return 'Chưa xác định';
     }
   };
@@ -547,10 +547,23 @@ export default function RequestDetail() {
                   {req.status === 'in_progress' && (
                     <div className="space-y-6 p-8 border-2 border-dashed rounded-[3rem] bg-slate-50 shadow-inner">
                       <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Hình thức xử lý</Label>
+                        <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
+                          <SelectTrigger className="h-16 rounded-[1.8rem] bg-white border-none font-bold px-6 shadow-sm">
+                            <SelectValue placeholder="Chọn hình thức..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa, khắc phục không cần thay thế thiết bị</SelectItem>
+                            <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay mới bằng thiết bị dự phòng</SelectItem>
+                            <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ thiết bị mua mới</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-3">
                         <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Báo cáo chi tiết công việc</Label>
                         <Textarea placeholder="Nội dung công việc, linh kiện thay thế..." className="min-h-[140px] rounded-[2rem] bg-white border-none shadow-sm font-bold p-6 leading-relaxed" value={report} onChange={e => setReport(e.target.value)} />
                       </div>
-                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim()} onClick={() => handleAction('completed', { technicianReport: report, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
+                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType: repairType as RepairType, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
                     </div>
                   )}
                 </>
