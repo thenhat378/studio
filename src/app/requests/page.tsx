@@ -6,7 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList, Plus } from 'lucide-react';
+import { Search, PlusCircle, Wrench, Clock, ThumbsUp, ChevronRight, HardDrive, User, ClipboardList, Plus, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -36,16 +36,16 @@ export default function RequestsList() {
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="flex flex-col gap-4">
+    <div className="space-y-8 pb-24">
+      <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Danh sách phiếu</h1>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Theo dõi tiến độ sửa chữa</p>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Danh sách phiếu</h1>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 opacity-80">THEO DÕI TIẾN ĐỘ SỬA</p>
           </div>
           {currentUser?.role === 'requester' && (
             <Link href="/requests/new" className="hidden md:block">
-              <Button className="bg-[#0054A4] rounded-2xl h-11 font-bold gap-2">
+              <Button className="bg-[#0054A4] hover:bg-[#00448a] rounded-2xl h-12 px-6 font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95">
                 <Plus className="h-4 w-4" /> Tạo phiếu mới
               </Button>
             </Link>
@@ -53,53 +53,55 @@ export default function RequestsList() {
         </div>
         
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
           <Input 
             placeholder="Tìm theo tiêu đề, thiết bị..." 
-            className="pl-12 h-14 rounded-2xl bg-white border-none shadow-sm font-bold text-sm"
+            className="pl-14 h-16 rounded-[1.8rem] bg-white border-none shadow-sm font-bold text-sm text-slate-700 placeholder:text-slate-300 focus-visible:ring-2 focus-visible:ring-primary/10"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid gap-6">
         {filteredRequests.map(req => {
           const status = getStatusInfo(req.status);
           return (
             <Link key={req.id} href={`/requests/${req.id}`}>
-              <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden hover:scale-[1.01] transition-transform">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-                      <HardDrive className="h-6 w-6 text-primary/30" />
+              <Card className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden hover:scale-[1.01] transition-all duration-300 active:scale-100 border-l-8 border-l-slate-100 hover:border-l-primary/30">
+                <CardContent className="p-8">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                      <HardDrive className="h-7 w-7 text-primary/20" />
                     </div>
-                    <Badge className={cn("border-none font-black text-[9px] uppercase px-3 py-1", status.bg, status.color)}>
+                    <Badge className={cn("border-none font-black text-[10px] uppercase px-4 py-1.5 rounded-full shadow-sm", status.bg, status.color)}>
                       {status.label}
                     </Badge>
                   </div>
                   
-                  <div className="space-y-3">
-                    <h3 className="font-black text-lg text-slate-800 leading-tight">{req.title}</h3>
-                    <div className="flex flex-wrap gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
-                      <span className="flex items-center gap-1.5"><Wrench className="h-3.5 w-3.5" /> {req.equipmentName}</span>
-                      <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
+                  <div className="space-y-4">
+                    <h3 className="font-black text-xl text-slate-800 leading-tight tracking-tight">{req.title}</h3>
+                    <div className="flex flex-wrap gap-5 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
+                      <span className="flex items-center gap-2"><Wrench className="h-4 w-4 text-primary/30" /> {req.equipmentName}</span>
+                      <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-slate-200" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
-                     <div className="flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                           <User className="h-3 w-3 text-primary" />
+                  <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
+                     <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm">
+                           <User className="h-4 w-4 text-slate-400" />
                         </div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">{req.requesterName}</span>
+                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">{req.requesterName}</span>
                      </div>
-                     <ChevronRight className="h-5 w-5 text-slate-200" />
+                     <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-200 group-hover:bg-primary group-hover:text-white transition-all">
+                        <ChevronRight className="h-6 w-6" />
+                     </div>
                   </div>
                   
                   {req.status === 'verified' && !req.requesterConfirmed && currentUser?.role === 'requester' && (
-                    <div className="mt-4">
-                      <Button className="w-full bg-primary h-12 rounded-xl font-bold gap-2 text-xs uppercase tracking-widest shadow-lg shadow-blue-100">
+                    <div className="mt-6">
+                      <Button className="w-full bg-primary h-14 rounded-2xl font-black gap-2 text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-primary/90 transition-all">
                         <ThumbsUp className="h-4 w-4" /> Xác nhận hài lòng
                       </Button>
                     </div>
@@ -110,9 +112,11 @@ export default function RequestsList() {
           );
         })}
         {filteredRequests.length === 0 && (
-          <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
-            <ClipboardList className="h-16 w-16 text-slate-100 mx-auto mb-6" />
-            <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Không tìm thấy phiếu nào</p>
+          <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100/50">
+            <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+              <FileText className="h-12 w-12 text-slate-200" />
+            </div>
+            <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">KHÔNG TÌM THẤY PHIẾU NÀO</p>
           </div>
         )}
       </div>

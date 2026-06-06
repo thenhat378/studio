@@ -21,6 +21,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { currentUser, logout, isInitialized } = useAppStore();
@@ -40,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: 'Trang chủ', href: '/', icon: LayoutDashboard },
-    { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
+    { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader', 'csvc_manager'] },
     { name: 'Duyệt đơn vị', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
     { name: 'Quản lý CSVC', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
@@ -61,31 +62,41 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const getPageTitle = () => {
+    const item = navigation.find(n => n.href === pathname);
+    return item ? item.name.toUpperCase() : 'CHI TIẾT';
+  };
+
   return (
     <div className="flex min-h-screen bg-[#F4F7FE]">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-white no-print fixed h-full z-40">
         <div className="flex h-16 items-center px-6 border-b shrink-0">
           <Link href="/" className="flex items-center gap-2 font-black text-sm tracking-tighter uppercase">
-            <Wrench className="h-5 w-5 p-1 bg-primary text-white rounded-lg shrink-0" />
-            <span className="text-slate-800">
-              Requisition Form <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
-            </span>
+            <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white">
+              <Wrench className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-[10px] text-slate-800 font-black">REQUISITION FORM</span>
+              <span className="text-[14px] font-black">
+                <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
+              </span>
+            </div>
           </Link>
         </div>
         <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
           {filteredNav.map((item) => (
             <Link key={item.name} href={item.href}>
               <Button
-                variant={pathname === item.href ? "secondary" : "ghost"}
+                variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl",
+                  "w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl transition-all",
                   pathname === item.href 
-                    ? "bg-primary/10 text-primary" 
-                    : "text-slate-500 hover:bg-slate-50"
+                    ? "bg-primary/5 text-primary" 
+                    : "text-slate-400 hover:bg-slate-50"
                 )}
               >
-                <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-slate-400")} />
+                <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-slate-300")} />
                 {item.name}
               </Button>
             </Link>
@@ -100,13 +111,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </div>
         <div className="p-4 border-t">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-rose-500 hover:bg-rose-50 h-12 rounded-2xl font-bold" 
-            onClick={() => logout()}
-          >
-            <Power className="mr-3 h-5 w-5" /> Đăng xuất
-          </Button>
+          <div className="flex items-center gap-3 px-2 mb-2">
+            <Avatar className="h-10 w-10 border-2 border-slate-100">
+              <AvatarFallback className="bg-slate-800 text-white font-black text-xs">
+                {currentUser.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <Button 
+              variant="ghost" 
+              className="flex-1 justify-start text-rose-500 hover:bg-rose-50 h-10 rounded-xl font-black text-xs uppercase p-0 px-2" 
+              onClick={() => logout()}
+            >
+              Đăng xuất
+            </Button>
+          </div>
         </div>
       </aside>
 
@@ -181,18 +199,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Desktop Header */}
         <header className="hidden md:flex h-20 items-center justify-between px-8 bg-transparent no-print">
-          <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">
-            {(pathname === '/' || pathname === '/dashboard') ? '' : (navigation.find(n => n.href === pathname)?.name || '')}
+          <h2 className="text-xl font-black text-slate-800 tracking-tighter">
+            {getPageTitle()}
           </h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input 
                 placeholder="Tìm kiếm nhanh..." 
-                className="bg-white border-none rounded-2xl h-11 pl-10 pr-4 w-64 shadow-sm text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                className="bg-white border-none rounded-2xl h-11 pl-10 pr-4 w-64 shadow-sm text-sm focus:ring-2 focus:ring-primary/20 outline-none font-medium"
               />
             </div>
-            <div className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center shadow-sm border">
+            <div className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
               <Bell className="h-5 w-5 text-slate-400" />
             </div>
           </div>
