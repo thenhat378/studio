@@ -3,9 +3,9 @@
   "placeholderImages": [
     {
       "id": "due-logo",
-      "description": "Logo DUE - University of Economics",
-      "imageUrl": "https://placehold.co/512x512/0054A4/FFFFFF?text=DUE",
-      "imageHint": "university emblem"
+      "description": "Logo DUE - University of Economics Since 1975",
+      "imageUrl": "https://placehold.co/512x512/FFFFFF/0054A4?text=DUE+SINCE+1975",
+      "imageHint": "university logo"
     },
     {
       "id": "hero-repair",

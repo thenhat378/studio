@@ -13,13 +13,13 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#0054A4',
     icons: [
       {
-        src: 'https://placehold.co/192x192/0054A4/FFFFFF?text=DUE',
+        src: 'https://placehold.co/192x192/FFFFFF/0054A4?text=DUE+1975',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'maskable'
       },
       {
-        src: 'https://placehold.co/512x512/0054A4/FFFFFF?text=DUE',
+        src: 'https://placehold.co/512x512/FFFFFF/0054A4?text=DUE+SINCE+1975',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any'
