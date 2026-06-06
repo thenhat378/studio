@@ -41,6 +41,12 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Hàm chuẩn hóa chuỗi dữ liệu (xóa khoảng trắng thừa)
+const normalizeString = (str: string | undefined) => {
+  if (!str) return '';
+  return str.trim();
+};
+
 const cleanObject = (obj: any) => {
   if (obj === null || typeof obj !== 'object') return obj;
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -77,7 +83,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Lắng nghe thay đổi của toàn bộ phiếu
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
@@ -90,7 +95,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
-  // Lắng nghe thay đổi người dùng
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -99,7 +103,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
-  // Lắng nghe thay đổi thiết bị
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'equipment'), (snapshot) => {
@@ -141,7 +144,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: userId,
       name: data.name.trim(),
       role: data.role,
-      unit: data.unit.trim(),
+      unit: normalizeString(data.unit), // Chuẩn hóa đơn vị khi đăng ký
       phoneNumber: data.phone,
       password: data.pass
     };
@@ -164,10 +167,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    // Đảm bảo đơn vị luôn được gán chính xác và bỏ khoảng trắng
     const rawData = {
       ...req,
-      unit: req.unit.trim(),
+      unit: normalizeString(req.unit), // Chuẩn hóa đơn vị khi tạo phiếu
       createdAt: new Date().toISOString(),
       status: 'pending_approval' as const
     };
@@ -202,17 +204,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db || !currentUser) return;
     try {
       const batch = writeBatch(db);
-      
       const requestSnap = await getDocs(collection(db, 'requests'));
       requestSnap.docs.forEach(docSnap => batch.delete(docSnap.ref));
-      
       const userSnap = await getDocs(collection(db, 'users'));
       userSnap.docs.forEach(docSnap => {
         if (docSnap.id !== currentUser.id) {
           batch.delete(docSnap.ref);
         }
       });
-      
       await batch.commit();
     } catch (error) {
       console.error("Reset error:", error);

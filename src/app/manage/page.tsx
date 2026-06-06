@@ -7,14 +7,10 @@ import { Button } from '@/components/ui/button';
 import { 
   ClipboardList, 
   UserCheck, 
-  CheckCircle2, 
   Eye, 
   ShieldCheck,
-  History,
-  Star,
-  Clock,
-  User,
-  ChevronRight
+  ChevronRight,
+  Star
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -37,7 +33,7 @@ export default function ManagementPage() {
 
   const pendingAssignment = useMemo(() => requests.filter(r => r.status === 'approved'), [requests]);
   const pendingVerification = useMemo(() => requests.filter(r => r.status === 'completed'), [requests]);
-  const historyRequests = useMemo(() => requests.filter(r => r.status === 'closed' || r.status === 'verified'), [requests]);
+  const historyRequests = useMemo(() => requests.filter(r => ['closed', 'verified'].includes(r.status)), [requests]);
 
   const technicians = useMemo(() => users.filter(u => u.role === 'technician'), [users]);
 
@@ -67,7 +63,7 @@ export default function ManagementPage() {
     updateRequestStatus(id, 'verified', { csvcManagerApproved: true });
     toast({
       title: "Đã duyệt hoàn thành kỹ thuật",
-      description: "Phiếu đã được chuyển về cho đơn vị nghiệm thu bước cuối."
+      description: "Phiếu đã được chuyển về cho đơn vị nghiệm thu."
     });
   };
 
@@ -79,7 +75,7 @@ export default function ManagementPage() {
             <ClipboardList className="h-7 w-7 text-primary" />
             Điều phối & Quản lý CSVC
           </h1>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò: Phó Trưởng phòng CSVC</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò: Quản lý CSVC</p>
         </div>
       </div>
 
@@ -90,11 +86,11 @@ export default function ManagementPage() {
             {pendingAssignment.length > 0 && <Badge variant="destructive" className="ml-1 h-5 w-5 p-0">{pendingAssignment.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="verify" className="gap-2 text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl">
-            Bước 5: Duyệt KT
+            Bước 5: Duyệt kỹ thuật
             {pendingVerification.length > 0 && <Badge className="ml-1 bg-cyan-500 h-5 w-5 p-0">{pendingVerification.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2 text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl">
-            Giám sát chung
+            Giám sát
           </TabsTrigger>
         </TabsList>
 
@@ -131,14 +127,14 @@ export default function ManagementPage() {
               <CardContent className="p-7 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-lg text-slate-800 truncate mb-2">{req.title}</h3>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase">KT thực hiện: <span className="text-slate-800">{req.technicianName}</span></p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase">Kỹ thuật: <span className="text-slate-800">{req.technicianName}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link href={`/requests/${req.id}`}>
                     <Button variant="ghost" size="sm" className="h-12 rounded-xl border-2 font-black text-[10px] uppercase"><Eye className="h-4 w-4 mr-2" /> Xem báo cáo</Button>
                   </Link>
                   <Button className="bg-emerald-600 hover:bg-emerald-700 h-12 rounded-xl text-white font-black text-[10px] uppercase gap-2" onClick={() => handleVerify(req.id)}>
-                    <ShieldCheck className="h-4 w-4" /> Duyệt kỹ thuật
+                    <ShieldCheck className="h-4 w-4" /> Duyệt hoàn thành
                   </Button>
                 </div>
               </CardContent>

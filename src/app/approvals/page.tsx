@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, CheckCircle2, Clock, Star, AlertCircle, Building2 } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, CheckCircle2, Star, AlertCircle, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -12,7 +12,6 @@ import { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -26,11 +25,10 @@ export default function ApprovalsPage() {
   const { toast } = useToast();
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
-  
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
-  // Chuẩn hóa bộ lọc phiếu theo đơn vị
+  // Chuẩn hóa và lọc phiếu theo đơn vị (So sánh không phân biệt hoa thường và xóa khoảng trắng)
   const unitRequests = useMemo(() => {
     if (!currentUser?.unit) return [];
     const normalizedUserUnit = currentUser.unit.trim().toLowerCase();
@@ -55,7 +53,7 @@ export default function ApprovalsPage() {
     updateRequestStatus(id, 'approved');
     toast({
       title: "Đã phê duyệt phiếu",
-      description: "Yêu cầu đã được chuyển lên Phòng CSVC để điều phối kỹ thuật."
+      description: "Yêu cầu đã được chuyển lên Quản lý CSVC để điều phối."
     });
   };
 
@@ -89,7 +87,7 @@ export default function ApprovalsPage() {
         </div>
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa xác định Đơn vị</h2>
         <p className="text-sm text-slate-500 max-w-md font-medium">
-          Vui lòng liên hệ Admin cập nhật Đơn vị công tác trước khi thực hiện duyệt phiếu.
+          Vui lòng cập nhật Đơn vị công tác trước khi thực hiện duyệt phiếu.
         </p>
       </div>
     );
@@ -107,7 +105,7 @@ export default function ApprovalsPage() {
             <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3">
               <Building2 className="h-3 w-3 mr-1" /> {currentUser.unit}
             </Badge>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-60">Vai trò: Phó Trưởng đơn vị</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-60">Vai trò: Quản lý đơn vị</p>
           </div>
         </div>
       </div>
@@ -152,7 +150,7 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
                     <Button variant="ghost" size="sm" className="w-full h-12 rounded-xl border-2 font-black text-[10px] uppercase">
-                      <Eye className="h-4 w-4 mr-2" /> Xem xét
+                      <Eye className="h-4 w-4 mr-2" /> Xem
                     </Button>
                   </Link>
                   <Button 
@@ -176,8 +174,7 @@ export default function ApprovalsPage() {
           ))}
           {pendingRequests.length === 0 && (
             <div className="text-center py-24 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hiện không có phiếu chờ duyệt tại đơn vị.</p>
-              <p className="text-[8px] font-bold text-slate-200 uppercase mt-2">Dữ liệu đơn vị: {currentUser.unit}</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ duyệt của đơn vị: {currentUser.unit}</p>
             </div>
           )}
         </TabsContent>
@@ -209,7 +206,7 @@ export default function ApprovalsPage() {
           ))}
           {pendingConfirmation.length === 0 && (
             <div className="text-center py-24 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hiện không có phiếu chờ nghiệm thu tại đơn vị.</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ nghiệm thu</p>
             </div>
           )}
         </TabsContent>

@@ -42,7 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { name: 'Trang chủ', href: '/', icon: LayoutDashboard },
     { name: 'Phiếu', href: '/requests', icon: ClipboardList, roles: ['requester', 'unit_leader'] },
     { name: 'Duyệt đơn vị', href: '/approvals', icon: ShieldCheck, roles: ['unit_leader'] },
-    { name: 'Điều phối CSVC', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
+    { name: 'Quản lý CSVC', href: '/manage', icon: ClipboardList, roles: ['csvc_manager'] },
     { name: 'Nhiệm vụ', href: '/tasks', icon: Wrench, roles: ['technician'] },
     { name: 'Thiết bị', href: '/equipment', icon: Package, roles: ['admin'] },
     { name: 'Người dùng', href: '/users', icon: Users, roles: ['admin'] },
@@ -54,8 +54,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const getRoleDisplayName = (role: string) => {
     switch(role) {
       case 'admin': return 'Quản trị viên';
-      case 'csvc_manager': return 'Phó Trưởng phòng CSVC';
-      case 'unit_leader': return 'Phó Trưởng đơn vị';
+      case 'csvc_manager': return 'Quản lý CSVC';
+      case 'unit_leader': return 'Quản lý đơn vị';
       case 'technician': return 'Nhân viên kỹ thuật';
       default: return 'Nhân viên / Giảng viên';
     }
