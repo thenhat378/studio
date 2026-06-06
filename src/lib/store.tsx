@@ -41,7 +41,6 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Helper to clean object for Firestore
 const cleanObject = (obj: any) => {
   if (obj === null || typeof obj !== 'object') return obj;
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -64,7 +63,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Persistence
   useEffect(() => {
     const savedUser = localStorage.getItem('due_user');
     if (savedUser) {
@@ -79,7 +77,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Listeners
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
@@ -169,7 +166,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const now = new Date().toISOString();
     const updateData: any = { status };
     
-    // Auto-timestamps
     if (status === 'assigned') {
       updateData.assignedAt = now;
     }

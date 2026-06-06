@@ -206,22 +206,22 @@ export default function RequestDetail() {
                      <span>Báo hỏng:</span>
                      <span className="text-slate-800 ml-auto">{formatDate(req.createdAt)}</span>
                    </div>
-                   {req.assignedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-tighter">
-                       <Timer className="h-4 w-4 text-blue-400" /> 
-                       <span>Nhận việc:</span>
-                       <span className="text-blue-700 ml-auto">{formatDate(req.assignedAt)}</span>
-                     </div>
-                   )}
                    {req.completedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-tighter col-span-full">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-tighter">
                        <CheckCircle2 className="h-4 w-4 text-emerald-400" /> 
                        <span>Hoàn thành kỹ thuật:</span>
                        <span className="text-emerald-700 ml-auto">{formatDate(req.completedAt)}</span>
                      </div>
                    )}
+                   {req.assignedAt && (
+                     <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-tighter col-span-full border-t border-slate-100 pt-2 mt-1">
+                       <Timer className="h-4 w-4 text-blue-400" /> 
+                       <span>Nhận việc lúc:</span>
+                       <span className="text-blue-700 ml-auto">{formatDate(req.assignedAt)}</span>
+                     </div>
+                   )}
                    {req.assignedAt && req.completedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-tighter col-span-full border-t border-slate-100 pt-2 mt-1">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-tighter col-span-full">
                        <Timer className="h-4 w-4 text-indigo-400" /> 
                        <span>Tổng thời gian xử lý:</span>
                        <span className="text-indigo-800 ml-auto">{getDuration(req.assignedAt, req.completedAt)}</span>
@@ -372,27 +372,17 @@ export default function RequestDetail() {
                           <Edit3 className="h-5 w-5" /> CHỈNH SỬA & GỬI LẠI PHIẾU
                         </Button>
                       )}
-                      {req.status === 'rejected' && !isEditing && (
-                        <div className="p-6 bg-rose-50 rounded-[2rem] border border-rose-100 flex items-start gap-3">
-                          <X className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-[10px] font-black text-rose-600 uppercase mb-1 tracking-widest">Lý do từ chối phê duyệt:</p>
-                            <p className="text-sm font-bold text-rose-800">{req.rejectionReason}</p>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
 
-                  {req.status === 'completed' && !req.requesterConfirmed && (
+                  {(req.status === 'completed' || req.status === 'verified') && !req.requesterConfirmed && (
                     <div className="space-y-4 p-8 border-2 border-dashed border-primary/20 rounded-[2.5rem] bg-primary/5">
                       <div className="flex items-center gap-3 mb-2">
                         <MessageSquareQuote className="h-6 w-6 text-primary" />
-                        <h4 className="font-black text-sm text-primary uppercase tracking-tighter">Báo cáo hoàn thành công việc</h4>
+                        <h4 className="font-black text-sm text-primary uppercase tracking-tighter">Phản hồi & Xác nhận hài lòng</h4>
                       </div>
-                      <p className="text-[11px] font-bold text-slate-500 leading-relaxed mb-4 uppercase">Kỹ thuật viên đã xử lý xong. Vui lòng cho biết ý kiến phản hồi của bạn về chất lượng dịch vụ.</p>
                       <Textarea 
-                        placeholder="Nhập ý kiến phản hồi của bạn (không bắt buộc)..." 
+                        placeholder="Nhập ý kiến phản hồi của bạn..." 
                         className="min-h-[100px] rounded-[1.5rem] bg-white border-none shadow-sm font-bold p-5"
                         value={feedback}
                         onChange={e => setFeedback(e.target.value)}
@@ -433,20 +423,9 @@ export default function RequestDetail() {
               )}
 
               {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
-                <div className="space-y-5">
-                   <div className="bg-blue-50 p-6 md:p-8 rounded-[2.5rem] flex items-start gap-4 border border-blue-100 shadow-sm">
-                      <Info className="h-6 w-6 text-blue-500 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-[11px] font-black text-blue-700 leading-relaxed uppercase tracking-widest mb-2">Thông tin điều phối</p>
-                        <p className="text-sm font-bold text-blue-800 leading-relaxed">
-                          Kỹ thuật viên đã báo cáo xong. Vui lòng duyệt kết quả kỹ thuật để chuyển về đơn vị sử dụng nghiệm thu và đóng hồ sơ.
-                        </p>
-                      </div>
-                   </div>
-                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" onClick={() => handleAction('verified', { csvcManagerApproved: true })}>
-                     DUYỆT HOÀN THÀNH KỸ THUẬT
-                   </Button>
-                </div>
+                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" onClick={() => handleAction('verified', { csvcManagerApproved: true })}>
+                  DUYỆT HOÀN THÀNH KỸ THUẬT
+                </Button>
               )}
 
               {currentUser?.role === 'technician' && req.technicianId === currentUser.id && (
@@ -457,23 +436,10 @@ export default function RequestDetail() {
                   {req.status === 'in_progress' && (
                     <div className="space-y-6 p-8 border-2 border-dashed rounded-[3rem] bg-slate-50 shadow-inner">
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Hình thức xử lý</Label>
-                        <Select onValueChange={(val) => setRepairType(val as RepairType)}>
-                          <SelectTrigger className="h-16 rounded-[1.8rem] bg-white border-none shadow-sm font-bold px-6">
-                            <SelectValue placeholder="Chọn hình thức..." />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-[2rem]">
-                            <SelectItem value="repair_only" className="rounded-xl h-12">Sửa chữa tại chỗ</SelectItem>
-                            <SelectItem value="replacement" className="rounded-xl h-12">Thay mới thiết bị</SelectItem>
-                            <SelectItem value="backup_replacement" className="rounded-xl h-12">Dùng thiết bị dự phòng</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-3">
                         <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Báo cáo chi tiết công việc</Label>
                         <Textarea placeholder="Nội dung công việc, linh kiện thay thế..." className="min-h-[140px] rounded-[2rem] bg-white border-none shadow-sm font-bold p-6 leading-relaxed" value={report} onChange={e => setReport(e.target.value)} />
                       </div>
-                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
+                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim()} onClick={() => handleAction('completed', { technicianReport: report, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
                     </div>
                   )}
                 </>
@@ -482,48 +448,21 @@ export default function RequestDetail() {
               {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
                 <div className="space-y-6">
                   <div className="flex flex-col items-center gap-6 py-10 bg-slate-50 rounded-[3rem] border border-slate-100 shadow-inner">
-                    <div className="flex flex-col items-center gap-2">
-                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Đánh giá chất lượng phục vụ</Label>
-                       <p className="text-[11px] font-bold text-primary uppercase">Bước cuối cùng: Nghiệm thu đơn vị</p>
-                    </div>
                     <div className="flex gap-4">
                       {[1,2,3,4,5].map(s => (
-                        <Star 
-                          key={s} 
-                          className={cn("h-12 w-12 cursor-pointer transition-all", s <= rating ? "fill-amber-400 text-amber-400 scale-110 drop-shadow-md" : "text-slate-200 hover:text-amber-200")} 
-                          onClick={() => setRating(s)} 
-                        />
+                        <Star key={s} className={cn("h-12 w-12 cursor-pointer transition-all", s <= rating ? "fill-amber-400 text-amber-400 scale-110 drop-shadow-md" : "text-slate-200")} onClick={() => setRating(s)} />
                       ))}
                     </div>
-                    <div className="px-6 py-2 bg-amber-50 rounded-full border border-amber-100">
-                       <p className="text-[10px] font-black text-amber-600 uppercase tracking-tighter">Mức độ hài lòng: {rating}/5 sao</p>
-                    </div>
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-tighter">Đánh giá chất lượng phục vụ: {rating}/5 sao</p>
                   </div>
                   <Button className="w-full bg-emerald-700 hover:bg-emerald-800 h-18 rounded-[2rem] font-black text-lg text-white shadow-2xl transition-all active:scale-95" onClick={() => handleAction('closed', { rating })}>XÁC NHẬN NGHIỆM THU & ĐÓNG PHIẾU</Button>
                 </div>
               )}
 
               {req.status === 'closed' && (
-                <div className="text-center py-12 space-y-6 bg-emerald-50/30 rounded-[3rem] border-2 border-dashed border-emerald-100">
-                  <div className="h-24 w-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto border-8 border-white shadow-xl animate-bounce">
-                    <CheckCircle2 className="h-12 w-12 text-emerald-600" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-emerald-800 font-black text-2xl uppercase tracking-tighter">Hồ sơ đã hoàn tất</p>
-                    <p className="text-[11px] text-emerald-600/60 font-black uppercase tracking-[0.2em]">Đã nghiệm thu, đánh giá & Đóng phiếu lưu trữ</p>
-                  </div>
-                </div>
-              )}
-
-              {req.status === 'rejected' && !isEditing && (
-                <div className="p-8 bg-rose-50 rounded-[3rem] border-2 border-dashed border-rose-200 text-center space-y-3">
-                  <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-                    <X className="h-8 w-8 text-rose-500" />
-                  </div>
-                  <div>
-                    <p className="text-rose-700 font-black text-lg uppercase tracking-tighter">Yêu cầu đã bị hủy bỏ</p>
-                    <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mt-1">Vui lòng xem lý do hoặc chỉnh sửa gửi lại</p>
-                  </div>
+                <div className="text-center py-12 bg-emerald-50/30 rounded-[3rem] border-2 border-dashed border-emerald-100">
+                  <p className="text-emerald-800 font-black text-2xl uppercase tracking-tighter">Hồ sơ đã hoàn tất</p>
+                  <p className="text-[10px] text-emerald-600/60 font-black uppercase tracking-[0.2em]">Đã nghiệm thu & Đóng hồ sơ lưu trữ</p>
                 </div>
               )}
             </div>
