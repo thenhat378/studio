@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -181,73 +182,72 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* Giao diện In - Chỉ hiển thị khi in */}
-      <div className="print-only p-8 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-        <div className="flex justify-between items-start border-b border-black pb-4">
-          <div className="text-center space-y-0.5">
-            <p className="font-bold text-sm uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+      {/* Giao diện In - Chuẩn văn bản hành chính (Word-like) */}
+      <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
+        <div className="flex justify-between items-start">
+          <div className="text-center w-[45%] space-y-1">
+            <p className="font-normal text-sm uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
             <p className="font-bold text-sm uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div className="w-24 h-0.5 bg-black mx-auto mt-1" />
-            <p className="text-[10px] pt-1">Mã phiếu: {req.id.slice(-8).toUpperCase()}</p>
+            <div className="w-32 h-[0.5px] bg-black mx-auto mt-1" />
+            <p className="text-[10px] pt-1 font-normal italic">Số: {req.id.slice(-8).toUpperCase()}/XNSC</p>
           </div>
-          <div className="text-center space-y-0.5">
+          <div className="text-center w-[55%] space-y-1">
             <p className="font-bold text-sm uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p className="font-bold text-sm underline underline-offset-4">Độc lập - Tự do - Hạnh phúc</p>
-            <div className="w-32 h-0.5 bg-black mx-auto mt-1" />
-            <p className="text-[10px] italic pt-1">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <p className="font-bold text-sm">Độc lập - Tự do - Hạnh phúc</p>
+            <div className="w-40 h-[0.5px] bg-black mx-auto mt-1" />
+            <p className="text-[11px] italic pt-2 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center space-y-2 pt-6">
-          <h1 className="text-2xl font-bold uppercase">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-sm font-bold">(Lưu trữ hồ sơ Phòng Cơ sở vật chất)</p>
+        <div className="text-center space-y-2 pt-10">
+          <h1 className="text-xl font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p className="text-[11px] italic font-normal">(Dành cho hồ sơ lưu trữ tại Phòng Cơ sở vật chất)</p>
         </div>
 
-        <div className="space-y-4 pt-4">
-          <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
-            <p><span className="font-bold">Người yêu cầu:</span> {req.requesterName}</p>
-            <p><span className="font-bold">Đơn vị:</span> {req.unit.toUpperCase()}</p>
-            <p><span className="font-bold">Thiết bị:</span> {req.equipmentName}</p>
-            <p><span className="font-bold">Ngày báo hỏng:</span> {formatDate(req.createdAt)}</p>
-          </div>
-
-          <div className="border border-black p-4 rounded-sm space-y-2">
-            <p className="font-bold text-sm">Mô tả sự cố:</p>
-            <p className="text-sm italic leading-relaxed">{req.description}</p>
-          </div>
-
-          <div className="space-y-4 pt-2">
-            <h3 className="font-bold text-sm border-b border-black pb-1 uppercase">KẾT QUẢ XỬ LÝ KỸ THUẬT</h3>
-            <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
-              <p><span className="font-bold">Kỹ thuật viên:</span> {req.technicianName || 'N/A'}</p>
-              <p><span className="font-bold">Hình thức:</span> {getRepairTypeText(req.repairType)}</p>
-              <p><span className="font-bold">Thời gian nhận việc:</span> {formatDate(req.assignedAt)}</p>
-              <p><span className="font-bold">Thời gian hoàn thành:</span> {formatDate(req.completedAt)}</p>
-              <p className="col-span-2"><span className="font-bold">Tổng thời gian xử lý:</span> {getDuration(req.assignedAt, req.completedAt)}</p>
-            </div>
-            <div className="border border-black p-4 rounded-sm space-y-2">
-              <p className="font-bold text-sm">Nội dung đã thực hiện:</p>
-              <p className="text-sm leading-relaxed">{req.technicianReport || 'Chưa có báo cáo'}</p>
+        <div className="space-y-6 pt-6 text-sm">
+          <div className="space-y-3">
+            <p><span className="font-bold">I. THÔNG TIN NGƯỜI YÊU CẦU</span></p>
+            <div className="pl-4 space-y-2">
+              <p>- Họ và tên: {req.requesterName}</p>
+              <p>- Đơn vị công tác: {req.unit.toUpperCase()}</p>
+              <p>- Nội dung yêu cầu: {req.title}</p>
+              <p>- Mô tả chi tiết sự cố: {req.description}</p>
+              <p>- Thời điểm báo hỏng: {formatDate(req.createdAt)}</p>
             </div>
           </div>
 
-          {req.requesterFeedback && (
-            <div className="space-y-2 pt-2">
-              <p className="font-bold text-sm">Đánh giá của đơn vị sử dụng:</p>
-              <p className="text-sm italic leading-relaxed">"{req.requesterFeedback}"</p>
-              <p className="text-sm font-bold text-right">Mức độ hài lòng: {req.rating || 5}/5 sao</p>
+          <div className="space-y-3">
+            <p><span className="font-bold">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</span></p>
+            <div className="pl-4 space-y-2">
+              <p>- Thiết bị xử lý: {req.equipmentName}</p>
+              <p>- Nhân viên thực hiện: {req.technicianName || 'N/A'}</p>
+              <p>- Hình thức xử lý: {getRepairTypeText(req.repairType)}</p>
+              <p>- Nội dung công việc: {req.technicianReport || 'Chưa cập nhật'}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <p>- Thời gian nhận việc: {formatDate(req.assignedAt)}</p>
+                <p>- Thời gian báo xong: {formatDate(req.completedAt)}</p>
+              </div>
+              <p>- Tổng thời gian thực hiện: <span className="font-bold">{getDuration(req.assignedAt, req.completedAt)}</span></p>
             </div>
-          )}
+          </div>
+
+          <div className="space-y-3">
+            <p><span className="font-bold">III. ĐÁNH GIÁ CỦA ĐƠN VỊ SỬ DỤNG</span></p>
+            <div className="pl-4 space-y-2">
+              <p>- Mức độ hài lòng: {req.rating ? `${req.rating}/5 sao` : 'Đã xác nhận hài lòng'}</p>
+              <p>- Ý kiến phản hồi: {req.requesterFeedback || 'Không có ý kiến thêm'}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-12 text-center text-sm font-bold">
-          <div className="space-y-24">
-            <p className="uppercase">PHÒNG TCHC</p>
-            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
+        <div className="grid grid-cols-2 gap-4 pt-16 text-center text-sm">
+          <div className="space-y-20">
+            <p className="font-bold uppercase">PHÒNG TCHC</p>
+            <p className="italic font-normal text-[11px]">(Ký và ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-24">
-            <p className="uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
+          <div className="space-y-20">
+            <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
+            <p className="italic font-normal text-[11px]">(Ký và ghi rõ họ tên)</p>
           </div>
         </div>
       </div>
