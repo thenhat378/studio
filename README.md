@@ -17,6 +17,31 @@ Nếu bạn có tài khoản GitHub, hãy đẩy mã nguồn lên Repo cá nhân
 
 ---
 
+## 📱 Cách chạy ứng dụng trên Điện thoại (Android/iOS)
+
+### Cách 1: Cài đặt dạng PWA (Khuyên dùng - Không cần máy tính)
+1. Mở trình duyệt (Chrome/Safari) trên điện thoại và truy cập đường link ứng dụng đang chạy.
+2. Chọn menu trình duyệt (3 chấm trên Chrome hoặc nút Share trên Safari).
+3. Chọn **"Thêm vào màn hình chính" (Add to Home Screen)**.
+4. Ứng dụng sẽ có biểu tượng DUE trên màn hình và chạy mượt mà như App thật.
+
+### Cách 2: Tạo file .apk (Cần máy tính)
+Nếu bạn muốn có file `.apk` để gửi cho người khác cài đặt:
+1. Tải mã nguồn về máy tính.
+2. Cài đặt **Node.js** và **Android Studio**.
+3. Mở Terminal tại thư mục dự án và chạy các lệnh:
+   ```bash
+   npm install
+   npm run build
+   npx cap init "Requisition DUE" com.due.requisition
+   npx cap add android
+   npx cap copy
+   npx cap open android
+   ```
+4. Trong Android Studio, chọn **Build > Build APK** để nhận file `.apk` cuối cùng.
+
+---
+
 ## 📘 Quy trình kiểm thử UAT (Bắt đầu từ đầu)
 Hệ thống đã được làm sạch dữ liệu. Bạn hãy thực hiện theo trình tự sau:
 
@@ -35,7 +60,7 @@ Hệ thống đã được làm sạch dữ liệu. Bạn hãy thực hiện the
 
 ## 🔑 Lưu ý quan trọng
 - **Mật khẩu**: Yêu cầu 8 ký tự và ít nhất 1 ký tự đặc biệt (!@#...).
-- **Nút Reset**: Trong mục **Thiết bị** của Admin, có nút **"Reset toàn bộ hệ thống"** để bạn xóa sạch mọi dữ liệu và bắt đầu lại đợt kiểm thử mới bất cứ lúc nào.
+- **Nút Reset**: Trong mục **Người dùng** của Admin, có nút **"Dọn dẹp Phiếu & Người dùng"** để bạn xóa sạch mọi dữ liệu và bắt đầu lại đợt kiểm thử mới bất cứ lúc nào.
 
 ---
 *Hệ thống đã sẵn sàng. Chúc bạn có một buổi kiểm thử thành công!*
