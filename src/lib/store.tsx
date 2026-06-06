@@ -67,7 +67,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem('due_user');
     if (savedUser) {
       try {
-        setCurrentUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        setCurrentUser(parsedUser);
       } catch (e) {
         localStorage.removeItem('due_user');
       }
@@ -76,17 +77,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
+  // Lắng nghe thay đổi của toàn bộ phiếu
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
-      setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
+      setRequests(data);
     }, (error) => {
       console.error("Firestore error (requests):", error);
     });
     return () => unsub();
   }, [db]);
 
+  // Lắng nghe thay đổi người dùng
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -95,6 +99,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
+  // Lắng nghe thay đổi thiết bị
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'equipment'), (snapshot) => {
@@ -159,11 +164,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addRequest = async (req: Omit<RepairRequest, 'id' | 'createdAt' | 'status'>) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
+    // Đảm bảo đơn vị luôn được gán chính xác và bỏ khoảng trắng
     const rawData = {
       ...req,
       unit: req.unit.trim(),
       createdAt: new Date().toISOString(),
-      status: 'pending_approval'
+      status: 'pending_approval' as const
     };
     await addDoc(collection(db, 'requests'), cleanObject(rawData));
   };
@@ -196,12 +202,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db || !currentUser) return;
     try {
       const batch = writeBatch(db);
+      
       const requestSnap = await getDocs(collection(db, 'requests'));
       requestSnap.docs.forEach(docSnap => batch.delete(docSnap.ref));
+      
       const userSnap = await getDocs(collection(db, 'users'));
       userSnap.docs.forEach(docSnap => {
-        if (docSnap.id !== currentUser.id) batch.delete(docSnap.ref);
+        if (docSnap.id !== currentUser.id) {
+          batch.delete(docSnap.ref);
+        }
       });
+      
       await batch.commit();
     } catch (error) {
       console.error("Reset error:", error);

@@ -30,9 +30,11 @@ export default function ApprovalsPage() {
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
+  // Chuẩn hóa bộ lọc phiếu theo đơn vị
   const unitRequests = useMemo(() => {
     if (!currentUser?.unit) return [];
     const normalizedUserUnit = currentUser.unit.trim().toLowerCase();
+    
     return requests.filter(r => {
       if (!r.unit) return false;
       return r.unit.trim().toLowerCase() === normalizedUserUnit;
@@ -175,6 +177,7 @@ export default function ApprovalsPage() {
           {pendingRequests.length === 0 && (
             <div className="text-center py-24 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hiện không có phiếu chờ duyệt tại đơn vị.</p>
+              <p className="text-[8px] font-bold text-slate-200 uppercase mt-2">Dữ liệu đơn vị: {currentUser.unit}</p>
             </div>
           )}
         </TabsContent>

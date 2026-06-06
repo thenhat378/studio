@@ -99,8 +99,9 @@ export default function NewRequest() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ràng buộc nghiêm ngặt thông tin đơn vị
-    if (!currentUser?.unit) {
+    // Ràng buộc nghiêm ngặt thông tin đơn vị từ currentUser
+    const userUnit = currentUser?.unit?.trim();
+    if (!userUnit) {
       toast({
         variant: "destructive",
         title: "Thiếu đơn vị công tác",
@@ -129,7 +130,7 @@ export default function NewRequest() {
       category: equip?.category || 'General',
       requesterId: currentUser.id,
       requesterName: currentUser.name,
-      unit: currentUser.unit.trim(), // Đảm bảo đơn vị được gửi đi
+      unit: userUnit, // Ép gán đơn vị của người dùng hiện tại
       images: images,
     };
 
