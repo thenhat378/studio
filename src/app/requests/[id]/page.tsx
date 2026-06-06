@@ -173,7 +173,8 @@ export default function RequestDetail() {
 
   const handlePrint = () => { window.print(); };
 
-  const canPrint = req.status === 'closed' || req.status === 'verified';
+  // Quyền in chỉ dành cho Admin hoặc Manager khi phiếu đã hoàn thành/nghiệm thu
+  const canPrint = (req.status === 'closed' || req.status === 'verified') && (currentUser?.role === 'admin' || currentUser?.role === 'csvc_manager');
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "N/A";
@@ -218,7 +219,6 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* RE-DESIGNED PRINT VIEW FOR A4 - NO WATERMARK / NO SHADOW */}
       <div className="print-only bg-white text-black text-[11pt]" style={{ padding: '0 5mm' }}>
         <div className="flex justify-between items-start mb-10 border-b-2 border-black pb-6">
           <div className="text-center w-[45%] space-y-1">
