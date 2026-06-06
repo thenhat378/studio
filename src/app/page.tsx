@@ -11,12 +11,10 @@ import {
   Phone,
   Lock,
   Loader2,
-  User,
   Building,
   CheckCircle2,
   ShieldCheck,
   Check,
-  X,
   Info,
   Wrench,
   ChevronRight,
@@ -25,9 +23,7 @@ import {
   Star,
   Timer,
   Clock,
-  MapPin,
-  BookOpen,
-  ArrowRight
+  BookOpen
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -38,7 +34,6 @@ import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -242,7 +237,7 @@ export default function Overview() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">SĐT</Label>
+                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">SỐ ĐIỆN THOẠI</Label>
                       <Input placeholder="Số điện thoại" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.phone} onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))} required />
                     </div>
                     <div className="space-y-2">
