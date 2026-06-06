@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -22,9 +23,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { currentUser, logout, isInitialized } = useAppStore();
+  const { currentUser, logout, isInitialized, requests } = useAppStore();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -33,6 +35,47 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       router.push('/');
     }
   }, [currentUser, isInitialized, pathname, router]);
+
+  const pendingCounts = useMemo(() => {
+    if (!currentUser) return {};
+    
+    const counts: Record<string, number> = {};
+    const userUnit = (currentUser.unit || '').trim().toLowerCase();
+
+    // Counts for Unit Leader
+    if (currentUser.role === 'unit_leader') {
+      counts['/approvals'] = requests.filter(r => 
+        (r.unit || '').trim().toLowerCase() === userUnit && 
+        (r.status === 'pending_approval' || r.status === 'verified')
+      ).length;
+    }
+
+    // Counts for CSVC Manager
+    if (currentUser.role === 'csvc_manager') {
+      counts['/manage'] = requests.filter(r => 
+        r.status === 'approved' || r.status === 'completed'
+      ).length;
+    }
+
+    // Counts for Technician
+    if (currentUser.role === 'technician') {
+      counts['/tasks'] = requests.filter(r => 
+        r.technicianId === currentUser.id && 
+        (r.status === 'assigned' || r.status === 'in_progress')
+      ).length;
+    }
+
+    // General counts for My Requests
+    if (currentUser.role === 'requester') {
+      counts['/requests'] = requests.filter(r => 
+        r.requesterId === currentUser.id && 
+        (r.status === 'verified' || r.status === 'completed') && 
+        !r.requesterConfirmed
+      ).length;
+    }
+
+    return counts;
+  }, [requests, currentUser]);
 
   if (!isInitialized) return null;
   if (!currentUser) {
@@ -90,7 +133,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-4 h-14 px-5 text-[13px] font-bold rounded-[1.2rem] transition-all",
+                  "w-full justify-start gap-4 h-14 px-5 text-[13px] font-bold rounded-[1.2rem] transition-all relative",
                   pathname === item.href 
                     ? "bg-primary/5 text-primary" 
                     : "text-slate-400 hover:bg-slate-50"
@@ -98,6 +141,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-primary" : "text-slate-300")} />
                 {item.name}
+                {pendingCounts[item.href] > 0 && (
+                  <Badge variant="destructive" className="ml-auto h-5 min-w-[20px] px-1 flex items-center justify-center font-black text-[9px] rounded-full animate-pulse">
+                    {pendingCounts[item.href]}
+                  </Badge>
+                )}
               </Button>
             </Link>
           ))}
@@ -146,8 +194,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-[1.2rem] bg-slate-100/50">
+            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-[1.2rem] bg-slate-100/50 relative">
               <Bell className="h-5 w-5 text-slate-600" />
+              {Object.values(pendingCounts).reduce((a, b) => a + b, 0) > 0 && (
+                <span className="absolute top-2 right-2 h-2 w-2 bg-rose-500 rounded-full animate-ping" />
+              )}
             </Button>
             <Sheet>
               <SheetTrigger asChild>
@@ -172,8 +223,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {filteredNav.map((item) => (
                       <SheetClose asChild key={item.name}>
                         <Link href={item.href}>
-                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-slate-700 hover:bg-slate-50 transition-all">
-                            <item.icon className="h-6 w-6 text-slate-300" /> {item.name}
+                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-slate-700 hover:bg-slate-50 transition-all relative">
+                            <item.icon className="h-6 w-6 text-slate-300" /> 
+                            {item.name}
+                            {pendingCounts[item.href] > 0 && (
+                              <Badge variant="destructive" className="ml-auto h-6 min-w-[24px] rounded-full font-black">
+                                {pendingCounts[item.href]}
+                              </Badge>
+                            )}
                           </Button>
                         </Link>
                       </SheetClose>
@@ -214,8 +271,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className="bg-white border-none rounded-[1.2rem] h-12 pl-12 pr-6 w-80 shadow-sm text-sm focus:ring-4 focus:ring-primary/5 outline-none font-bold"
               />
             </div>
-            <div className="h-12 w-12 rounded-[1.2rem] bg-white flex items-center justify-center shadow-sm border border-slate-50 hover:bg-slate-50 cursor-pointer transition-all hover:scale-105">
+            <div className="h-12 w-12 rounded-[1.2rem] bg-white flex items-center justify-center shadow-sm border border-slate-50 hover:bg-slate-50 cursor-pointer transition-all hover:scale-105 relative">
               <Bell className="h-6 w-6 text-slate-400" />
+              {Object.values(pendingCounts).reduce((a, b) => a + b, 0) > 0 && (
+                <span className="absolute top-3 right-3 h-2 w-2 bg-rose-500 rounded-full" />
+              )}
             </div>
           </div>
         </header>
@@ -229,12 +289,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile Bottom Navigation */}
         <nav className="md:hidden glass-morphism fixed bottom-0 left-0 w-full h-24 px-6 flex items-center justify-around z-50 rounded-t-[3rem] shadow-[0_-15px_35px_rgba(0,0,0,0.03)] border-none">
           {bottomNavItems.map((item) => (
-            <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1.5 group active:scale-90 transition-all">
+            <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1.5 group active:scale-90 transition-all relative">
               <div className={cn(
-                "p-3 rounded-[1.2rem] transition-all duration-300",
+                "p-3 rounded-[1.2rem] transition-all duration-300 relative",
                 pathname === item.href ? "bg-primary text-white shadow-xl shadow-primary/20 scale-110" : "text-slate-300"
               )}>
                 <item.icon className="h-6 w-6" />
+                {pendingCounts[item.href] > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 border-2 border-white flex items-center justify-center font-black text-[8px] rounded-full">
+                    {pendingCounts[item.href]}
+                  </Badge>
+                )}
               </div>
               <span className={cn(
                 "text-[8px] font-black uppercase tracking-widest",
