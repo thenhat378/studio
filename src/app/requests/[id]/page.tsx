@@ -11,22 +11,17 @@ import {
   Star, 
   ThumbsUp,
   CheckCircle2,
-  ShieldCheck,
   Wrench,
-  User,
-  Info,
   ImageIcon,
   Check,
   Edit3,
   Send,
   X,
   MessageSquareQuote,
-  Timer,
   Building2,
   MapPin,
   Camera,
-  ImagePlus,
-  ArrowRight
+  ImagePlus
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -189,15 +184,6 @@ export default function RequestDetail() {
     }
   };
 
-  const getDuration = (start?: string, end?: string) => {
-    if (!start || !end) return "N/A";
-    try {
-      return formatDistanceStrict(new Date(start), new Date(end), { locale: vi });
-    } catch (e) {
-      return "N/A";
-    }
-  };
-
   const getFormattedSequenceId = (fullId: string) => {
     const numericPart = fullId.replace(/\D/g, '');
     if (numericPart.length > 0) {
@@ -232,64 +218,61 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* RE-DESIGNED PRINT VIEW FOR A4 */}
-      <div className="print-only bg-white text-black" style={{ padding: '0 10mm' }}>
-        <div className="flex justify-between items-start mb-10">
-          <div className="text-center w-[45%] space-y-1">
-            <p className="font-normal text-[12px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
-            <p className="font-bold text-[13px] uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div className="w-24 h-[1px] bg-black mx-auto mt-1" />
+      {/* RE-DESIGNED PRINT VIEW FOR A4 - SINGLE PAGE ONLY */}
+      <div className="print-only bg-white text-black text-[11pt]" style={{ padding: '0 5mm' }}>
+        <div className="flex justify-between items-start mb-6">
+          <div className="text-center w-[45%] space-y-0.5">
+            <p className="font-normal text-[10pt] uppercase leading-tight">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-[11pt] uppercase leading-tight">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div className="w-20 h-[0.5px] bg-black mx-auto mt-0.5" />
           </div>
-          <div className="text-center w-[55%] space-y-1">
-            <p className="font-bold text-[13px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p className="font-bold text-[13px]">Độc lập - Tự do - Hạnh phúc</p>
-            <div className="w-36 h-[1px] bg-black mx-auto mt-1" />
-            <p className="text-[11px] italic pt-3 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+          <div className="text-center w-[55%] space-y-0.5">
+            <p className="font-bold text-[11pt] uppercase leading-tight">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-[11pt] leading-tight">Độc lập - Tự do - Hạnh phúc</p>
+            <div className="w-32 h-[0.5px] bg-black mx-auto mt-0.5" />
+            <p className="text-[10pt] italic pt-2 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center space-y-2 mb-10">
-          <h1 className="text-xl font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-[12px] font-normal italic">Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
+        <div className="text-center space-y-1 mb-6">
+          <h1 className="text-[16pt] font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p className="text-[10pt] font-normal italic">Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <div className="space-y-6">
-          {/* Section I */}
+        <div className="space-y-4">
           <div className="print-section-title">I. Thông tin người yêu cầu</div>
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1.5 pt-1">
             <div className="print-row"><span className="print-label">Họ và tên:</span><span className="print-value">{req.requesterName}</span></div>
             <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
             <div className="print-row"><span className="print-label">Vị trí sự cố:</span><span className="print-value">{req.location}</span></div>
             <div className="print-row"><span className="print-label">Thời gian báo:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
-            <div className="py-2"><span className="print-label block mb-1">Mô tả hỏng hóc:</span><p className="italic">{req.description}</p></div>
+            <div className="py-1"><span className="print-label block">Mô tả hỏng hóc:</span><p className="italic text-[10.5pt]">{req.description}</p></div>
           </div>
 
-          {/* Section II */}
           <div className="print-section-title">II. Kết quả xử lý kỹ thuật</div>
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1.5 pt-1">
             <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
             <div className="print-row"><span className="print-label">Nhân viên kỹ thuật:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
             <div className="print-row"><span className="print-label">Hình thức xử lý:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
             <div className="print-row"><span className="print-label">Thời gian hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
-            <div className="py-2"><span className="print-label block mb-1">Nội dung công việc đã thực hiện:</span><p className="italic">{req.technicianReport || 'N/A'}</p></div>
+            <div className="py-1"><span className="print-label block">Nội dung công việc đã thực hiện:</span><p className="italic text-[10.5pt]">{req.technicianReport || 'N/A'}</p></div>
           </div>
 
-          {/* Section III */}
           <div className="print-section-title">III. Nghiệm thu & Đánh giá</div>
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1.5 pt-1">
             <div className="print-row"><span className="print-label">Mức độ hài lòng:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đã nghiệm thu'}</span></div>
-            <div className="py-2"><span className="print-label block mb-1">Phản hồi của đơn vị:</span><p className="italic">{req.requesterFeedback || 'Đạt yêu cầu.'}</p></div>
+            <div className="py-1"><span className="print-label block">Phản hồi của đơn vị:</span><p className="italic text-[10.5pt]">{req.requesterFeedback || 'Đạt yêu cầu.'}</p></div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-20 text-center text-[13px]">
-          <div className="space-y-20">
+        <div className="grid grid-cols-2 gap-4 mt-8 text-center text-[11pt]">
+          <div className="space-y-14">
             <p className="font-bold uppercase">NGƯỜI YÊU CẦU</p>
-            <p className="font-normal italic text-[11px]">(Ký và ghi rõ họ tên)</p>
+            <p className="font-normal italic text-[10pt]">(Ký và ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-20">
+          <div className="space-y-14">
             <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p className="font-normal italic text-[11px]">(Ký và đóng dấu)</p>
+            <p className="font-normal italic text-[10pt]">(Ký và đóng dấu)</p>
           </div>
         </div>
       </div>
@@ -414,25 +397,6 @@ export default function RequestDetail() {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {req.requesterConfirmed && (
-              <div className="bg-secondary/10 p-6 md:p-8 rounded-[2.5rem] border border-secondary/20 space-y-4 shadow-sm">
-                <div className="flex items-center gap-2">
-                  <ThumbsUp className="h-5 w-5 text-secondary" />
-                  <Label className="text-[10px] font-black uppercase text-secondary tracking-widest">Phản hồi từ người dùng:</Label>
-                </div>
-                <div className="flex flex-col gap-3">
-                   <div className="flex items-center gap-2 text-[10px] font-black text-secondary uppercase">
-                     <Check className="h-4 w-4" /> Đã xác nhận hài lòng
-                   </div>
-                   {req.requesterFeedback && (
-                     <p className="text-sm font-bold text-slate-700 italic bg-white/50 p-6 rounded-2xl border border-secondary/10 leading-relaxed">
-                       "{req.requesterFeedback}"
-                     </p>
-                   )}
-                </div>
               </div>
             )}
 
