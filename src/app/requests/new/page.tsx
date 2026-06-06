@@ -99,13 +99,13 @@ export default function NewRequest() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ràng buộc nghiêm ngặt thông tin đơn vị từ currentUser
+    // Ràng buộc nghiêm ngặt: Lấy đơn vị từ currentUser
     const userUnit = currentUser?.unit?.trim();
     if (!userUnit) {
       toast({
         variant: "destructive",
         title: "Thiếu đơn vị công tác",
-        description: "Tài khoản của bạn chưa có thông tin đơn vị. Vui lòng liên hệ Admin cập nhật trước khi tạo phiếu."
+        description: "Vui lòng cập nhật thông tin đơn vị trong hồ sơ trước khi tạo phiếu."
       });
       return;
     }
@@ -130,7 +130,7 @@ export default function NewRequest() {
       category: equip?.category || 'General',
       requesterId: currentUser.id,
       requesterName: currentUser.name,
-      unit: userUnit, // Ép gán đơn vị của người dùng hiện tại
+      unit: userUnit, // Ép gán đơn vị chuẩn từ tài khoản
       images: images,
     };
 
@@ -145,7 +145,7 @@ export default function NewRequest() {
       await addRequest(requestData);
       toast({
         title: "Thành công",
-        description: "Yêu cầu của bạn đã được gửi đi."
+        description: "Yêu cầu của bạn đã được gửi và đang chờ Quản lý đơn vị duyệt."
       });
       router.push('/requests');
     } catch (error: any) {
@@ -168,8 +168,7 @@ export default function NewRequest() {
         </div>
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa thiết lập Đơn vị</h2>
         <p className="text-sm text-slate-500 max-w-md font-medium">
-          Bạn cần có thông tin Đơn vị công tác để hệ thống có thể chuyển phiếu đến đúng Lãnh đạo phê duyệt. 
-          Vui lòng cập nhật thông tin tài khoản trước.
+          Tài khoản của bạn cần có thông tin Đơn vị công tác để gửi phiếu đến đúng người quản lý.
         </p>
         <Button variant="link" onClick={() => router.back()} className="mt-4 font-bold">Quay lại</Button>
       </div>
@@ -249,7 +248,7 @@ export default function NewRequest() {
 
               <div className="space-y-3 pt-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
-                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Đính kèm minh chứng hình ảnh)
+                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Minh chứng)
                 </Label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {images.map((img, idx) => (
@@ -311,16 +310,6 @@ export default function NewRequest() {
                     ))}
                   </ul>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/50 p-4 rounded-2xl">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Phân loại AI:</p>
-                    <p className="text-xs font-bold text-primary">{aiSuggestions.category}</p>
-                  </div>
-                  <div className="bg-white/50 p-4 rounded-2xl">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">Vật tư gợi ý:</p>
-                    <p className="text-xs font-bold text-primary">{aiSuggestions.recommendedEquipment.join(', ') || 'N/A'}</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           )}
@@ -330,7 +319,7 @@ export default function NewRequest() {
               {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi yêu cầu phê duyệt"}
             </Button>
             <Button type="button" variant="ghost" className="w-full h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400" onClick={() => router.back()}>
-              Hủy bỏ yêu cầu
+              Hủy bỏ
             </Button>
           </div>
         </div>

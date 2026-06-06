@@ -28,14 +28,17 @@ export default function ApprovalsPage() {
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
-  // Chuẩn hóa so sánh đơn vị để đảm bảo không bị lỗi do khoảng trắng hoặc hoa thường
+  // Logic lọc phiếu theo đơn vị (Cực kỳ nghiêm ngặt)
   const unitRequests = useMemo(() => {
     if (!currentUser?.unit) return [];
-    const normalizedUserUnit = currentUser.unit.trim().toLowerCase();
+    
+    // Chuẩn hóa tên đơn vị của quản lý
+    const managerUnit = currentUser.unit.trim().toLowerCase();
     
     return requests.filter(r => {
       if (!r.unit) return false;
-      return r.unit.trim().toLowerCase() === normalizedUserUnit;
+      // Chuẩn hóa tên đơn vị trong phiếu để so sánh
+      return r.unit.trim().toLowerCase() === managerUnit;
     });
   }, [requests, currentUser?.unit]);
 
@@ -99,7 +102,7 @@ export default function ApprovalsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
             <ShieldCheck className="h-7 w-7 text-primary" />
-            Xét duyệt & Nghiệm thu
+            Duyệt đơn vị
           </h1>
           <div className="flex items-center gap-2">
             <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3">

@@ -41,12 +41,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Hàm chuẩn hóa chuỗi dữ liệu (xóa khoảng trắng thừa và chuyển về chữ thường để so sánh chính xác)
-const normalizeUnit = (str: string | undefined) => {
-  if (!str) return '';
-  return str.trim().toLowerCase();
-};
-
+// Helper to clean object for Firestore
 const cleanObject = (obj: any) => {
   if (obj === null || typeof obj !== 'object') return obj;
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -69,6 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Persistence
   useEffect(() => {
     const savedUser = localStorage.getItem('due_user');
     if (savedUser) {
@@ -83,14 +79,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
+  // Listeners
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest));
-      setRequests(data);
-    }, (error) => {
-      console.error("Firestore error (requests):", error);
+      setRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RepairRequest)));
     });
     return () => unsub();
   }, [db]);
@@ -113,10 +107,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const login = async (phone: string, pass: string) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    
     const q = query(collection(db, 'users'), where('phoneNumber', '==', phone), limit(1));
     const snap = await getDocs(q);
-    
     if (!snap.empty) {
       const userData = { id: snap.docs[0].id, ...snap.docs[0].data() } as User;
       if (userData.password === pass) { 
@@ -132,23 +124,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const register = async (data: { phone: string, pass: string, name: string, unit: string, role: UserRole }) => {
     if (!db) throw new Error("Database chưa sẵn sàng.");
-    
     const q = query(collection(db, 'users'), where('phoneNumber', '==', data.phone), limit(1));
     const snap = await getDocs(q);
-    if (!snap.empty) {
-      throw new Error("Số điện thoại này đã được đăng ký.");
-    }
+    if (!snap.empty) throw new Error("Số điện thoại này đã được đăng ký.");
 
     const userId = `user_${Date.now()}`;
     const userData: User = {
       id: userId,
       name: data.name.trim(),
       role: data.role,
-      unit: data.unit.trim(), // Lưu tên đơn vị hiển thị, nhưng khi so sánh sẽ dùng normalize
+      unit: data.unit.trim(),
       phoneNumber: data.phone,
       password: data.pass
     };
-
     await setDoc(doc(db, 'users', userId), cleanObject(userData));
   };
 
@@ -169,7 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     const rawData = {
       ...req,
-      unit: req.unit.trim(), 
+      unit: req.unit.trim(),
       createdAt: new Date().toISOString(),
       status: 'pending_approval' as const
     };
@@ -179,9 +167,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
     const updateData: any = { status };
-    if (extra) {
-      Object.assign(updateData, extra);
-    }
+    if (extra) Object.assign(updateData, extra);
     await updateDoc(doc(db, 'requests', id), cleanObject(updateData));
   };
 
@@ -202,21 +188,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const resetSystem = async () => {
     if (!db || !currentUser) return;
-    try {
-      const batch = writeBatch(db);
-      const requestSnap = await getDocs(collection(db, 'requests'));
-      requestSnap.docs.forEach(docSnap => batch.delete(docSnap.ref));
-      const userSnap = await getDocs(collection(db, 'users'));
-      userSnap.docs.forEach(docSnap => {
-        if (docSnap.id !== currentUser.id) {
-          batch.delete(docSnap.ref);
-        }
-      });
-      await batch.commit();
-    } catch (error) {
-      console.error("Reset error:", error);
-      throw error;
-    }
+    const batch = writeBatch(db);
+    const requestSnap = await getDocs(collection(db, 'requests'));
+    requestSnap.docs.forEach(d => batch.delete(d.ref));
+    const userSnap = await getDocs(collection(db, 'users'));
+    userSnap.docs.forEach(d => { if (d.id !== currentUser.id) batch.delete(d.ref); });
+    await batch.commit();
   };
 
   return (
