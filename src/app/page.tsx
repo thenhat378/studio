@@ -141,7 +141,20 @@ export default function Overview() {
     try {
       await register(regData);
       toast({ title: "Đăng ký thành công!", description: "Bạn có thể đăng nhập ngay bây giờ." });
-      setLoginPhone(regData.phone);
+      
+      const registeredPhone = regData.phone;
+      
+      // Reset form data after successful registration
+      setRegData({
+        name: '',
+        phone: '',
+        pass: '',
+        unit: '',
+        role: 'requester' as UserRole
+      });
+      setShowPassHint(false);
+
+      setLoginPhone(registeredPhone);
       setLoginPass('');
       setActiveTab('login');
     } catch (error: any) {
@@ -284,12 +297,12 @@ export default function Overview() {
           </Card>
 
           <footer className="pt-8 pb-4 text-center space-y-1 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
               © 2026 Hệ thống quản lý Phiếu yêu cầu, cáp phát sửa chữa v1.0
-            </p>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
+            </div>
+            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
               Phát triển bởi Phòng Cơ sở vật chất
-            </p>
+            </div>
           </footer>
         </div>
 
@@ -330,12 +343,12 @@ export default function Overview() {
                 ))}
               </div>
               <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10">
-                <p className="text-[10px] font-black uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
+                <div className="text-[10px] font-black uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
                    <Info className="h-4 w-4" /> Lưu ý quan trọng
-                </p>
-                <p className="text-xs font-bold text-slate-600 leading-relaxed italic">
+                </div>
+                <div className="text-xs font-bold text-slate-600 leading-relaxed italic">
                   Để có trải nghiệm tốt nhất trên điện thoại, hãy chọn "Thêm vào màn hình chính" trên trình duyệt để sử dụng như ứng dụng di động thực thụ.
-                </p>
+                </div>
               </div>
             </div>
             <DialogFooter className="mt-8">
@@ -402,13 +415,13 @@ export default function Overview() {
       <div className="bg-primary rounded-[3.5rem] p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="space-y-3">
-              <p className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">HỆ THỐNG QUẢN LÝ DUE</p>
+              <div className="text-[11px] font-black uppercase opacity-60 tracking-[0.3em]">HỆ THỐNG QUẢN LÝ DUE</div>
               <h1 className="text-4xl font-black leading-none tracking-tight">Chào, {currentUser.name.split(' ').pop()}!</h1>
               <div className="flex items-center gap-3 pt-2">
                  <div className="p-2 bg-white/10 rounded-xl">
                    <Building className="h-4 w-4 opacity-80" />
                  </div>
-                 <p className="text-sm font-bold opacity-90 uppercase tracking-tight">{currentUser.unit}</p>
+                 <div className="text-sm font-bold opacity-90 uppercase tracking-tight">{currentUser.unit}</div>
               </div>
             </div>
             <Badge className="bg-white/20 hover:bg-white/30 text-white border-none font-black text-[11px] uppercase tracking-widest px-6 py-3 rounded-full backdrop-blur-md">
@@ -432,8 +445,8 @@ export default function Overview() {
                 <stat.icon className={cn("h-7 w-7", stat.color)} />
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                <p className="text-3xl font-black text-slate-800 tracking-tighter">{stat.value}</p>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                <div className="text-3xl font-black text-slate-800 tracking-tighter">{stat.value}</div>
               </div>
             </CardContent>
           </Card>
@@ -453,7 +466,7 @@ export default function Overview() {
               <Card key={req.id} className="rounded-[3rem] bg-white border-none card-shadow p-10 space-y-6 border-t-8 border-t-primary/5">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 space-y-1">
-                    <p className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">[{req.location}] {req.technicianName}</p>
+                    <div className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">[{req.location}] {req.technicianName}</div>
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                       <div className="h-1.5 w-1.5 rounded-full bg-slate-300" /> {req.unit}
                     </div>
@@ -467,14 +480,14 @@ export default function Overview() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/80 rounded-[2rem] p-6 border border-slate-100">
                   <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận việc lúc</p>
+                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận việc lúc</div>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
                       <Clock className="h-3.5 w-3.5 text-primary" />
                       <span className="text-[11px] font-bold text-slate-700">{formatDate(req.assignedAt)}</span>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Báo xong lúc</p>
+                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Báo xong lúc</div>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
                       <CheckCircle2 className="h-3.5 w-3.5 text-secondary" />
                       <span className="text-[11px] font-bold text-secondary">{formatDate(req.completedAt)}</span>
@@ -513,15 +526,15 @@ export default function Overview() {
                <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30 group">
                   <CardContent className="p-8 flex items-center justify-between">
                      <div className="space-y-3 min-w-0">
-                        <p className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase truncate">
+                        <div className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase truncate">
                           <span className="text-primary/40 mr-2 font-black">#</span>[{req.location}] {req.equipmentName}
-                        </p>
+                        </div>
                         <div className="flex items-center gap-3">
                            <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 bg-slate-100 text-slate-500 border-none rounded-lg">
                              {req.unit}
                            </Badge>
                            <div className="h-1 w-1 rounded-full bg-slate-200" />
-                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</p>
+                           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</div>
                         </div>
                      </div>
                      <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary/5 group-hover:text-primary transition-all ml-4 shrink-0">
