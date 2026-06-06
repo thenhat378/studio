@@ -96,34 +96,35 @@
 
   @page {
     size: A4;
-    margin: 15mm 10mm;
+    margin: 10mm 15mm;
   }
 
   .print-section-title {
-    border-bottom: 2px solid black !important;
+    border-bottom: 1.5px solid black !important;
     font-weight: bold !important;
     text-transform: uppercase !important;
-    font-size: 12pt !important;
-    margin-top: 15px !important;
-    padding-bottom: 2px !important;
+    font-size: 11pt !important;
+    margin-top: 10px !important;
+    padding-bottom: 1px !important;
     display: block !important;
   }
 
   .print-row {
     display: flex !important;
     justify-content: space-between !important;
-    padding: 4px 0 !important;
+    padding: 2px 0 !important;
     border-bottom: 0.5px dotted #ccc !important;
+    line-height: 1.2 !important;
   }
 
   .print-label {
     font-weight: bold !important;
-    font-size: 11pt !important;
+    font-size: 10.5pt !important;
   }
 
   .print-value {
     text-align: right !important;
-    font-size: 11pt !important;
+    font-size: 10.5pt !important;
   }
 }
 

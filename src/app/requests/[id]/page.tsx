@@ -173,7 +173,6 @@ export default function RequestDetail() {
 
   const handlePrint = () => { window.print(); };
 
-  // Quyền in chỉ dành cho Admin hoặc Manager khi phiếu đã hoàn thành/nghiệm thu
   const canPrint = (req.status === 'closed' || req.status === 'verified') && (currentUser?.role === 'admin' || currentUser?.role === 'csvc_manager');
 
   const formatDate = (dateStr?: string) => {
@@ -208,66 +207,70 @@ export default function RequestDetail() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
-      {/* Container chỉ dành cho in ấn - hiển thị rõ tiêu ngữ */}
-      <div className="print-only" style={{ padding: '0 5mm' }}>
-        <div className="flex justify-between items-start mb-6" style={{ borderBottom: '2px solid black', paddingBottom: '10px' }}>
+      {/* Container dành cho in ấn */}
+      <div className="print-only" style={{ padding: '0 5mm', color: 'black' }}>
+        <div className="flex justify-between items-start mb-4" style={{ borderBottom: '1.5px solid black', paddingBottom: '8px' }}>
           <div className="text-center" style={{ width: '45%' }}>
-            <p style={{ fontWeight: 'bold', fontSize: '13pt', margin: 0 }}>ĐẠI HỌC ĐÀ NẴNG</p>
-            <p style={{ fontWeight: 'bold', fontSize: '14pt', margin: 0, textTransform: 'uppercase' }}>TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div style={{ width: '80px', height: '1.5px', background: 'black', margin: '5px auto' }} />
+            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>ĐẠI HỌC ĐÀ NẴNG</p>
+            <p style={{ fontWeight: 'bold', fontSize: '12pt', margin: 0, textTransform: 'uppercase' }}>TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div style={{ width: '60px', height: '1.2px', background: 'black', margin: '4px auto' }} />
           </div>
           <div className="text-center" style={{ width: '55%' }}>
-            <p style={{ fontWeight: 'bold', fontSize: '12pt', margin: 0 }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p style={{ fontWeight: 'bold', fontSize: '12pt', margin: 0 }}>Độc lập - Tự do - Hạnh phúc</p>
-            <div style={{ width: '120px', height: '1.5px', background: 'black', margin: '5px auto' }} />
-            <p style={{ fontSize: '10pt', fontStyle: 'italic', marginTop: '10px' }}>Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>Độc lập - Tự do - Hạnh phúc</p>
+            <div style={{ width: '100px', height: '1.2px', background: 'black', margin: '4px auto' }} />
+            <p style={{ fontSize: '9pt', fontStyle: 'italic', marginTop: '6px' }}>Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 style={{ fontSize: '20pt', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p style={{ fontSize: '11pt', fontStyle: 'italic' }}>Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
+        <div className="text-center mb-6">
+          <h1 style={{ fontSize: '18pt', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '2px' }}>PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p style={{ fontSize: '10pt', fontStyle: 'italic' }}>Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="print-section-title">I. THÔNG TIN NGƯỜI YÊU CẦU</div>
-          <div className="space-y-1">
-            <div className="print-row"><span className="print-label">Họ và tên người báo:</span><span className="print-value">{req.requesterName}</span></div>
-            <div className="print-row"><span className="print-label">Đơn vị công tác:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
-            <div className="print-row"><span className="print-label">Vị trí hư hỏng:</span><span className="print-value">{req.location}</span></div>
-            <div className="print-row"><span className="print-label">Thời gian báo:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
-            <div className="mt-2"><span className="print-label">Mô tả hỏng hóc:</span><p style={{ fontStyle: 'italic', marginTop: '5px', paddingLeft: '15px', borderLeft: '1px solid black' }}>{req.description}</p></div>
+          <div className="space-y-0.5">
+            <div className="print-row"><span className="print-label">Người báo:</span><span className="print-value">{req.requesterName}</span></div>
+            <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
+            <div className="print-row"><span className="print-label">Vị trí:</span><span className="print-value">{req.location}</span></div>
+            <div className="print-row"><span className="print-label">Thời gian:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
+            <div className="mt-1"><span className="print-label">Mô tả hỏng hóc:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.description}</p></div>
           </div>
 
           <div className="print-section-title">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</div>
-          <div className="space-y-1">
-            <div className="print-row"><span className="print-label">Tên thiết bị xử lý:</span><span className="print-value">{req.equipmentName}</span></div>
-            <div className="print-row"><span className="print-label">Nhân viên kỹ thuật:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
-            <div className="print-row"><span className="print-label">Hình thức xử lý:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
-            <div className="print-row"><span className="print-label">Thời gian hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
-            <div className="mt-2"><span className="print-label">Chi tiết nội dung đã thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '5px', paddingLeft: '15px', borderLeft: '1px solid black' }}>{req.technicianReport || 'N/A'}</p></div>
+          <div className="space-y-0.5">
+            <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
+            <div className="print-row"><span className="print-label">Kỹ thuật viên:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
+            <div className="print-row"><span className="print-label">Hình thức:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
+            <div className="print-row"><span className="print-label">Hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
+            <div className="mt-1"><span className="print-label">Nội dung thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.technicianReport || 'N/A'}</p></div>
           </div>
 
           <div className="print-section-title">III. NGHIỆM THU VÀ ĐÁNH GIÁ</div>
-          <div className="space-y-1">
-            <div className="print-row"><span className="print-label">Mức độ hài lòng của đơn vị:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đã nghiệm thu đạt yêu cầu'}</span></div>
-            <div className="mt-2"><span className="print-label">Phản hồi của người yêu cầu:</span><p style={{ fontStyle: 'italic', marginTop: '5px', paddingLeft: '15px', borderLeft: '1px solid black' }}>{req.requesterFeedback || 'Thiết bị đã hoạt động ổn định sau sửa chữa.'}</p></div>
+          <div className="space-y-0.5">
+            <div className="print-row"><span className="print-label">Đánh giá đơn vị:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đạt yêu cầu'}</span></div>
+            <div className="mt-1"><span className="print-label">Phản hồi đơn vị:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.requesterFeedback || 'Thiết bị đã hoạt động ổn định.'}</p></div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-12 text-center" style={{ pageBreakInside: 'avoid' }}>
-          <div className="space-y-20">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>NGƯỜI YÊU CẦU / ĐƠN VỊ</p>
-            <p style={{ fontSize: '10pt', fontStyle: 'italic' }}>(Ký và ghi rõ họ tên)</p>
+        <div className="grid grid-cols-3 gap-2 mt-10 text-center" style={{ pageBreakInside: 'avoid' }}>
+          <div className="space-y-16">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>NGƯỜI YÊU CẦU</p>
+            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-20">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p style={{ fontSize: '10pt', fontStyle: 'italic' }}>(Ký và đóng dấu)</p>
+          <div className="space-y-16">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>LÃNH ĐẠO ĐƠN VỊ</p>
+            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-16">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
+            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký và đóng dấu)</p>
           </div>
         </div>
       </div>
 
-      {/* Giao diện xem trên web - không bị ảnh hưởng bởi Print */}
+      {/* Giao diện xem trên web */}
       <div className="flex items-center justify-between no-print bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/20 sticky top-24 z-30">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 font-black text-[10px] uppercase tracking-widest">
           <ChevronLeft className="h-4 w-4" /> Trở về
