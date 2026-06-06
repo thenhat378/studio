@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera } from 'lucide-react';
+import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -41,7 +41,6 @@ export default function NewRequest() {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      // Giới hạn dung lượng ảnh khoảng 1MB để tránh lỗi Firestore payload (Firestore doc limit is 1MB)
       if (file.size > 1 * 1024 * 1024) {
         toast({
           variant: "destructive",
@@ -99,7 +98,18 @@ export default function NewRequest() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.description || !formData.equipmentId || !currentUser) {
+    
+    // Ràng buộc nghiêm ngặt thông tin đơn vị
+    if (!currentUser?.unit) {
+      toast({
+        variant: "destructive",
+        title: "Thiếu đơn vị công tác",
+        description: "Tài khoản của bạn chưa có thông tin đơn vị. Vui lòng liên hệ Admin cập nhật trước khi tạo phiếu."
+      });
+      return;
+    }
+
+    if (!formData.title || !formData.description || !formData.equipmentId) {
       toast({
         variant: "destructive",
         title: "Thiếu thông tin",
@@ -119,7 +129,7 @@ export default function NewRequest() {
       category: equip?.category || 'General',
       requesterId: currentUser.id,
       requesterName: currentUser.name,
-      unit: currentUser.unit || 'Đơn vị không xác định',
+      unit: currentUser.unit.trim(), // Đảm bảo đơn vị được gửi đi
       images: images,
     };
 
@@ -148,6 +158,22 @@ export default function NewRequest() {
       setIsSubmitting(false);
     }
   };
+
+  if (!currentUser?.unit) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-2 border-dashed border-rose-100">
+        <div className="h-20 w-20 rounded-full bg-rose-50 flex items-center justify-center mb-6">
+          <AlertCircle className="h-10 w-10 text-rose-500" />
+        </div>
+        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa thiết lập Đơn vị</h2>
+        <p className="text-sm text-slate-500 max-w-md font-medium">
+          Bạn cần có thông tin Đơn vị công tác để hệ thống có thể chuyển phiếu đến đúng Lãnh đạo phê duyệt. 
+          Vui lòng cập nhật thông tin tài khoản trước.
+        </p>
+        <Button variant="link" onClick={() => router.back()} className="mt-4 font-bold">Quay lại</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-24">

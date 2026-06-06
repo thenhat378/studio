@@ -8,7 +8,7 @@ import { ShieldCheck, Eye, Check, X, CheckCircle2, Clock, Star, AlertCircle, Bui
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -30,19 +30,30 @@ export default function ApprovalsPage() {
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
-  // Lọc phiếu theo đơn vị của lãnh đạo (chuẩn hóa so sánh để tránh lỗi nhập liệu)
-  const unitRequests = requests.filter(r => {
-    if (!currentUser?.unit || !r.unit) return false;
-    const userUnit = currentUser.unit.trim().toLowerCase();
-    const reqUnit = r.unit.trim().toLowerCase();
-    return reqUnit === userUnit;
-  });
+  // Lọc phiếu theo đơn vị của lãnh đạo với logic chuẩn hóa mạnh mẽ
+  const unitRequests = useMemo(() => {
+    if (!currentUser?.unit) return [];
+    
+    const normalizedUserUnit = currentUser.unit.trim().toLowerCase();
+    
+    return requests.filter(r => {
+      if (!r.unit) return false;
+      const normalizedReqUnit = r.unit.trim().toLowerCase();
+      return normalizedReqUnit === normalizedUserUnit;
+    });
+  }, [requests, currentUser?.unit]);
 
   // Phiếu chờ duyệt bước 2 (Chờ duyệt đơn vị)
-  const pendingRequests = unitRequests.filter(r => r.status === 'pending_approval');
+  const pendingRequests = useMemo(() => 
+    unitRequests.filter(r => r.status === 'pending_approval'),
+    [unitRequests]
+  );
   
   // Phiếu chờ nghiệm thu bước 7 (sau khi CSVC đã verified)
-  const pendingConfirmation = unitRequests.filter(r => r.status === 'verified');
+  const pendingConfirmation = useMemo(() => 
+    unitRequests.filter(r => r.status === 'verified'),
+    [unitRequests]
+  );
 
   const handleApprove = (id: string) => {
     updateRequestStatus(id, 'approved');
