@@ -193,13 +193,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const resetSystem = async () => {
-    if (!db || !currentUser) return;
-    const batch = writeBatch(db);
-    const requestSnap = await getDocs(collection(db, 'requests'));
-    requestSnap.docs.forEach(d => batch.delete(d.ref));
-    const userSnap = await getDocs(collection(db, 'users'));
-    userSnap.docs.forEach(d => { if (d.id !== currentUser.id) batch.delete(d.ref); });
-    await batch.commit();
+    if (!db || !currentUser) throw new Error("Hệ thống chưa sẵn sàng.");
+
+    try {
+      const requestSnap = await getDocs(collection(db, 'requests'));
+      const userSnap = await getDocs(collection(db, 'users'));
+
+      const refsToDelete = [
+        ...requestSnap.docs.map(d => d.ref),
+        ...userSnap.docs.filter(d => d.id !== currentUser.id).map(d => d.ref)
+      ];
+
+      // Firestore Batch has a limit of 500 operations.
+      // We chunk the deletions into batches of 400 to be safe.
+      for (let i = 0; i < refsToDelete.length; i += 400) {
+        const batch = writeBatch(db);
+        const chunk = refsToDelete.slice(i, i + 400);
+        chunk.forEach(ref => batch.delete(ref));
+        await batch.commit();
+      }
+    } catch (e: any) {
+      console.error("Reset System Error:", e);
+      throw new Error("Lỗi khi dọn dẹp hệ thống: " + e.message);
+    }
   };
 
   return (

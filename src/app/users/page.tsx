@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -42,14 +43,14 @@ export default function UserManagementPage() {
         await resetSystem();
         toast({ 
           title: "Đã làm sạch hệ thống", 
-          description: "Dữ liệu rác đã được xóa. Hệ thống hiện ở trạng thái sẵn sàng triển khai." 
+          description: "Dữ liệu rác đã được xóa sạch. Hệ thống hiện ở trạng thái sẵn sàng bàn giao." 
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         toast({ 
           variant: "destructive", 
           title: "Lỗi dọn dẹp", 
-          description: "Không thể hoàn tác thao tác. Vui lòng kiểm tra lại kết nối." 
+          description: error.message || "Không thể thực hiện dọn dẹp lúc này." 
         });
       } finally {
         setIsResetting(false);
@@ -95,7 +96,7 @@ export default function UserManagementPage() {
       {isResetting && (
         <Card className="rounded-[2.5rem] border-2 border-dashed border-rose-200 bg-rose-50/50 p-8 flex items-center justify-center gap-4 animate-pulse">
            <AlertTriangle className="h-6 w-6 text-rose-500" />
-           <p className="font-black text-rose-500 uppercase text-xs tracking-widest">Đang tiến hành dọn dẹp dữ liệu...</p>
+           <p className="font-black text-rose-500 uppercase text-xs tracking-widest">Hệ thống đang được dọn dẹp, vui lòng đợi...</p>
         </Card>
       )}
 
@@ -103,7 +104,7 @@ export default function UserManagementPage() {
         {users.map((user) => (
           <Card key={user.id} className={cn(
             "border-none shadow-sm rounded-[3rem] bg-white card-shadow overflow-hidden hover:bg-slate-50 transition-all active:scale-[0.98]",
-            user.id === currentUser.id && "ring-4 ring-primary/10 bg-blue-50/10"
+            user.id === currentUser?.id && "ring-4 ring-primary/10 bg-blue-50/10"
           )}>
             <CardContent className="p-8">
               <div className="flex items-start justify-between gap-4">
@@ -114,7 +115,7 @@ export default function UserManagementPage() {
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-black text-xl text-slate-800 tracking-tight">{user.name}</h3>
-                      {user.id === currentUser.id && <Badge className="bg-primary text-[9px] font-black uppercase px-2 py-0.5">Bạn</Badge>}
+                      {user.id === currentUser?.id && <Badge className="bg-primary text-[9px] font-black uppercase px-2 py-0.5">Bạn</Badge>}
                     </div>
                     <Badge variant="secondary" className="bg-primary/5 text-primary border-none text-[10px] font-black uppercase px-3 py-1">
                       {getRoleLabel(user.role)}
@@ -142,7 +143,7 @@ export default function UserManagementPage() {
         ))}
       </div>
 
-      {users.length === 0 && (
+      {users.length === 0 && !isResetting && (
         <div className="text-center py-32 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100">
           <Users className="h-24 w-24 text-slate-50 mx-auto mb-6" />
           <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">HỆ THỐNG TRỐNG</p>
