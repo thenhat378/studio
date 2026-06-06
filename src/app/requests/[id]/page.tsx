@@ -168,9 +168,24 @@ export default function RequestDetail() {
     }
   };
 
+  // Helper function to format numeric-like sequence ID for the report
+  const getFormattedSequenceId = (fullId: string) => {
+    const numericPart = fullId.replace(/\D/g, '');
+    if (numericPart.length > 0) {
+      return numericPart.slice(-7).padStart(7, '0');
+    }
+    // Fallback if no numeric parts found
+    let hash = 0;
+    for (let i = 0; i < fullId.length; i++) {
+      hash = ((hash << 5) - hash) + fullId.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash).toString().slice(-7).padStart(7, '0');
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
-      {/* Nút điều hướng - Ẩn khi in */}
+      {/* Navigation Buttons - Hidden during print */}
       <div className="flex items-center justify-between no-print bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/20 sticky top-24 z-30">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 font-black text-[10px] uppercase tracking-widest">
           <ChevronLeft className="h-4 w-4" /> Trở về
@@ -182,32 +197,32 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* Giao diện In - Chuẩn văn bản hành chính (Word-like) */}
+      {/* Print Interface - Times New Roman Word-like layout */}
       <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
         <div className="flex justify-between items-start">
           <div className="text-center w-[45%] space-y-1">
-            <p className="font-normal text-sm uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
-            <p className="font-bold text-sm uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div className="w-32 h-[0.5px] bg-black mx-auto mt-1" />
-            <p className="text-[10px] pt-1 font-normal italic">Số: {req.id.slice(-8).toUpperCase()}/XNSC</p>
+            <p className="font-normal text-[13px] uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-[14px] uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div className="w-32 h-[1px] bg-black mx-auto mt-1" />
+            <p className="text-[11px] pt-1 font-normal">Mã phiếu: {getFormattedSequenceId(req.id)}</p>
           </div>
           <div className="text-center w-[55%] space-y-1">
-            <p className="font-bold text-sm uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p className="font-bold text-sm">Độc lập - Tự do - Hạnh phúc</p>
-            <div className="w-40 h-[0.5px] bg-black mx-auto mt-1" />
-            <p className="text-[11px] italic pt-2 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <p className="font-bold text-[14px] uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-[14px]">Độc lập - Tự do - Hạnh phúc</p>
+            <div className="w-40 h-[1px] bg-black mx-auto mt-1" />
+            <p className="text-[12px] italic pt-3 font-normal">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
         <div className="text-center space-y-2 pt-10">
           <h1 className="text-xl font-bold uppercase tracking-tight">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p className="text-[11px] italic font-normal">(Dành cho hồ sơ lưu trữ tại Phòng Cơ sở vật chất)</p>
+          <p className="text-[12px] italic font-normal">(Hồ sơ lưu trữ Phòng Cơ sở vật chất)</p>
         </div>
 
-        <div className="space-y-6 pt-6 text-sm">
+        <div className="space-y-6 pt-6 text-[14px] leading-relaxed">
           <div className="space-y-3">
             <p><span className="font-bold">I. THÔNG TIN NGƯỜI YÊU CẦU</span></p>
-            <div className="pl-4 space-y-2">
+            <div className="pl-6 space-y-2">
               <p>- Họ và tên: {req.requesterName}</p>
               <p>- Đơn vị công tác: {req.unit.toUpperCase()}</p>
               <p>- Nội dung yêu cầu: {req.title}</p>
@@ -218,12 +233,12 @@ export default function RequestDetail() {
 
           <div className="space-y-3">
             <p><span className="font-bold">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</span></p>
-            <div className="pl-4 space-y-2">
+            <div className="pl-6 space-y-2">
               <p>- Thiết bị xử lý: {req.equipmentName}</p>
               <p>- Nhân viên thực hiện: {req.technicianName || 'N/A'}</p>
               <p>- Hình thức xử lý: {getRepairTypeText(req.repairType)}</p>
               <p>- Nội dung công việc: {req.technicianReport || 'Chưa cập nhật'}</p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-4">
                 <p>- Thời gian nhận việc: {formatDate(req.assignedAt)}</p>
                 <p>- Thời gian báo xong: {formatDate(req.completedAt)}</p>
               </div>
@@ -233,26 +248,26 @@ export default function RequestDetail() {
 
           <div className="space-y-3">
             <p><span className="font-bold">III. ĐÁNH GIÁ CỦA ĐƠN VỊ SỬ DỤNG</span></p>
-            <div className="pl-4 space-y-2">
+            <div className="pl-6 space-y-2">
               <p>- Mức độ hài lòng: {req.rating ? `${req.rating}/5 sao` : 'Đã xác nhận hài lòng'}</p>
               <p>- Ý kiến phản hồi: {req.requesterFeedback || 'Không có ý kiến thêm'}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-16 text-center text-sm">
-          <div className="space-y-20">
+        <div className="grid grid-cols-2 gap-4 pt-20 text-center text-[14px]">
+          <div className="space-y-24">
             <p className="font-bold uppercase">PHÒNG TCHC</p>
-            <p className="italic font-normal text-[11px]">(Ký và ghi rõ họ tên)</p>
+            <p className="italic font-normal text-[12px]">(Ký và ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-20">
+          <div className="space-y-24">
             <p className="font-bold uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p className="italic font-normal text-[11px]">(Ký và ghi rõ họ tên)</p>
+            <p className="italic font-normal text-[12px]">(Ký và ghi rõ họ tên)</p>
           </div>
         </div>
       </div>
 
-      {/* Giao diện App - Ẩn khi in */}
+      {/* App Interface - Hidden during print */}
       <div className="space-y-4 md:space-y-6 no-print">
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-primary/10">
           <CardHeader className="bg-slate-50/50 pb-8 p-8 md:p-10">
@@ -404,7 +419,7 @@ export default function RequestDetail() {
           </CardContent>
         </Card>
 
-        {/* Thao tác nghiệp vụ */}
+        {/* Business Logic Actions */}
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-accent/10">
           <CardHeader className="bg-slate-50/50 py-6 px-8 md:px-10">
             <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 text-slate-800">
