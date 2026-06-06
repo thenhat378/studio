@@ -26,7 +26,8 @@ import {
   Building2,
   MapPin,
   Camera,
-  ImagePlus
+  ImagePlus,
+  ArrowRight
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -211,6 +212,15 @@ export default function RequestDetail() {
     return Math.abs(hash).toString().slice(-7).padStart(7, '0');
   };
 
+  // 5 Steps Progress Tracking
+  const steps = [
+    { label: 'Tạo phiếu', active: true, done: true },
+    { label: 'Đơn vị Duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', done: !['pending_approval', 'rejected'].includes(req.status) },
+    { label: 'CSVC Giao việc', active: !!req.technicianId, done: !!req.technicianId },
+    { label: 'Kỹ thuật xong', active: ['completed', 'verified', 'closed'].includes(req.status), done: ['completed', 'verified', 'closed'].includes(req.status) },
+    { label: 'Nghiệm thu', active: req.status === 'closed', done: req.status === 'closed' }
+  ];
+
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
       <div className="flex items-center justify-between no-print bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/20 sticky top-24 z-30">
@@ -224,6 +234,7 @@ export default function RequestDetail() {
         )}
       </div>
 
+      {/* Print View Hidden on Screen */}
       <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
         <div className="flex justify-between items-start">
           <div className="text-center w-[45%] space-y-1">
@@ -472,26 +483,28 @@ export default function RequestDetail() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-3 pt-4">
-              {[
-                { label: 'Đơn vị Duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', icon: ShieldCheck },
-                { label: 'CSVC Giao việc', active: !!req.technicianId, icon: Wrench },
-                { label: 'Hoàn tất hồ sơ', active: req.status === 'closed', icon: CheckCircle2 }
-              ].map((step, i) => (
-                <div key={i} className={cn(
-                  "flex flex-col items-center gap-3 p-4 md:p-6 rounded-[2rem] border transition-all duration-500",
-                  step.active 
-                    ? "bg-emerald-50 border-emerald-100 text-emerald-600 shadow-sm" 
-                    : "bg-slate-50/50 border-slate-100 text-slate-300"
-                )}>
-                  <step.icon className={cn("h-6 w-6 md:h-8 md:w-8", step.active ? "text-emerald-500 animate-pulse" : "text-slate-200")} />
-                  <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-center">{step.label}</span>
+            {/* Stepper Progress Bar */}
+            <div className="flex justify-between gap-1 pt-6 px-2 relative">
+              <div className="absolute top-[calc(1.5rem+6px)] left-8 right-8 h-[2px] bg-slate-100 z-0" />
+              {steps.map((step, i) => (
+                <div key={i} className="flex flex-col items-center gap-3 z-10 flex-1">
+                  <div className={cn(
+                    "h-8 w-8 rounded-full flex items-center justify-center transition-all duration-500 border-2",
+                    step.done ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100" : (step.active ? "bg-white border-primary text-primary" : "bg-white border-slate-100 text-slate-300")
+                  )}>
+                    {step.done ? <Check className="h-4 w-4" /> : <span className="text-[10px] font-black">{i + 1}</span>}
+                  </div>
+                  <span className={cn(
+                    "text-[8px] font-black uppercase tracking-tighter text-center leading-tight transition-colors",
+                    step.active ? "text-slate-800" : "text-slate-300"
+                  )}>{step.label}</span>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
+        {/* Action Controls Card */}
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-accent/10">
           <CardHeader className="bg-slate-50/50 py-6 px-8 md:px-10">
             <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 text-slate-800">

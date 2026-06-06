@@ -62,7 +62,6 @@ export default function ManagementPage() {
 
   // Statistics Data
   const stats = useMemo(() => {
-    // 1. Incidents by Location (Room)
     const locationMap: Record<string, number> = {};
     requests.forEach(r => {
       const loc = r.location || 'Chưa rõ';
@@ -73,14 +72,12 @@ export default function ManagementPage() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    // 2. Incidents by Category
     const categoryMap: Record<string, number> = {};
     requests.forEach(r => {
       categoryMap[r.category] = (categoryMap[r.category] || 0) + 1;
     });
     const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
 
-    // 3. Resolution Method
     const methodMap = {
       'Sửa chữa': 0,
       'Thay mới': 0,
@@ -115,7 +112,7 @@ export default function ManagementPage() {
 
   const handleVerify = (id: string) => {
     updateRequestStatus(id, 'verified', { csvcManagerApproved: true });
-    toast({ title: "Đã duyệt hoàn thành", description: "Phiếu đã chuyển về đơn vị nghiệm thu." });
+    toast({ title: "Đã duyệt hoàn thành", description: "Phiếu đã chuyển về đơn vị để nghiệm thu." });
   };
 
   const exportToExcel = () => {
@@ -242,15 +239,15 @@ export default function ManagementPage() {
                   </h3>
                   <div className="flex flex-wrap gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span className="text-slate-800 font-black">Kỹ thuật: {req.technicianName}</span>
-                    <span className="flex items-center gap-1.5"><Timer className="h-3 w-3" /> Xong trong: {getDuration(req.assignedAt, req.completedAt)}</span>
+                    <span className="flex items-center gap-1.5"><Timer className="h-3 w-3" /> Xử lý: {getDuration(req.assignedAt, req.completedAt)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
-                    <Button variant="ghost" className="w-full h-14 px-6 rounded-xl font-black text-[10px] uppercase border-2">Chi tiết báo cáo</Button>
+                    <Button variant="ghost" className="w-full h-14 px-6 rounded-xl font-black text-[10px] uppercase border-2">Xem báo cáo</Button>
                   </Link>
                   <Button className="bg-cyan-600 h-14 px-8 rounded-xl text-white font-black text-[10px] uppercase gap-2 shadow-2xl shadow-cyan-100 active:scale-95 transition-all" onClick={() => handleVerify(req.id)}>
-                    <ShieldCheck className="h-5 w-5" /> Duyệt hoàn thành
+                    <ShieldCheck className="h-5 w-5" /> Duyệt xong kỹ thuật
                   </Button>
                 </div>
               </CardContent>
@@ -289,11 +286,6 @@ export default function ManagementPage() {
                 </div>
              </Card>
            ))}
-           {historyRequests.length === 0 && (
-            <div className="text-center py-24 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100">
-               <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">Chưa có dữ liệu lịch sử</p>
-            </div>
-          )}
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-8 animate-slide-up">
