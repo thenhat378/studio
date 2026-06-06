@@ -44,6 +44,7 @@ export default function EquipmentCatalog() {
     'Thiết bị điện',
     'Thiết bị nước',
     'Thiết bị làm mát',
+    'Khóa',
     'Các loại thiết bị khác'
   ];
 

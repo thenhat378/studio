@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview An AI assistant for repair request creation.
@@ -50,6 +49,7 @@ const availableCategories = [
   'Thiết bị điện',
   'Thiết bị nước',
   'Thiết bị làm mát',
+  'Khóa',
   'Các loại thiết bị khác',
 ];
 
@@ -70,6 +70,9 @@ const equipmentCatalog = [
   'Ghế',
   'Gạch nền',
   'Laphong',
+  'Khóa cửa',
+  'Ổ khóa',
+  'Chìa khóa',
 ];
 
 const prompt = ai.definePrompt({
@@ -85,6 +88,7 @@ Analyze the user's problem description and provide the following:
     - Thiết bị điện: Bóng đèn, ổ cắm, hệ thống điện.
     - Thiết bị nước: Bàn cầu, Lavabo, vòi nước, đường ống.
     - Thiết bị làm mát: Máy lạnh, Điều hòa, Quạt trần, Quạt treo tường, Quạt đứng.
+    - Khóa: Các loại khóa cửa, ổ khóa, chìa khóa, tay nắm cửa có khóa.
     - Các loại thiết bị khác: Bàn, ghế, gạch nền, laphong, cửa, v.v.
 3.  A list of relevant equipment from the following catalog that might be involved in or related to the problem: {{{equipmentCatalog}}}.
 
