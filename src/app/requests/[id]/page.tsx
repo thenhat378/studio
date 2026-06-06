@@ -103,11 +103,12 @@ export default function RequestDetail() {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      if (file.size > 1 * 1024 * 1024) {
+      // Tăng giới hạn lên 500MB (500 * 1024 * 1024 bytes)
+      if (file.size > 500 * 1024 * 1024) {
         toast({
           variant: "destructive",
           title: "Ảnh quá lớn",
-          description: "Vui lòng chọn ảnh dưới 1MB."
+          description: "Vui lòng chọn ảnh dưới 500MB."
         });
         return;
       }
