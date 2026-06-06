@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -99,7 +98,6 @@ export default function NewRequest() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ràng buộc nghiêm ngặt: Lấy đơn vị từ currentUser
     const userUnit = currentUser?.unit?.trim();
     if (!userUnit) {
       toast({
@@ -130,7 +128,7 @@ export default function NewRequest() {
       category: equip?.category || 'General',
       requesterId: currentUser.id,
       requesterName: currentUser.name,
-      unit: userUnit, // Ép gán đơn vị chuẩn từ tài khoản
+      unit: userUnit,
       images: images,
     };
 
@@ -162,110 +160,110 @@ export default function NewRequest() {
 
   if (!currentUser?.unit) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-2 border-dashed border-rose-100">
-        <div className="h-20 w-20 rounded-full bg-rose-50 flex items-center justify-center mb-6">
+      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-none animate-slide-up mx-4">
+        <div className="h-20 w-20 rounded-[2rem] bg-rose-50 flex items-center justify-center mb-6">
           <AlertCircle className="h-10 w-10 text-rose-500" />
         </div>
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa thiết lập Đơn vị</h2>
         <p className="text-sm text-slate-500 max-w-md font-medium">
           Tài khoản của bạn cần có thông tin Đơn vị công tác để gửi phiếu đến đúng người quản lý.
         </p>
-        <Button variant="link" onClick={() => router.back()} className="mt-4 font-bold">Quay lại</Button>
+        <Button variant="link" onClick={() => router.back()} className="mt-4 font-black uppercase text-[10px] tracking-widest">Quay lại</Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-24">
-      <div className="flex items-center gap-2 mb-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full">
-          <ChevronLeft className="h-5 w-5" />
+    <div className="max-w-3xl mx-auto space-y-6 pb-safe animate-slide-up">
+      <div className="flex items-center gap-3 mb-6 px-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl bg-white shadow-sm h-12 w-12">
+          <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="text-2xl font-black text-slate-800">Tạo phiếu yêu cầu</h1>
+        <h1 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">Tạo phiếu mới</h1>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="px-4">
         <div className="space-y-6">
-          <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden">
-            <CardHeader className="bg-slate-50/50">
+          <Card className="border-none shadow-sm rounded-[3rem] bg-white card-shadow overflow-hidden">
+            <CardHeader className="bg-slate-50/50 p-8">
               <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tighter">Thông tin sự cố</CardTitle>
-              <CardDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mô tả chi tiết vấn đề cần xử lý</CardDescription>
+              <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Mô tả tình trạng hỏng hóc</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 p-8">
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1">Tiêu đề yêu cầu</Label>
+            <CardContent className="space-y-8 p-8">
+              <div className="space-y-3">
+                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tiêu đề ngắn gọn</Label>
                 <Input 
                   id="title" 
                   placeholder="Ví dụ: Máy chiếu phòng 302 không lên" 
-                  className="h-14 rounded-2xl bg-slate-50 border-none font-bold"
+                  className="h-16 rounded-2xl bg-slate-50 border-none font-bold p-6"
                   value={formData.title}
                   onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   required
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <Label htmlFor="description" className="text-[10px] font-black uppercase text-slate-400">Mô tả sự cố</Label>
+                  <Label htmlFor="description" className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Mô tả chi tiết</Label>
                   <Button 
                     type="button" 
                     variant="ghost" 
                     size="sm" 
-                    className="text-primary hover:text-accent font-black text-[10px] uppercase tracking-widest"
+                    className="text-primary hover:text-accent font-black text-[10px] uppercase tracking-widest h-8"
                     onClick={handleAiAssist}
                     disabled={isAiLoading || !formData.description}
                   >
-                    {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
-                    Phân tích bằng AI
+                    {isAiLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                    Phân tích AI
                   </Button>
                 </div>
                 <Textarea 
                   id="description" 
-                  placeholder="Mô tả tình trạng lỗi..." 
-                  className="min-h-[120px] rounded-2xl bg-slate-50 border-none font-bold p-4"
+                  placeholder="Mô tả cụ thể tình trạng lỗi..." 
+                  className="min-h-[160px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed"
                   value={formData.description}
                   onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="equipment" className="text-[10px] font-black uppercase text-slate-400 ml-1">Thiết bị cần sửa</Label>
+              <div className="space-y-3">
+                <Label htmlFor="equipment" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Thiết bị sự cố</Label>
                 <Select 
                   value={formData.equipmentId} 
                   onValueChange={val => setFormData(prev => ({ ...prev, equipmentId: val }))}
                 >
-                  <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold">
+                  <SelectTrigger className="h-16 rounded-2xl bg-slate-50 border-none font-bold px-6">
                     <SelectValue placeholder="Chọn thiết bị từ danh mục" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-none shadow-xl">
+                  <SelectContent className="rounded-[2rem] border-none shadow-2xl p-2">
                     {equipment.map(e => (
-                      <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                      <SelectItem key={e.id} value={e.id} className="rounded-xl h-12 font-bold">{e.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-3 pt-2">
-                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
-                  <Camera className="h-3.5 w-3.5 text-primary" /> Hình ảnh sự cố (Minh chứng)
+              <div className="space-y-4 pt-4">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
+                  <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng
                 </Label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   {images.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-slate-100 group">
+                    <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 group shadow-sm">
                       <Image src={img} alt="Preview" fill className="object-cover" />
                       <button 
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="absolute top-1 right-1 bg-rose-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 bg-rose-500 text-white p-2 rounded-full shadow-lg"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </button>
                     </div>
                   ))}
-                  <label className="aspect-square rounded-2xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors bg-slate-50/50">
-                    <Camera className="h-8 w-8 text-primary/60" />
-                    <span className="text-[9px] font-black text-primary/60 uppercase text-center px-1">Mở máy ảnh</span>
+                  <label className="aspect-square rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all bg-primary/5 active:scale-95 shadow-sm">
+                    <Camera className="h-8 w-8 text-primary" />
+                    <span className="text-[10px] font-black text-primary uppercase text-center px-4 leading-tight">Mở máy ảnh</span>
                     <input 
                       type="file" 
                       multiple 
@@ -275,9 +273,9 @@ export default function NewRequest() {
                       onChange={handleImageChange} 
                     />
                   </label>
-                  <label className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                  <label className="aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
                     <ImagePlus className="h-8 w-8 text-slate-300" />
-                    <span className="text-[9px] font-black text-slate-400 uppercase">Thư viện</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase">Thư viện</span>
                     <input 
                       type="file" 
                       multiple 
@@ -292,19 +290,19 @@ export default function NewRequest() {
           </Card>
 
           {aiSuggestions && (
-            <Card className="border-accent/20 bg-accent/5 rounded-[2rem] overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-widest">
-                  <Sparkles className="h-4 w-4" /> Gợi ý từ FixFlow AI
+            <Card className="border-none bg-accent/10 rounded-[3rem] overflow-hidden card-shadow">
+              <CardHeader className="pb-4 p-8">
+                <CardTitle className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-[0.2em]">
+                  <Sparkles className="h-4 w-4 text-accent" /> Phân tích bởi AI
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 p-6 pt-0">
-                <div className="bg-white/50 p-4 rounded-2xl">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">Phân tích nguyên nhân:</p>
-                  <ul className="space-y-1">
+              <CardContent className="space-y-4 p-8 pt-0">
+                <div className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] shadow-sm">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Nguyên nhân dự kiến:</p>
+                  <ul className="space-y-2">
                     {aiSuggestions.causes.map((cause, i) => (
-                      <li key={i} className="text-xs font-bold flex items-start gap-2 text-slate-700">
-                        <CheckCircle2 className="h-3 w-3 text-accent mt-0.5 shrink-0" />
+                      <li key={i} className="text-xs font-bold flex items-start gap-3 text-slate-700 leading-snug">
+                        <CheckCircle2 className="h-4 w-4 text-accent mt-0.5 shrink-0" />
                         {cause}
                       </li>
                     ))}
@@ -314,12 +312,12 @@ export default function NewRequest() {
             </Card>
           )}
 
-          <div className="flex flex-col gap-3">
-            <Button type="submit" className="w-full bg-primary h-16 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-blue-100 transition-all active:scale-95" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi yêu cầu phê duyệt"}
+          <div className="flex flex-col gap-4 pt-4">
+            <Button type="submit" className="w-full bg-primary h-18 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi phiếu phê duyệt"}
             </Button>
-            <Button type="button" variant="ghost" className="w-full h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400" onClick={() => router.back()}>
-              Hủy bỏ
+            <Button type="button" variant="ghost" className="w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400" onClick={() => router.back()}>
+              Hủy bỏ yêu cầu
             </Button>
           </div>
         </div>

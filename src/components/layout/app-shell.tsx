@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect } from 'react';
@@ -13,7 +12,8 @@ import {
   Menu,
   Bell,
   Search,
-  Users
+  Users,
+  UserCircle
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!isInitialized) return null;
   if (!currentUser) {
-    return <div className="min-h-screen bg-slate-50/50">{children}</div>;
+    return <div className="min-h-screen bg-[#F4F7FE]">{children}</div>;
   }
 
   const navigation = [
@@ -68,29 +68,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F4F7FE]">
+    <div className="flex min-h-screen bg-[#F4F7FE] overflow-x-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col border-r bg-white no-print fixed h-full z-40">
-        <div className="flex h-16 items-center px-6 border-b shrink-0">
-          <Link href="/" className="flex items-center gap-2 font-black text-sm tracking-tighter uppercase">
-            <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white">
-              <Wrench className="h-5 w-5" />
+      <aside className="hidden md:flex w-72 flex-col border-r bg-white no-print fixed h-full z-40 shadow-sm">
+        <div className="flex h-20 items-center px-8 border-b shrink-0">
+          <Link href="/" className="flex items-center gap-3 font-black text-sm tracking-tighter uppercase">
+            <div className="h-10 w-10 bg-primary rounded-[1.2rem] flex items-center justify-center text-white shadow-lg shadow-primary/20">
+              <Wrench className="h-6 w-6" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-[10px] text-slate-800 font-black">REQUISITION FORM</span>
-              <span className="text-[14px] font-black">
+              <span className="text-[10px] text-slate-400 font-black tracking-widest">REQUISITION FORM</span>
+              <span className="text-[18px] font-black">
                 <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
               </span>
             </div>
           </Link>
         </div>
-        <div className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
+        <div className="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
           {filteredNav.map((item) => (
             <Link key={item.name} href={item.href}>
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl transition-all",
+                  "w-full justify-start gap-4 h-14 px-5 text-[13px] font-bold rounded-[1.2rem] transition-all",
                   pathname === item.href 
                     ? "bg-primary/5 text-primary" 
                     : "text-slate-400 hover:bg-slate-50"
@@ -102,74 +102,78 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
           {currentUser.role === 'requester' && (
-            <Link href="/requests/new">
-              <Button variant="ghost" className="w-full justify-start gap-3 h-12 px-4 text-sm font-bold rounded-2xl text-accent hover:bg-orange-50">
+            <Link href="/requests/new" className="block pt-4">
+              <Button className="w-full justify-start gap-4 h-14 px-5 text-[13px] font-black rounded-[1.2rem] bg-accent text-white hover:bg-accent/90 shadow-lg shadow-orange-100">
                 <PlusCircle className="h-5 w-5" />
                 Tạo phiếu mới
               </Button>
             </Link>
           )}
         </div>
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-3 px-2 mb-2">
-            <Avatar className="h-10 w-10 border-2 border-slate-100">
-              <AvatarFallback className="bg-slate-800 text-white font-black text-xs">
+        <div className="p-6 border-t bg-slate-50/50">
+          <div className="flex items-center gap-4 mb-4">
+            <Avatar className="h-12 w-12 border-4 border-white shadow-sm">
+              <AvatarFallback className="bg-primary text-white font-black text-sm">
                 {currentUser.name.charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <Button 
-              variant="ghost" 
-              className="flex-1 justify-start text-rose-500 hover:bg-rose-50 h-10 rounded-xl font-black text-xs uppercase p-0 px-2" 
-              onClick={() => logout()}
-            >
-              Đăng xuất
-            </Button>
+            <div className="min-w-0">
+              <p className="font-black text-sm text-slate-800 truncate">{currentUser.name}</p>
+              <p className="text-[9px] font-black text-primary uppercase tracking-tighter">{getRoleDisplayName(currentUser.role)}</p>
+            </div>
           </div>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-3 text-rose-500 hover:bg-rose-50 h-12 rounded-[1rem] font-black text-[11px] uppercase p-0 px-4" 
+            onClick={() => logout()}
+          >
+            <Power className="h-4 w-4" /> Đăng xuất
+          </Button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
+      <div className="flex-1 flex flex-col min-w-0 md:ml-72">
         {/* Mobile Header */}
-        <header className="md:hidden glass-morphism fixed top-0 left-0 w-full h-16 flex items-center justify-between px-6 z-50">
+        <header className="md:hidden glass-morphism fixed top-0 left-0 w-full h-20 flex items-center justify-between px-6 z-50 shadow-sm border-none">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary/30">
+            <div className="h-12 w-12 rounded-[1.5rem] bg-primary flex items-center justify-center text-white font-black text-xl shadow-xl shadow-primary/20">
               {currentUser.name.charAt(0)}
             </div>
-            <div>
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest leading-none">Xin chào,</p>
-              <p className="text-sm font-black text-slate-800">{currentUser.name.split(' ').pop()}</p>
+            <div className="flex flex-col">
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em] leading-none mb-1">DUE SYSTEM</p>
+              <p className="text-[15px] font-black text-slate-800 leading-none">{currentUser.name.split(' ').pop()}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full bg-slate-100/50">
+            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-[1.2rem] bg-slate-100/50">
               <Bell className="h-5 w-5 text-slate-600" />
             </Button>
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full bg-slate-100/50">
-                  <Menu className="h-5 w-5 text-slate-600" />
+                <Button variant="ghost" size="icon" className="h-11 w-11 rounded-[1.2rem] bg-slate-100/50">
+                  <Menu className="h-6 w-6 text-slate-600" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] rounded-l-[3rem] p-0 border-none">
-                <div className="flex flex-col h-full bg-white p-8">
-                  <div className="flex items-center gap-4 mb-8 pt-4">
-                    <div className="h-14 w-14 rounded-[2rem] bg-primary flex items-center justify-center text-white text-2xl font-black">
+              <SheetContent side="right" className="w-[85vw] rounded-l-[3.5rem] p-0 border-none shadow-2xl">
+                <div className="flex flex-col h-full bg-white p-10">
+                  <div className="flex items-center gap-5 mb-10 pt-4">
+                    <div className="h-16 w-16 rounded-[2rem] bg-primary flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-primary/20">
                       {currentUser.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-black text-lg">{currentUser.name}</p>
-                      <p className="text-[10px] font-black text-primary uppercase">
+                      <p className="font-black text-xl tracking-tighter text-slate-800">{currentUser.name}</p>
+                      <p className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">
                         {getRoleDisplayName(currentUser.role)}
                       </p>
                     </div>
                   </div>
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-3 flex-1">
                     {filteredNav.map((item) => (
                       <SheetClose asChild key={item.name}>
                         <Link href={item.href}>
-                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-slate-600">
-                            <item.icon className="h-5 w-5" /> {item.name}
+                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-slate-700 hover:bg-slate-50 transition-all">
+                            <item.icon className="h-6 w-6 text-slate-300" /> {item.name}
                           </Button>
                         </Link>
                       </SheetClose>
@@ -177,8 +181,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {currentUser.role === 'requester' && (
                       <SheetClose asChild>
                         <Link href="/requests/new">
-                          <Button variant="ghost" className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-accent">
-                            <PlusCircle className="h-5 w-5" /> Tạo phiếu mới
+                          <Button variant="ghost" className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-accent hover:bg-orange-50 transition-all">
+                            <PlusCircle className="h-6 w-6" /> Tạo phiếu mới
                           </Button>
                         </Link>
                       </SheetClose>
@@ -186,10 +190,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </div>
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-start gap-4 h-14 rounded-2xl font-bold text-rose-500 mt-auto"
+                    className="w-full justify-start gap-5 h-16 rounded-[1.5rem] font-black text-rose-500 mt-auto bg-rose-50 hover:bg-rose-100"
                     onClick={() => logout()}
                   >
-                    <Power className="h-5 w-5" /> Đăng xuất
+                    <Power className="h-6 w-6" /> Đăng xuất
                   </Button>
                 </div>
               </SheetContent>
@@ -198,42 +202,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Desktop Header */}
-        <header className="hidden md:flex h-20 items-center justify-between px-8 bg-transparent no-print">
-          <h2 className="text-xl font-black text-slate-800 tracking-tighter">
+        <header className="hidden md:flex h-24 items-center justify-between px-10 bg-transparent no-print">
+          <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">
             {getPageTitle()}
           </h2>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
               <input 
                 placeholder="Tìm kiếm nhanh..." 
-                className="bg-white border-none rounded-2xl h-11 pl-10 pr-4 w-64 shadow-sm text-sm focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                className="bg-white border-none rounded-[1.2rem] h-12 pl-12 pr-6 w-80 shadow-sm text-sm focus:ring-4 focus:ring-primary/5 outline-none font-bold"
               />
             </div>
-            <div className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
-              <Bell className="h-5 w-5 text-slate-400" />
+            <div className="h-12 w-12 rounded-[1.2rem] bg-white flex items-center justify-center shadow-sm border border-slate-50 hover:bg-slate-50 cursor-pointer transition-all hover:scale-105">
+              <Bell className="h-6 w-6 text-slate-400" />
             </div>
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-4 pb-safe overflow-y-auto">
-          <div className="max-w-5xl mx-auto">
+        <main className="flex-1 p-5 md:p-10 pt-24 md:pt-4 pb-safe overflow-y-auto">
+          <div className="max-w-6xl mx-auto">
             {children}
           </div>
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden glass-morphism fixed bottom-0 left-0 w-full h-20 px-6 flex items-center justify-between z-50 rounded-t-[2.5rem] card-shadow">
+        <nav className="md:hidden glass-morphism fixed bottom-0 left-0 w-full h-24 px-6 flex items-center justify-around z-50 rounded-t-[3rem] shadow-[0_-15px_35px_rgba(0,0,0,0.03)] border-none">
           {bottomNavItems.map((item) => (
-            <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1 group">
+            <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1.5 group active:scale-90 transition-all">
               <div className={cn(
-                "p-2 rounded-2xl transition-all duration-300",
-                pathname === item.href ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-slate-400"
+                "p-3 rounded-[1.2rem] transition-all duration-300",
+                pathname === item.href ? "bg-primary text-white shadow-xl shadow-primary/20 scale-110" : "text-slate-300"
               )}>
                 <item.icon className="h-6 w-6" />
               </div>
               <span className={cn(
-                "text-[9px] font-black uppercase tracking-tighter",
+                "text-[8px] font-black uppercase tracking-widest",
                 pathname === item.href ? "text-primary" : "text-slate-400"
               )}>
                 {item.name}
@@ -241,9 +245,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
           {currentUser.role === 'requester' && (
-            <Link href="/requests/new" className="absolute -top-8 left-1/2 -translate-x-1/2">
-              <div className="h-16 w-16 rounded-full bg-accent flex items-center justify-center text-white shadow-xl shadow-orange-200 border-4 border-[#F4F7FE] active:scale-95 transition-transform">
-                <PlusCircle className="h-8 w-8" />
+            <Link href="/requests/new" className="absolute -top-10 left-1/2 -translate-x-1/2 active:scale-90 transition-all">
+              <div className="h-20 w-20 rounded-full bg-accent flex items-center justify-center text-white shadow-2xl shadow-orange-200 border-[6px] border-[#F4F7FE]">
+                <PlusCircle className="h-10 w-10" />
               </div>
             </Link>
           )}
