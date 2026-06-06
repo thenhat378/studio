@@ -55,5 +55,6 @@ export interface RepairRequest {
   unitFeedback?: string;
   rating?: number;
   requesterConfirmed?: boolean;
+  requesterFeedback?: string;
   csvcManagerApproved?: boolean;
 }
