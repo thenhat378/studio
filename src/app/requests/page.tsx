@@ -15,11 +15,26 @@ export default function RequestsList() {
   const { requests, currentUser } = useAppStore();
   const [search, setSearch] = useState('');
 
-  const filteredRequests = requests.filter(r => 
-    (r.location.toLowerCase().includes(search.toLowerCase()) ||
-     r.equipmentName.toLowerCase().includes(search.toLowerCase())) &&
-    (currentUser?.role === 'csvc_manager' ? true : r.requesterId === currentUser?.id || r.unit === currentUser?.unit)
-  );
+  const filteredRequests = requests.filter(r => {
+    // Kiểm tra an toàn cho các trường dữ liệu chuỗi để tránh lỗi toLowerCase()
+    const location = r.location || '';
+    const equipmentName = r.equipmentName || '';
+    const searchLower = (search || '').toLowerCase();
+    
+    const matchesSearch = location.toLowerCase().includes(searchLower) || 
+                         equipmentName.toLowerCase().includes(searchLower);
+
+    // Chuẩn hóa dữ liệu đơn vị để so sánh chính xác
+    const userRole = currentUser?.role;
+    const userUnit = currentUser?.unit?.trim().toLowerCase();
+    const requestUnit = r.unit?.trim().toLowerCase();
+    
+    const isAuthorized = userRole === 'csvc_manager' || userRole === 'admin'
+      ? true 
+      : (r.requesterId === currentUser?.id || (requestUnit && userUnit && requestUnit === userUnit));
+
+    return matchesSearch && isAuthorized;
+  });
 
   const getStatusInfo = (status: string) => {
     switch(status) {
@@ -82,13 +97,18 @@ export default function RequestsList() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3 py-1 flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" /> {req.location}
+                        <MapPin className="h-3.5 w-3.5" /> {req.location || 'N/A'}
                       </Badge>
                     </div>
                     <h3 className="font-black text-xl text-slate-800 leading-tight tracking-tight">{req.equipmentName}</h3>
                     <div className="flex flex-wrap gap-5 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
-                      <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-slate-200" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
-                      <span className="flex items-center gap-2 uppercase font-black text-slate-500">{req.unit}</span>
+                      <span className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-slate-200" /> 
+                        {req.createdAt ? new Date(req.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+                      </span>
+                      <span className="flex items-center gap-2 uppercase font-black text-slate-500">
+                        {req.unit || 'N/A'}
+                      </span>
                     </div>
                   </div>
 
@@ -97,7 +117,9 @@ export default function RequestsList() {
                         <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm">
                            <User className="h-4 w-4 text-slate-400" />
                         </div>
-                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">{req.requesterName}</span>
+                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">
+                          {req.requesterName || 'N/A'}
+                        </span>
                      </div>
                      <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-200 group-hover:bg-primary group-hover:text-white transition-all">
                         <ChevronRight className="h-6 w-6" />
