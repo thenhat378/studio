@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Eye, Check, X, CheckCircle2, Star, AlertCircle, Building2, MapPin } from 'lucide-react';
+import { ShieldCheck, Eye, Check, X, Building2, MapPin, AlertCircle, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -114,12 +114,10 @@ export default function ApprovalsPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden border-l-8 border-l-primary/20">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex-1 min-w-0 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-primary/5 text-primary border-none font-black text-[9px] uppercase px-2 py-0.5 flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" /> {req.location}
-                    </Badge>
-                  </div>
-                  <h3 className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">{req.equipmentName}</h3>
+                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight">
+                    <span className="text-primary mr-2 uppercase">[{req.location}]</span>
+                    {req.equipmentName}
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Người báo</p>
@@ -156,9 +154,92 @@ export default function ApprovalsPage() {
               </CardContent>
             </Card>
           ))}
+          {pendingRequests.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
+               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ duyệt</p>
+            </div>
+          )}
         </TabsContent>
-        {/* Shortened: Same logic for Step 7 */}
+
+        <TabsContent value="confirm" className="space-y-4">
+          {pendingConfirmation.map(req => (
+            <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden border-l-8 border-l-emerald-500">
+              <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="flex-1 min-w-0 space-y-3">
+                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight">
+                    <span className="text-emerald-600 mr-2 uppercase">[{req.location}]</span>
+                    {req.equipmentName}
+                  </h3>
+                  <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span>Xong bởi: {req.technicianName}</span>
+                    <span className="text-slate-600 font-black">{req.unit}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
+                    <Button variant="ghost" size="sm" className="w-full h-12 rounded-xl border-2 font-black text-[10px] uppercase">
+                      <Eye className="h-4 w-4 mr-2" /> Xem báo cáo
+                    </Button>
+                  </Link>
+                  <Button 
+                    size="sm" 
+                    className="bg-emerald-600 hover:bg-emerald-700 h-12 rounded-xl text-white font-black text-[10px] uppercase gap-2 flex-1 md:flex-none" 
+                    onClick={() => setRatingId(req.id)}
+                  >
+                    <ShieldCheck className="h-4 w-4" /> Nghiệm thu
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {pendingConfirmation.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
+               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Không có phiếu chờ nghiệm thu</p>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
+
+      {/* Dialogs for Reject and Rating */}
+      {rejectingId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <Card className="w-full max-w-md rounded-[3rem] p-8 space-y-6">
+            <h3 className="font-black text-xl text-primary uppercase tracking-tighter">Lý do từ chối phiếu</h3>
+            <textarea 
+              className="w-full h-32 rounded-2xl bg-slate-50 border-none p-5 font-bold text-sm focus:ring-2 focus:ring-primary/20 outline-none" 
+              placeholder="Nhập nội dung từ chối..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            />
+            <div className="flex gap-3">
+              <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-black text-xs uppercase" onClick={() => setRejectingId(null)}>Hủy</Button>
+              <Button className="flex-1 bg-rose-500 h-14 rounded-2xl text-white font-black text-xs uppercase" onClick={handleReject} disabled={!rejectionReason.trim()}>Xác nhận từ chối</Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {ratingId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <Card className="w-full max-w-md rounded-[3rem] p-8 space-y-8 text-center">
+            <h3 className="font-black text-xl text-primary uppercase tracking-tighter">Nghiệm thu & Đánh giá</h3>
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map(s => (
+                <Star 
+                  key={s} 
+                  className={cn("h-10 w-10 cursor-pointer transition-all", s <= currentRating ? "fill-amber-400 text-amber-400" : "text-slate-200")} 
+                  onClick={() => setCurrentRating(s)}
+                />
+              ))}
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mức độ hài lòng của đơn vị: {currentRating}/5 sao</p>
+            <div className="flex gap-3">
+              <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-black text-xs uppercase" onClick={() => setRatingId(null)}>Hủy</Button>
+              <Button className="flex-1 bg-emerald-600 h-14 rounded-2xl text-white font-black text-xs uppercase shadow-xl shadow-emerald-100" onClick={handleConfirmAcceptance}>Xác nhận & Đóng phiếu</Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

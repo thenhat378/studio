@@ -4,28 +4,11 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, Eye, ClipboardPen, Clock, MapPin, HardDrive, ChevronRight } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, ChevronRight, MapPin, HardDrive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useMemo } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { RepairType } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -44,17 +27,6 @@ export default function TasksPage() {
   const handleStart = (id: string) => {
     updateRequestStatus(id, 'in_progress');
     toast({ title: "Đã bắt đầu làm", description: "Thời gian bắt đầu đã được ghi nhận." });
-  };
-
-  const handleSubmitReport = () => {
-    if (!reportingId || !reportText.trim() || !repairType) return;
-    updateRequestStatus(reportingId, 'completed', { 
-      technicianReport: reportText,
-      repairType: repairType as RepairType,
-      completedAt: new Date().toISOString()
-    });
-    toast({ title: "Báo cáo hoàn thành", description: "Đã gửi báo cáo lên Phòng CSVC." });
-    setReportingId(null);
   };
 
   return (
@@ -87,8 +59,10 @@ export default function TasksPage() {
                     {req.status === 'assigned' ? 'Bước 3: Mới nhận' : 'Bước 4: Đang sửa'}
                   </Badge>
                 </div>
-                <h3 className="font-black text-lg text-slate-800 mb-2 uppercase tracking-tight">{req.location}</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">{req.equipmentName}</p>
+                <h3 className="font-black text-lg text-slate-800 mb-2 leading-tight">
+                  {req.equipmentName}
+                  <span className="text-primary ml-2 uppercase">({req.location})</span>
+                </h3>
                 <div className="grid grid-cols-1 gap-3 mb-6 text-[11px] font-bold text-slate-500 uppercase">
                   <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-rose-400" /> {req.unit}</p>
                 </div>
@@ -101,14 +75,21 @@ export default function TasksPage() {
                       <Play className="h-4 w-4 mr-2" /> Bắt đầu làm
                     </Button>
                   ) : (
-                    <Button className="flex-[2] bg-emerald-600 h-12 rounded-xl text-white font-black text-[10px] uppercase shadow-lg shadow-emerald-100" onClick={() => { setReportingId(req.id); setReportText(''); }}>
-                      <CheckCircle2 className="h-4 w-4 mr-2" /> Báo cáo hoàn thành
-                    </Button>
+                    <Link href={`/requests/${req.id}`} className="flex-[2]">
+                      <Button className="w-full bg-emerald-600 h-12 rounded-xl text-white font-black text-[10px] uppercase shadow-lg shadow-emerald-100">
+                        <CheckCircle2 className="h-4 w-4 mr-2" /> Báo cáo hoàn thành
+                      </Button>
+                    </Link>
                   )}
                 </div>
               </CardContent>
             </Card>
           ))}
+          {activeTasks.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
+               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Hiện không có nhiệm vụ nào</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="finished" className="space-y-4">
@@ -117,10 +98,12 @@ export default function TasksPage() {
               <Card className="border-none shadow-sm rounded-2xl bg-white p-6 hover:bg-slate-50 transition-all opacity-90">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="font-black text-sm text-slate-800 truncate mb-1 uppercase tracking-tight">{req.location}</p>
+                    <p className="font-black text-sm text-slate-800 truncate mb-1 uppercase tracking-tight">
+                      [{req.location}] {req.equipmentName}
+                    </p>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-[8px] font-black uppercase">{req.status}</Badge>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase">{req.equipmentName}</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase">{req.unit}</span>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-300" />
@@ -130,7 +113,6 @@ export default function TasksPage() {
           ))}
         </TabsContent>
       </Tabs>
-      {/* Shortened: Dialog for reporting remains the same */}
     </div>
   );
 }

@@ -7,15 +7,10 @@ import { Button } from '@/components/ui/button';
 import { 
   ClipboardList, 
   UserCheck, 
-  Eye, 
   ShieldCheck,
-  ChevronRight,
   Star,
   Clock,
-  History,
   Timer,
-  User,
-  MessageSquareQuote,
   CheckCircle2,
   MapPin
 } from 'lucide-react';
@@ -42,7 +37,7 @@ export default function ManagementPage() {
 
   const pendingAssignment = useMemo(() => requests.filter(r => r.status === 'approved'), [requests]);
   const pendingVerification = useMemo(() => requests.filter(r => r.status === 'completed'), [requests]);
-  const historyRequests = useMemo(() => requests.filter(r => r.technicianId && ['closed', 'verified', 'completed'].includes(r.status)), [requests]);
+  const historyRequests = useMemo(() => requests.filter(r => r.technicianId && (['closed', 'verified', 'completed'].includes(r.status))), [requests]);
 
   const technicians = useMemo(() => users.filter(u => u.role === 'technician'), [users]);
 
@@ -106,12 +101,10 @@ export default function ManagementPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow border-l-8 border-l-indigo-500 overflow-hidden">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-indigo-50 text-indigo-600 border-none font-black text-[9px] uppercase px-3 py-1 flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" /> {req.location}
-                    </Badge>
-                  </div>
-                  <h3 className="font-black text-lg text-slate-800 truncate">{req.equipmentName}</h3>
+                  <h3 className="font-black text-lg text-slate-800 truncate">
+                    <span className="text-indigo-600 mr-2 uppercase">[{req.location}]</span>
+                    {req.equipmentName}
+                  </h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Báo hỏng: {formatDate(req.createdAt)}</span>
                     <span className="uppercase text-slate-600 font-black">{req.unit}</span>
@@ -134,7 +127,60 @@ export default function ManagementPage() {
             </Card>
           ))}
         </TabsContent>
-        {/* Shortened: Other TabsContent also use req.location instead of req.title */}
+
+        <TabsContent value="verify" className="space-y-4">
+          {pendingVerification.map(req => (
+            <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow border-l-8 border-l-cyan-500 overflow-hidden">
+              <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <h3 className="font-black text-lg text-slate-800 truncate">
+                    <span className="text-cyan-600 mr-2 uppercase">[{req.location}]</span>
+                    {req.equipmentName}
+                  </h3>
+                  <div className="flex flex-wrap gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span className="text-slate-800 font-black">Xử lý: {req.technicianName}</span>
+                    <span>T/g: {getDuration(req.assignedAt, req.completedAt)}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <Link href={`/requests/${req.id}`} className="flex-1 md:flex-none">
+                    <Button variant="ghost" className="w-full h-14 px-6 rounded-xl font-black text-[10px] uppercase border-2">Xem báo cáo</Button>
+                  </Link>
+                  <Button className="bg-cyan-600 h-14 px-6 rounded-xl text-white font-black text-[10px] uppercase gap-2 shadow-xl shadow-cyan-100" onClick={() => handleVerify(req.id)}>
+                    <ShieldCheck className="h-5 w-5" /> Duyệt xong
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+           {historyRequests.map(req => (
+             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden p-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                   <div className="space-y-2">
+                      <h3 className="font-black text-base text-slate-800">
+                        <span className="text-slate-400 mr-2 uppercase">[{req.location}]</span>
+                        {req.equipmentName}
+                      </h3>
+                      <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase">
+                         <span className="text-primary">{req.technicianName}</span>
+                         <span className="flex items-center gap-1"><Timer className="h-3 w-3" /> {getDuration(req.assignedAt, req.completedAt)}</span>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      {req.rating && (
+                        <div className="flex gap-0.5">
+                          {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3.5 w-3.5", s <= req.rating! ? "fill-amber-400 text-amber-400" : "text-slate-100")} />)}
+                        </div>
+                      )}
+                      <Badge variant="secondary" className="bg-slate-50 text-[9px] font-black uppercase px-3 py-1">{req.status}</Badge>
+                   </div>
+                </div>
+             </Card>
+           ))}
+        </TabsContent>
       </Tabs>
     </div>
   );
