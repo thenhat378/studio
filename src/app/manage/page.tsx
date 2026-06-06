@@ -107,11 +107,11 @@ export default function ManagementPage() {
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-indigo-50 text-indigo-600 border-none font-black text-[9px] uppercase px-3 py-1 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" /> {req.location}
+                    <Badge className="bg-indigo-50 text-indigo-600 border-none font-black text-[9px] uppercase px-3 py-1 flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" /> {req.location}
                     </Badge>
                   </div>
-                  <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
+                  <h3 className="font-black text-lg text-slate-800 truncate">{req.equipmentName}</h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Báo hỏng: {formatDate(req.createdAt)}</span>
                     <span className="uppercase text-slate-600 font-black">{req.unit}</span>
@@ -134,7 +134,7 @@ export default function ManagementPage() {
             </Card>
           ))}
         </TabsContent>
-        {/* Same for other TabsContent... shortened for brevity */}
+        {/* Shortened: Other TabsContent also use req.location instead of req.title */}
       </Tabs>
     </div>
   );

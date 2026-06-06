@@ -61,7 +61,6 @@ export default function RequestDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
-    title: '',
     location: '',
     description: '',
     equipmentId: ''
@@ -73,7 +72,6 @@ export default function RequestDetail() {
   useEffect(() => {
     if (req) {
       setEditData({
-        title: req.title,
         location: req.location || '',
         description: req.description,
         equipmentId: req.equipmentId
@@ -105,7 +103,7 @@ export default function RequestDetail() {
   };
 
   const handleResend = () => {
-    if (!editData.title || !editData.location || !editData.description || !editData.equipmentId) {
+    if (!editData.location || !editData.description || !editData.equipmentId) {
       toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ thông tin trước khi gửi lại." });
       return;
     }
@@ -113,7 +111,6 @@ export default function RequestDetail() {
     const equip = equipment.find(e => e.id === editData.equipmentId);
     
     updateRequestStatus(req.id, 'pending_approval', {
-      title: editData.title,
       location: editData.location,
       description: editData.description,
       equipmentId: editData.equipmentId,
@@ -186,7 +183,6 @@ export default function RequestDetail() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
-      {/* Navigation Buttons - Hidden during print */}
       <div className="flex items-center justify-between no-print bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/20 sticky top-24 z-30">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 font-black text-[10px] uppercase tracking-widest">
           <ChevronLeft className="h-4 w-4" /> Trở về
@@ -198,7 +194,6 @@ export default function RequestDetail() {
         )}
       </div>
 
-      {/* Print Interface - Times New Roman Word-like layout with Table */}
       <div className="print-only p-12 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif', minHeight: '29.7cm' }}>
         <div className="flex justify-between items-start">
           <div className="text-center w-[45%] space-y-1">
@@ -219,7 +214,6 @@ export default function RequestDetail() {
           <p className="text-[12px] font-normal">Số phiếu: {getFormattedSequenceId(req.id)}</p>
         </div>
 
-        {/* Main Content Table */}
         <table className="w-full border-collapse border border-black text-[14px]">
           <tbody>
             <tr>
@@ -238,10 +232,6 @@ export default function RequestDetail() {
             <tr>
               <td className="border border-black p-3">Vị trí sự cố:</td>
               <td className="border border-black p-3">{req.location}</td>
-            </tr>
-            <tr>
-              <td className="border border-black p-3">Nội dung yêu cầu:</td>
-              <td className="border border-black p-3">{req.title}</td>
             </tr>
             <tr>
               <td className="border border-black p-3">Mô tả hỏng hóc:</td>
@@ -298,7 +288,6 @@ export default function RequestDetail() {
           </tbody>
         </table>
 
-        {/* Signature Section */}
         <div className="grid grid-cols-2 gap-4 pt-20 text-center text-[14px]">
           <div className="space-y-24">
             <p className="font-bold uppercase">PHÒNG TCHC</p>
@@ -311,7 +300,6 @@ export default function RequestDetail() {
         </div>
       </div>
 
-      {/* App Interface - Hidden during print */}
       <div className="space-y-4 md:space-y-6 no-print">
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-primary/10">
           <CardHeader className="bg-slate-50/50 pb-8 p-8 md:p-10">
@@ -319,19 +307,13 @@ export default function RequestDetail() {
               <div className="space-y-4 flex-1">
                 {isEditing ? (
                   <div className="space-y-3">
-                    <Input 
-                      value={editData.title}
-                      onChange={e => setEditData(prev => ({ ...prev, title: e.target.value }))}
-                      className="h-14 text-lg font-black bg-white rounded-2xl border-primary/20"
-                      placeholder="Nội dung yêu cầu..."
-                    />
                     <div className="relative">
                       <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
                       <Input 
                         value={editData.location}
                         onChange={e => setEditData(prev => ({ ...prev, location: e.target.value }))}
-                        className="h-12 text-sm font-bold bg-white rounded-xl border-primary/20 pl-11"
-                        placeholder="Vị trí cụ thể..."
+                        className="h-14 text-lg font-black bg-white rounded-2xl border-primary/20 pl-11"
+                        placeholder="Vị trí sự cố..."
                       />
                     </div>
                   </div>
@@ -340,7 +322,7 @@ export default function RequestDetail() {
                     <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase px-3 py-1 flex items-center gap-1.5 w-fit">
                       <MapPin className="h-3.5 w-3.5" /> {req.location}
                     </Badge>
-                    <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight tracking-tight">{req.title}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight tracking-tight uppercase">Báo cáo sửa chữa thiết bị</CardTitle>
                   </div>
                 )}
                 
@@ -353,22 +335,8 @@ export default function RequestDetail() {
                    {req.completedAt && (
                      <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-tighter">
                        <CheckCircle2 className="h-4 w-4 text-emerald-400" /> 
-                       <span>Hoàn thành kỹ thuật:</span>
+                       <span>Xong kỹ thuật:</span>
                        <span className="text-emerald-700 ml-auto">{formatDate(req.completedAt)}</span>
-                     </div>
-                   )}
-                   {req.assignedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-tighter col-span-full border-t border-slate-100 pt-2 mt-1">
-                       <Timer className="h-4 w-4 text-blue-400" /> 
-                       <span>Nhận việc lúc:</span>
-                       <span className="text-blue-700 ml-auto">{formatDate(req.assignedAt)}</span>
-                     </div>
-                   )}
-                   {req.assignedAt && req.completedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-tighter col-span-full">
-                       <Timer className="h-4 w-4 text-indigo-400" /> 
-                       <span>Tổng thời gian xử lý:</span>
-                       <span className="text-indigo-800 ml-auto">{getDuration(req.assignedAt, req.completedAt)}</span>
                      </div>
                    )}
                 </div>
@@ -479,7 +447,6 @@ export default function RequestDetail() {
           </CardContent>
         </Card>
 
-        {/* Business Logic Actions */}
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-accent/10">
           <CardHeader className="bg-slate-50/50 py-6 px-8 md:px-10">
             <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 text-slate-800">

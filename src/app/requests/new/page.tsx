@@ -24,7 +24,6 @@ export default function NewRequest() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    title: '',
     location: '',
     description: '',
     equipmentId: '',
@@ -110,7 +109,7 @@ export default function NewRequest() {
       return;
     }
 
-    if (!formData.title || !formData.location || !formData.description || !formData.equipmentId) {
+    if (!formData.location || !formData.description || !formData.equipmentId) {
       toast({
         variant: "destructive",
         title: "Thiếu thông tin",
@@ -123,7 +122,6 @@ export default function NewRequest() {
     const equip = equipment.find(e => e.id === formData.equipmentId);
     
     const requestData: any = {
-      title: formData.title.trim(),
       location: formData.location.trim(),
       description: formData.description.trim(),
       equipmentId: formData.equipmentId,
@@ -193,18 +191,6 @@ export default function NewRequest() {
               <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Mô tả tình trạng hỏng hóc</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8 p-8">
-              <div className="space-y-3">
-                <Label htmlFor="title" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tiêu đề nội dung</Label>
-                <Input 
-                  id="title" 
-                  placeholder="Ví dụ: Máy chiếu không lên hình" 
-                  className="h-16 rounded-2xl bg-slate-50 border-none font-bold p-6"
-                  value={formData.title}
-                  onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  required
-                />
-              </div>
-
               <div className="space-y-3">
                 <Label htmlFor="location" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Vị trí hư hỏng (Tiêu đề ngắn)</Label>
                 <div className="relative">

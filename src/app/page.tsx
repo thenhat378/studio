@@ -25,7 +25,8 @@ import {
   BarChart3,
   Star,
   Timer,
-  Clock
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -421,7 +422,7 @@ export default function Overview() {
                <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30">
                   <CardContent className="p-7 flex items-center justify-between">
                      <div className="space-y-2">
-                        <p className="font-black text-base text-slate-800 tracking-tight leading-tight">{req.title}</p>
+                        <p className="font-black text-base text-slate-800 tracking-tight leading-tight uppercase">{req.location}</p>
                         <div className="flex items-center gap-2">
                            <Badge variant="secondary" className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 border-none">
                              {req.equipmentName}

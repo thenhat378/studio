@@ -16,8 +16,7 @@ export default function RequestsList() {
   const [search, setSearch] = useState('');
 
   const filteredRequests = requests.filter(r => 
-    (r.title.toLowerCase().includes(search.toLowerCase()) || 
-     r.location.toLowerCase().includes(search.toLowerCase()) ||
+    (r.location.toLowerCase().includes(search.toLowerCase()) ||
      r.equipmentName.toLowerCase().includes(search.toLowerCase())) &&
     (currentUser?.role === 'csvc_manager' ? true : r.requesterId === currentUser?.id || r.unit === currentUser?.unit)
   );
@@ -56,7 +55,7 @@ export default function RequestsList() {
         <div className="relative">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
           <Input 
-            placeholder="Tìm theo tiêu đề, vị trí, thiết bị..." 
+            placeholder="Tìm theo vị trí, thiết bị..." 
             className="pl-14 h-16 rounded-[1.8rem] bg-white border-none shadow-sm font-bold text-sm text-slate-700 placeholder:text-slate-300 focus-visible:ring-2 focus-visible:ring-primary/10"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -86,10 +85,10 @@ export default function RequestsList() {
                         <MapPin className="h-3.5 w-3.5" /> {req.location}
                       </Badge>
                     </div>
-                    <h3 className="font-black text-xl text-slate-800 leading-tight tracking-tight">{req.title}</h3>
+                    <h3 className="font-black text-xl text-slate-800 leading-tight tracking-tight">{req.equipmentName}</h3>
                     <div className="flex flex-wrap gap-5 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
-                      <span className="flex items-center gap-2"><Wrench className="h-4 w-4 text-primary/30" /> {req.equipmentName}</span>
                       <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-slate-200" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
+                      <span className="flex items-center gap-2 uppercase font-black text-slate-500">{req.unit}</span>
                     </div>
                   </div>
 

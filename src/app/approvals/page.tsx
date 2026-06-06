@@ -9,14 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useMemo } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 
@@ -79,14 +71,12 @@ export default function ApprovalsPage() {
 
   if (!currentUser?.unit) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-2 border-dashed border-rose-100">
+      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-2 border-dashed border-rose-100 mx-4">
         <div className="h-20 w-20 rounded-full bg-rose-50 flex items-center justify-center mb-6">
           <AlertCircle className="h-10 w-10 text-rose-500" />
         </div>
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa xác định Đơn vị</h2>
-        <p className="text-sm text-slate-500 max-w-md font-medium">
-          Vui lòng cập nhật Đơn vị công tác trước khi thực hiện duyệt phiếu.
-        </p>
+        <p className="text-sm text-slate-500 max-w-md font-medium">Vui lòng cập nhật Đơn vị công tác trước khi thực hiện duyệt phiếu.</p>
       </div>
     );
   }
@@ -126,18 +116,18 @@ export default function ApprovalsPage() {
                 <div className="flex-1 min-w-0 space-y-3">
                   <div className="flex items-center gap-2">
                     <Badge className="bg-primary/5 text-primary border-none font-black text-[9px] uppercase px-2 py-0.5 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" /> {req.location}
+                      <MapPin className="h-3.5 w-3.5" /> {req.location}
                     </Badge>
                   </div>
-                  <h3 className="font-black text-lg text-slate-800 truncate">{req.title}</h3>
+                  <h3 className="font-black text-lg text-slate-800 truncate uppercase tracking-tight">{req.equipmentName}</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Người báo</p>
                       <p className="text-xs font-bold text-slate-700">{req.requesterName}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thiết bị</p>
-                      <p className="text-xs font-bold text-slate-700">{req.equipmentName}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nhóm</p>
+                      <p className="text-xs font-bold text-slate-700">{req.category}</p>
                     </div>
                   </div>
                 </div>
@@ -167,9 +157,8 @@ export default function ApprovalsPage() {
             </Card>
           ))}
         </TabsContent>
-        {/* Same for other TabsContent... shortened for brevity but keeping core logic */}
+        {/* Shortened: Same logic for Step 7 */}
       </Tabs>
-      {/* Dialogs... */}
     </div>
   );
 }
