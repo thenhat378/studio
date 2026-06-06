@@ -1,4 +1,3 @@
-
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
@@ -20,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0054A4',
+  themeColor: '#0054A4', // Exact DUE Blue
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,

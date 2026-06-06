@@ -186,7 +186,7 @@ export default function Overview() {
             <div className="h-24 w-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 active-scale">
               <Wrench className="h-12 w-12 text-white" />
             </div>
-            <h1 className="text-4xl font-black tracking-tighter mt-4 leading-none">
+            <h1 className="text-4xl font-black tracking-tighter mt-4 leading-none uppercase">
               <span className="text-slate-800">Requisition Form</span>
               <div className="mt-2">
                 <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
@@ -197,8 +197,8 @@ export default function Overview() {
           <Card className="rounded-[3.5rem] overflow-hidden bg-white card-shadow text-left border-none">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 h-20 bg-slate-50 p-2">
-                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Đăng ký</TabsTrigger>
+                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary">Đăng ký</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login" className="p-8 md:p-12 space-y-8">
@@ -243,12 +243,12 @@ export default function Overview() {
                   {showPassHint && (
                     <div className="p-5 bg-slate-50 rounded-[2rem] border text-[11px] space-y-2 font-bold uppercase tracking-tighter">
                       <div className="flex items-center gap-3">
-                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.length ? "bg-emerald-500" : "bg-slate-200")} />
-                        <span className={passValidation.length ? "text-emerald-600" : "text-slate-400"}>Tối thiểu 8 ký tự</span>
+                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.length ? "bg-secondary" : "bg-slate-200")} />
+                        <span className={passValidation.length ? "text-secondary" : "text-slate-400"}>Tối thiểu 8 ký tự</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.special ? "bg-emerald-500" : "bg-slate-200")} />
-                        <span className={passValidation.special ? "text-emerald-600" : "text-slate-400"}>Có ký tự đặc biệt (!@#...)</span>
+                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.special ? "bg-secondary" : "bg-slate-200")} />
+                        <span className={passValidation.special ? "text-secondary" : "text-slate-400"}>Có ký tự đặc biệt (!@#...)</span>
                       </div>
                     </div>
                   )}
@@ -269,7 +269,7 @@ export default function Overview() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full h-20 rounded-[2rem] bg-emerald-600 text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-emerald-100 active-scale" disabled={isSubmitting}>
+                  <Button className="w-full h-20 rounded-[2rem] bg-secondary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-secondary/10 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận đăng ký"}
                   </Button>
                 </form>
@@ -355,9 +355,9 @@ export default function Overview() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {[
-          { label: 'Tất cả phiếu', value: roleFilteredRequests.length, icon: UserCircle2, color: 'text-blue-500', bg: 'bg-blue-50' },
-          { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Wrench, color: 'text-amber-500', bg: 'bg-amber-50' },
-          { label: 'Hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+          { label: 'Tất cả phiếu', value: roleFilteredRequests.length, icon: UserCircle2, color: 'text-primary', bg: 'bg-primary/5' },
+          { label: 'Đang xử lý', value: roleFilteredRequests.filter(r => ['assigned', 'in_progress'].includes(r.status)).length, icon: Wrench, color: 'text-accent', bg: 'bg-accent/5' },
+          { label: 'Hoàn thành', value: roleFilteredRequests.filter(r => r.status === 'closed').length, icon: CheckCircle2, color: 'text-secondary', bg: 'bg-secondary/5' },
           { label: 'Cần duyệt', value: roleFilteredRequests.filter(r => r.status === 'pending_approval' || r.status === 'verified').length, icon: ShieldCheck, color: 'text-rose-500', bg: 'bg-rose-50' },
         ].map((stat, i) => (
           <Card key={i} className="rounded-[2.5rem] bg-white border-none card-shadow group hover:bg-slate-50 transition-all active-scale">
@@ -403,29 +403,29 @@ export default function Overview() {
                   <div className="space-y-2">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận việc lúc</p>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
-                      <Clock className="h-3.5 w-3.5 text-blue-500" />
+                      <Clock className="h-3.5 w-3.5 text-primary" />
                       <span className="text-[11px] font-bold text-slate-700">{formatDate(req.assignedAt)}</span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Báo xong lúc</p>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                      <span className="text-[11px] font-bold text-emerald-600">{formatDate(req.completedAt)}</span>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-secondary" />
+                      <span className="text-[11px] font-bold text-secondary">{formatDate(req.completedAt)}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between px-2 pt-2">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-50 rounded-lg">
-                      <Timer className="h-4 w-4 text-blue-500" />
+                    <div className="p-2 bg-primary/5 rounded-lg">
+                      <Timer className="h-4 w-4 text-primary" />
                     </div>
                     <span className="text-xs font-black text-slate-700 uppercase tracking-tight">Xử lý trong: {getDuration(req.assignedAt, req.completedAt)}</span>
                   </div>
                   <Badge className={cn(
                     "text-[9px] font-black uppercase border-none px-4 py-1.5 rounded-lg",
-                    req.status === 'closed' ? "bg-emerald-50 text-emerald-600" : "bg-cyan-50 text-cyan-600"
+                    req.status === 'closed' ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"
                   )}>
                     {req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}
                   </Badge>

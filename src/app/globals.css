@@ -11,15 +11,15 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
     
-    /* Blue - Primary */
-    --primary: 210 100% 32%;
+    /* DUE Blue - Primary (Chữ E) */
+    --primary: 209 100% 32%;
     --primary-foreground: 210 40% 98%;
     
-    /* Green - Secondary */
-    --secondary: 149 100% 33%;
+    /* DUE Green - Secondary (Chữ U) */
+    --secondary: 148 100% 31%;
     --secondary-foreground: 210 40% 98%;
     
-    /* Orange - Accent */
+    /* DUE Orange - Accent (Chữ D) */
     --accent: 28 92% 54%;
     --accent-foreground: 210 40% 98%;
     
@@ -29,7 +29,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 32%;
+    --ring: 209 100% 32%;
     --radius: 1.5rem;
   }
 }
