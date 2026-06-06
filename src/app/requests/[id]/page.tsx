@@ -21,7 +21,8 @@ import {
   Edit3,
   Send,
   X,
-  MessageSquareQuote
+  MessageSquareQuote,
+  Timer
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +41,8 @@ import {
 import { cn } from '@/lib/utils';
 import { RepairType } from '@/lib/types';
 import Image from 'next/image';
+import { format, formatDistanceStrict } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 export default function RequestDetail() {
   const params = useParams();
@@ -54,7 +57,6 @@ export default function RequestDetail() {
   const [rating, setRating] = useState<number>(5);
   const [feedback, setFeedback] = useState('');
 
-  // States for editing mode (Resend feature)
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     title: '',
@@ -112,7 +114,7 @@ export default function RequestDetail() {
       equipmentId: editData.equipmentId,
       equipmentName: equip?.name || req.equipmentName,
       category: equip?.category || req.category,
-      rejectionReason: "" // Clear rejection reason if resending
+      rejectionReason: "" 
     });
 
     setIsEditing(false);
@@ -144,13 +146,30 @@ export default function RequestDetail() {
 
   const handlePrint = () => { window.print(); };
 
-  // Determine if Print is allowed (Technician can print when closed)
   const canPrint = req.status === 'closed' && (
     currentUser?.role === 'admin' || 
     currentUser?.role === 'technician' || 
     currentUser?.role === 'csvc_manager' || 
     currentUser?.role === 'unit_leader'
   );
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "N/A";
+    try {
+      return format(new Date(dateStr), 'HH:mm - dd/MM/yyyy');
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
+  const getDuration = (start?: string, end?: string) => {
+    if (!start || !end) return "N/A";
+    try {
+      return formatDistanceStrict(new Date(start), new Date(end), { locale: vi });
+    } catch (e) {
+      return "N/A";
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
@@ -169,7 +188,7 @@ export default function RequestDetail() {
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-primary/10">
           <CardHeader className="bg-slate-50/50 pb-8 p-8 md:p-10">
             <div className="flex justify-between items-start gap-6">
-              <div className="space-y-3 flex-1">
+              <div className="space-y-4 flex-1">
                 {isEditing ? (
                   <Input 
                     value={editData.title}
@@ -180,38 +199,54 @@ export default function RequestDetail() {
                 ) : (
                   <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight tracking-tight">{req.title}</CardTitle>
                 )}
-                <div className="flex flex-col gap-2">
-                   <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.1em]">
-                     <Clock className="h-4 w-4 text-slate-300" /> 
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/60 p-5 rounded-[2rem] border border-white">
+                   <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-tighter">
+                     <Clock className="h-4 w-4 text-slate-400" /> 
                      <span>Báo hỏng:</span>
-                     <span className="text-slate-600">{new Date(req.createdAt).toLocaleString('vi-VN')}</span>
+                     <span className="text-slate-800 ml-auto">{formatDate(req.createdAt)}</span>
                    </div>
-                   {req.completedAt && (
-                     <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-[0.1em] bg-emerald-50 w-fit px-3 py-1 rounded-full">
-                       <CheckCircle2 className="h-4 w-4" /> 
-                       <span>Hoàn thành:</span>
-                       <span>{new Date(req.completedAt).toLocaleString('vi-VN')}</span>
+                   {req.assignedAt && (
+                     <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-tighter">
+                       <Timer className="h-4 w-4 text-blue-400" /> 
+                       <span>Nhận việc:</span>
+                       <span className="text-blue-700 ml-auto">{formatDate(req.assignedAt)}</span>
                      </div>
                    )}
-                   <div className="flex items-center gap-2 mt-2">
-                      {isEditing ? (
-                        <Select value={editData.equipmentId} onValueChange={val => setEditData(prev => ({ ...prev, equipmentId: val }))}>
-                          <SelectTrigger className="h-12 text-[10px] font-black bg-white rounded-xl w-60">
-                            <SelectValue placeholder="Chọn thiết bị..." />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-2xl">
-                            {equipment.map(e => <SelectItem key={e.id} value={e.id} className="rounded-xl font-bold">{e.name}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-primary">
-                          {req.equipmentName}
-                        </Badge>
-                      )}
-                      <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-slate-500">
-                        Đơn vị: {req.unit}
-                      </Badge>
-                   </div>
+                   {req.completedAt && (
+                     <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-tighter col-span-full">
+                       <CheckCircle2 className="h-4 w-4 text-emerald-400" /> 
+                       <span>Hoàn thành kỹ thuật:</span>
+                       <span className="text-emerald-700 ml-auto">{formatDate(req.completedAt)}</span>
+                     </div>
+                   )}
+                   {req.assignedAt && req.completedAt && (
+                     <div className="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-tighter col-span-full border-t border-slate-100 pt-2 mt-1">
+                       <Timer className="h-4 w-4 text-indigo-400" /> 
+                       <span>Tổng thời gian xử lý:</span>
+                       <span className="text-indigo-800 ml-auto">{getDuration(req.assignedAt, req.completedAt)}</span>
+                     </div>
+                   )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                   {isEditing ? (
+                     <Select value={editData.equipmentId} onValueChange={val => setEditData(prev => ({ ...prev, equipmentId: val }))}>
+                       <SelectTrigger className="h-12 text-[10px] font-black bg-white rounded-xl w-60">
+                         <SelectValue placeholder="Chọn thiết bị..." />
+                       </SelectTrigger>
+                       <SelectContent className="rounded-2xl">
+                         {equipment.map(e => <SelectItem key={e.id} value={e.id} className="rounded-xl font-bold">{e.name}</SelectItem>)}
+                       </SelectContent>
+                     </Select>
+                   ) : (
+                     <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-primary">
+                       {req.equipmentName}
+                     </Badge>
+                   )}
+                   <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-slate-500">
+                     Đơn vị: {req.unit}
+                   </Badge>
                 </div>
               </div>
               <div className="no-print">
@@ -298,7 +333,6 @@ export default function RequestDetail() {
               ))}
             </div>
 
-            {/* Phần chữ ký khi in */}
             <div className="print-only mt-24 grid grid-cols-2 gap-20 text-center">
                <div className="space-y-24">
                   <p className="font-black text-base">ĐƠN VỊ SỬ DỤNG</p>
@@ -320,7 +354,6 @@ export default function RequestDetail() {
           </CardHeader>
           <CardContent className="p-8 md:p-10">
             <div className="space-y-6">
-              {/* NHÂN VIÊN/GIẢNG VIÊN - CHỈNH SỬA & GỬI LẠI HOẶC XÁC NHẬN HÀI LÒNG */}
               {currentUser?.role === 'requester' && req.requesterId === currentUser.id && (
                 <>
                   {(req.status === 'pending_approval' || req.status === 'rejected') && (
@@ -372,7 +405,6 @@ export default function RequestDetail() {
                 </>
               )}
 
-              {/* QUẢN LÝ ĐƠN VỊ - PHÊ DUYỆT BAN ĐẦU */}
               {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                 <div className="flex flex-col gap-4">
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" onClick={() => handleAction('approved')}>PHÊ DUYỆT CHUYỂN PHÒNG CSVC</Button>
@@ -380,7 +412,6 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* QUẢN LÝ CSVC - PHÂN CÔNG KỸ THUẬT */}
               {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                 <div className="space-y-6">
                   <div className="space-y-3">
@@ -401,7 +432,6 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* QUẢN LÝ CSVC - DUYỆT HOÀN THÀNH KỸ THUẬT */}
               {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                 <div className="space-y-5">
                    <div className="bg-blue-50 p-6 md:p-8 rounded-[2.5rem] flex items-start gap-4 border border-blue-100 shadow-sm">
@@ -419,7 +449,6 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* NHÂN VIÊN KỸ THUẬT - THỰC HIỆN */}
               {currentUser?.role === 'technician' && req.technicianId === currentUser.id && (
                 <>
                   {req.status === 'assigned' && (
@@ -450,7 +479,6 @@ export default function RequestDetail() {
                 </>
               )}
 
-              {/* QUẢN LÝ ĐƠN VỊ - NGHIỆM THU & ĐÓNG PHIẾU */}
               {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
                 <div className="space-y-6">
                   <div className="flex flex-col items-center gap-6 py-10 bg-slate-50 rounded-[3rem] border border-slate-100 shadow-inner">

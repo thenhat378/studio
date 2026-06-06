@@ -15,7 +15,8 @@ import {
   History,
   Timer,
   User,
-  MessageSquareQuote
+  MessageSquareQuote,
+  CheckCircle2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict, format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 export default function ManagementPage() {
@@ -40,7 +41,7 @@ export default function ManagementPage() {
 
   const pendingAssignment = useMemo(() => requests.filter(r => r.status === 'approved'), [requests]);
   const pendingVerification = useMemo(() => requests.filter(r => r.status === 'completed'), [requests]);
-  const historyRequests = useMemo(() => requests.filter(r => ['closed', 'verified'].includes(r.status)), [requests]);
+  const historyRequests = useMemo(() => requests.filter(r => ['closed', 'verified', 'completed'].includes(r.status)), [requests]);
 
   const technicians = useMemo(() => users.filter(u => u.role === 'technician'), [users]);
 
@@ -83,6 +84,15 @@ export default function ManagementPage() {
     }
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "N/A";
+    try {
+      return format(new Date(dateStr), 'HH:mm - dd/MM/yyyy');
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   return (
     <div className="space-y-6 pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -98,15 +108,15 @@ export default function ManagementPage() {
       <Tabs defaultValue="assign" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-[500px] h-14 p-1 bg-white rounded-2xl shadow-sm border mb-8">
           <TabsTrigger value="assign" className="gap-2 text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl">
-            Bước 3: Phân công
+            Phân công
             {pendingAssignment.length > 0 && <Badge variant="destructive" className="ml-1 h-5 w-5 p-0">{pendingAssignment.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="verify" className="gap-2 text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl">
-            Bước 5: Duyệt kỹ thuật
+            Duyệt kỹ thuật
             {pendingVerification.length > 0 && <Badge className="ml-1 bg-cyan-500 h-5 w-5 p-0">{pendingVerification.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2 text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl">
-            <History className="h-4 w-4 mr-1" /> Giám sát & Hiệu suất
+            Hiệu suất & Giám sát
           </TabsTrigger>
         </TabsList>
 
@@ -117,7 +127,7 @@ export default function ManagementPage() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-lg text-slate-800 truncate mb-2">{req.title}</h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {new Date(req.createdAt).toLocaleDateString('vi-VN')}</span>
+                    <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> Báo hỏng: {formatDate(req.createdAt)}</span>
                     <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {req.unit}</span>
                   </div>
                 </div>
@@ -150,15 +160,17 @@ export default function ManagementPage() {
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-lg text-slate-800 truncate mb-2">{req.title}</h3>
-                  <div className="flex items-center gap-4 text-[10px] font-bold text-cyan-600 uppercase tracking-widest">
-                    <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> Kỹ thuật: {req.technicianName}</span>
-                    <span className="flex items-center gap-1.5"><Timer className="h-3.5 w-3.5" /> Xử lý: {getDuration(req.assignedAt, req.completedAt)}</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5 text-blue-500" /> KT: {req.technicianName}</span>
+                    <span className="flex items-center gap-1.5"><Timer className="h-3.5 w-3.5 text-blue-500" /> Thời gian xử lý: {getDuration(req.assignedAt, req.completedAt)}</span>
+                    <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-slate-400" /> Nhận việc: {formatDate(req.assignedAt)}</span>
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> Báo xong: {formatDate(req.completedAt)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link href={`/requests/${req.id}`}>
                     <Button variant="ghost" size="sm" className="h-14 px-6 rounded-[1.2rem] border-2 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all">
-                      <Eye className="h-5 w-5 mr-2" /> Xem báo cáo
+                      <Eye className="h-5 w-5 mr-2" /> Chi tiết
                     </Button>
                   </Link>
                   <Button className="bg-emerald-600 hover:bg-emerald-700 h-14 px-6 rounded-[1.2rem] text-white font-black text-[10px] uppercase gap-2 shadow-xl shadow-emerald-100 transition-all active:scale-95" onClick={() => handleVerify(req.id)}>
@@ -181,7 +193,7 @@ export default function ManagementPage() {
               <Card key={req.id} className="border-none shadow-sm rounded-[3rem] bg-white card-shadow overflow-hidden group hover:bg-slate-50 transition-all border-l-8 border-l-slate-100 hover:border-l-primary/30">
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="flex-1 space-y-4">
+                    <div className="flex-1 space-y-4 w-full">
                       <div className="flex items-center justify-between">
                          <div className="flex items-center gap-3">
                            <h3 className="font-black text-lg text-slate-800 tracking-tight">{req.title}</h3>
@@ -192,31 +204,29 @@ export default function ManagementPage() {
                            )}
                          </div>
                          <Badge className={cn("text-[9px] font-black uppercase px-3 py-1 border-none", req.status === 'closed' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
-                            {req.status === 'closed' ? 'Đã đóng hồ sơ' : 'Chờ đơn vị nghiệm thu'}
+                            {req.status === 'closed' ? 'Đã đóng hồ sơ' : req.status === 'verified' ? 'Chờ đơn vị nghiệm thu' : 'Chờ CSVC duyệt'}
                          </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-5 bg-slate-50/50 rounded-[2rem] border border-slate-100">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100">
                          <div className="space-y-1">
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kỹ thuật viên</p>
-                            <div className="text-[12px] font-black text-slate-700">{req.technicianName}</div>
+                            <div className="text-[11px] font-black text-slate-700">{req.technicianName || 'N/A'}</div>
                          </div>
                          <div className="space-y-1">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian sửa</p>
-                            <div className="text-[12px] font-black text-slate-700 flex items-center gap-1.5">
-                              <Timer className="h-3.5 w-3.5 text-blue-400" />
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian xử lý</p>
+                            <div className="text-[11px] font-black text-blue-600 flex items-center gap-1.5">
+                              <Timer className="h-3.5 w-3.5" />
                               {getDuration(req.assignedAt, req.completedAt)}
                             </div>
                          </div>
                          <div className="space-y-1">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đơn vị yêu cầu</p>
-                            <div className="text-[12px] font-black text-slate-700">{req.unit}</div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời điểm nhận việc</p>
+                            <div className="text-[11px] font-bold text-slate-700">{formatDate(req.assignedAt)}</div>
                          </div>
                          <div className="space-y-1">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ngày kết thúc</p>
-                            <div className="text-[12px] font-black text-slate-700">
-                              {req.completedAt ? new Date(req.completedAt).toLocaleDateString('vi-VN') : 'N/A'}
-                            </div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời điểm báo xong</p>
+                            <div className="text-[11px] font-bold text-emerald-600">{formatDate(req.completedAt)}</div>
                          </div>
                       </div>
 

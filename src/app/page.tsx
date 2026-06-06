@@ -24,7 +24,8 @@ import {
   UserCircle2,
   BarChart3,
   Star,
-  Timer
+  Timer,
+  Clock
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict, format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 export default function Overview() {
@@ -310,6 +311,15 @@ export default function Overview() {
     }
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "N/A";
+    try {
+      return format(new Date(dateStr), 'HH:mm - dd/MM/yyyy');
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   return (
     <div className="space-y-8 pb-safe">
       <div className="bg-primary rounded-[3rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
@@ -354,29 +364,45 @@ export default function Overview() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-4">
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" /> Hiệu suất kỹ thuật
+              <BarChart3 className="h-4 w-4 text-primary" /> Hiệu suất kỹ thuật chi tiết
             </h3>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {roleFilteredRequests.filter(r => r.status === 'closed').slice(0, 4).map(req => (
-              <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-6">
-                <div className="flex items-center justify-between mb-4">
+            {roleFilteredRequests.filter(r => r.status === 'closed' || r.status === 'verified').slice(0, 4).map(req => (
+              <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-8 space-y-4">
+                <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="font-black text-sm text-slate-800 truncate">{req.technicianName}</p>
-                    <p className="text-[9px] font-black text-slate-400 uppercase">KT thực hiện</p>
+                    <p className="font-black text-base text-slate-800 truncate">{req.technicianName}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase">Nhân viên thực hiện</p>
                   </div>
-                  <div className="flex gap-0.5">
-                    {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3 w-3", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />)}
-                  </div>
+                  {req.status === 'closed' && (
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3.5 w-3.5", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />)}
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center justify-between bg-slate-50 rounded-2xl p-4">
+                
+                <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-100">
                   <div className="space-y-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase">Thời gian xử lý</p>
-                    <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                      <Timer className="h-3 w-3 text-blue-500" /> {getDuration(req.assignedAt, req.completedAt)}
+                    <p className="text-[8px] font-black text-slate-400 uppercase">Nhận việc lúc</p>
+                    <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                      <Clock className="h-3 w-3 text-blue-500" /> {formatDate(req.assignedAt)}
                     </p>
                   </div>
-                  <Badge className="bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase border-none">Hoàn thành</Badge>
+                  <div className="space-y-1">
+                    <p className="text-[8px] font-black text-slate-400 uppercase">Báo xong lúc</p>
+                    <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3 w-3" /> {formatDate(req.completedAt)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <Timer className="h-4 w-4 text-blue-500" />
+                    <span className="text-xs font-black text-slate-700 uppercase tracking-tighter">Xử lý trong: {getDuration(req.assignedAt, req.completedAt)}</span>
+                  </div>
+                  <Badge className="bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase border-none">{req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}</Badge>
                 </div>
               </Card>
             ))}
