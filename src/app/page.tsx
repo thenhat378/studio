@@ -276,6 +276,15 @@ export default function Overview() {
               </TabsContent>
             </Tabs>
           </Card>
+
+          <footer className="pt-8 pb-4 text-center space-y-1 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+              © 2026 Hệ thống quản lý Phiếu yêu cầu, cáp phát sửa chữa v1.0
+            </p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
+              Phát triển bởi Phòng Cơ sở vật chất
+            </p>
+          </footer>
         </div>
 
         <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
