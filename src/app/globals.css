@@ -61,12 +61,13 @@
   }
   body {
     background: white !important;
+    background-image: none !important;
     font-size: 11pt !important;
     color: black !important;
     margin: 0 !important;
     padding: 0 !important;
   }
-  .card-shadow {
+  .card-shadow, .shadow-sm, .shadow-lg, .shadow-2xl, .shadow-inner {
     box-shadow: none !important;
     border: none !important;
   }
@@ -82,11 +83,11 @@
     margin: 15mm 10mm;
   }
   .print-section-title {
-    background-color: #f8fafc !important;
+    background-color: white !important;
     -webkit-print-color-adjust: exact;
     padding: 4px 0;
-    margin-top: 10px;
-    border-bottom: 1.5px solid black;
+    margin-top: 15px;
+    border-bottom: 2px solid black;
     font-weight: bold;
     text-transform: uppercase;
     font-size: 11pt;
@@ -94,7 +95,7 @@
   .print-row {
     display: flex;
     justify-content: space-between;
-    padding: 4px 0;
+    padding: 6px 0;
     border-bottom: 0.5px dotted #999;
   }
   .print-label {
