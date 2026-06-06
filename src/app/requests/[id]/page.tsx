@@ -207,65 +207,65 @@ export default function RequestDetail() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
-      {/* Container dành cho in ấn */}
-      <div className="print-only" style={{ padding: '0 5mm', color: 'black' }}>
-        <div className="flex justify-between items-start mb-4" style={{ borderBottom: '1.5px solid black', paddingBottom: '8px' }}>
+      {/* Container dành cho in ấn - Tối ưu nén dòng cực đại */}
+      <div className="print-only" style={{ padding: '0 2mm', color: 'black' }}>
+        <div className="flex justify-between items-start mb-2" style={{ borderBottom: '1.5px solid black', paddingBottom: '4px' }}>
           <div className="text-center" style={{ width: '45%' }}>
-            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>ĐẠI HỌC ĐÀ NẴNG</p>
-            <p style={{ fontWeight: 'bold', fontSize: '12pt', margin: 0, textTransform: 'uppercase' }}>TRƯỜNG ĐẠI HỌC KINH TẾ</p>
-            <div style={{ width: '60px', height: '1.2px', background: 'black', margin: '4px auto' }} />
+            <p style={{ fontWeight: 'bold', fontSize: '10pt', margin: 0 }}>ĐẠI HỌC ĐÀ NẴNG</p>
+            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0, textTransform: 'uppercase' }}>TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div style={{ width: '50px', height: '1px', background: 'black', margin: '2px auto' }} />
           </div>
           <div className="text-center" style={{ width: '55%' }}>
-            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p style={{ fontWeight: 'bold', fontSize: '11pt', margin: 0 }}>Độc lập - Tự do - Hạnh phúc</p>
-            <div style={{ width: '100px', height: '1.2px', background: 'black', margin: '4px auto' }} />
-            <p style={{ fontSize: '9pt', fontStyle: 'italic', marginTop: '6px' }}>Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+            <p style={{ fontWeight: 'bold', fontSize: '10pt', margin: 0 }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p style={{ fontWeight: 'bold', fontSize: '10pt', margin: 0 }}>Độc lập - Tự do - Hạnh phúc</p>
+            <div style={{ width: '80px', height: '1px', background: 'black', margin: '2px auto' }} />
+            <p style={{ fontSize: '8pt', fontStyle: 'italic', marginTop: '4px' }}>Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
-        <div className="text-center mb-6">
-          <h1 style={{ fontSize: '18pt', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '2px' }}>PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
-          <p style={{ fontSize: '10pt', fontStyle: 'italic' }}>Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
+        <div className="text-center mb-3">
+          <h1 style={{ fontSize: '15pt', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '1px' }}>PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>Mã số phiếu: DUE-{getFormattedSequenceId(req.id)}</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-1">
           <div className="print-section-title">I. THÔNG TIN NGƯỜI YÊU CẦU</div>
-          <div className="space-y-0.5">
+          <div className="space-y-0">
             <div className="print-row"><span className="print-label">Người báo:</span><span className="print-value">{req.requesterName}</span></div>
             <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
             <div className="print-row"><span className="print-label">Vị trí:</span><span className="print-value">{req.location}</span></div>
             <div className="print-row"><span className="print-label">Thời gian:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
-            <div className="mt-1"><span className="print-label">Mô tả hỏng hóc:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.description}</p></div>
+            <div className="mt-0.5"><span className="print-label">Mô tả hỏng hóc:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.description}</p></div>
           </div>
 
           <div className="print-section-title">II. KẾT QUẢ XỬ LÝ KỸ THUẬT</div>
-          <div className="space-y-0.5">
+          <div className="space-y-0">
             <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
             <div className="print-row"><span className="print-label">Kỹ thuật viên:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
             <div className="print-row"><span className="print-label">Hình thức:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
             <div className="print-row"><span className="print-label">Hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
-            <div className="mt-1"><span className="print-label">Nội dung thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.technicianReport || 'N/A'}</p></div>
+            <div className="mt-0.5"><span className="print-label">Nội dung thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.technicianReport || 'N/A'}</p></div>
           </div>
 
           <div className="print-section-title">III. NGHIỆM THU VÀ ĐÁNH GIÁ</div>
-          <div className="space-y-0.5">
+          <div className="space-y-0">
             <div className="print-row"><span className="print-label">Đánh giá đơn vị:</span><span className="print-value">{req.rating ? `${req.rating}/5 sao` : 'Đạt yêu cầu'}</span></div>
-            <div className="mt-1"><span className="print-label">Phản hồi đơn vị:</span><p style={{ fontStyle: 'italic', marginTop: '2px', paddingLeft: '10px', borderLeft: '1px solid black', fontSize: '10pt' }}>{req.requesterFeedback || 'Thiết bị đã hoạt động ổn định.'}</p></div>
+            <div className="mt-0.5"><span className="print-label">Phản hồi đơn vị:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.requesterFeedback || 'Thiết bị đã hoạt động ổn định.'}</p></div>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 mt-10 text-center" style={{ pageBreakInside: 'avoid' }}>
-          <div className="space-y-16">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>NGƯỜI YÊU CẦU</p>
-            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
+        <div className="grid grid-cols-3 gap-2 mt-6 text-center" style={{ pageBreakInside: 'avoid' }}>
+          <div className="space-y-12">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>NGƯỜI YÊU CẦU</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-16">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>LÃNH ĐẠO ĐƠN VỊ</p>
-            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
+          <div className="space-y-12">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>LÃNH ĐẠO ĐƠN VỊ</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-16">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '10pt' }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p style={{ fontSize: '9pt', fontStyle: 'italic' }}>(Ký và đóng dấu)</p>
+          <div className="space-y-12">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký và đóng dấu)</p>
           </div>
         </div>
       </div>
@@ -541,7 +541,7 @@ export default function RequestDetail() {
                             <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 group shadow-sm">
                               <Image src={img} alt="Preview" fill className="object-cover" />
                               <button 
-                                type="button"
+                                type="button" 
                                 onClick={() => removeTechImage(idx)}
                                 className="absolute top-2 right-2 bg-rose-500 text-white p-2 rounded-full shadow-lg"
                               >

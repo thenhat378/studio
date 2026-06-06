@@ -71,8 +71,9 @@
     font-family: "Times New Roman", Times, serif !important;
     background: white !important;
     color: black !important;
-    padding: 0 !important;
+    padding: 2mm !important;
     margin: 0 !important;
+    box-shadow: none !important;
   }
 
   .no-print {
@@ -96,35 +97,35 @@
 
   @page {
     size: A4;
-    margin: 10mm 15mm;
+    margin: 8mm 12mm;
   }
 
   .print-section-title {
-    border-bottom: 1.5px solid black !important;
+    border-bottom: 1px solid black !important;
     font-weight: bold !important;
     text-transform: uppercase !important;
-    font-size: 11pt !important;
-    margin-top: 10px !important;
-    padding-bottom: 1px !important;
+    font-size: 10pt !important;
+    margin-top: 4px !important;
+    padding-bottom: 0.5px !important;
     display: block !important;
   }
 
   .print-row {
     display: flex !important;
     justify-content: space-between !important;
-    padding: 2px 0 !important;
-    border-bottom: 0.5px dotted #ccc !important;
-    line-height: 1.2 !important;
+    padding: 1px 0 !important;
+    border-bottom: 0.5px dotted #ddd !important;
+    line-height: 1.1 !important;
   }
 
   .print-label {
     font-weight: bold !important;
-    font-size: 10.5pt !important;
+    font-size: 9.5pt !important;
   }
 
   .print-value {
     text-align: right !important;
-    font-size: 10.5pt !important;
+    font-size: 9.5pt !important;
   }
 }
 
