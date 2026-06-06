@@ -144,7 +144,6 @@ export default function Overview() {
       
       const registeredPhone = regData.phone;
       
-      // Reset form data after successful registration
       setRegData({
         name: '',
         phone: '',
@@ -238,7 +237,7 @@ export default function Overview() {
                     </div>
                   </div>
                   <Button className="w-full h-20 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-primary/20 active-scale" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Vào hệ thống"}
+                    {isSubmitting ? <Loader2 className="animate-spin" /> : "ĐĂNG NHẬP"}
                   </Button>
                 </form>
               </TabsContent>
@@ -306,7 +305,6 @@ export default function Overview() {
           </footer>
         </div>
 
-        {/* Hướng dẫn sử dụng Dialog */}
         <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
           <DialogContent className="rounded-[3.5rem] p-8 md:p-12 border-none shadow-2xl max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
