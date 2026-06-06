@@ -182,17 +182,19 @@ export default function RequestDetail() {
       </div>
 
       {/* Giao diện In - Chỉ hiển thị khi in */}
-      <div className="print-only p-8 space-y-8 bg-white text-black font-serif">
-        <div className="flex justify-between items-start border-b-2 border-black pb-4">
-          <div className="text-center space-y-1">
-            <p className="font-bold text-xs uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
-            <p className="font-bold text-xs uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ (DUE)</p>
-            <p className="text-[10px] border-t border-black pt-1">Mã phiếu: {req.id.slice(-8).toUpperCase()}</p>
+      <div className="print-only p-8 space-y-8 bg-white text-black" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+        <div className="flex justify-between items-start border-b border-black pb-4">
+          <div className="text-center space-y-0.5">
+            <p className="font-bold text-sm uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-sm uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ</p>
+            <div className="w-24 h-0.5 bg-black mx-auto mt-1" />
+            <p className="text-[10px] pt-1">Mã phiếu: {req.id.slice(-8).toUpperCase()}</p>
           </div>
-          <div className="text-center space-y-1">
-            <p className="font-bold text-xs uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-            <p className="font-bold text-xs underline underline-offset-4">Độc lập - Tự do - Hạnh phúc</p>
-            <p className="text-[10px] italic">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+          <div className="text-center space-y-0.5">
+            <p className="font-bold text-sm uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-sm underline underline-offset-4">Độc lập - Tự do - Hạnh phúc</p>
+            <div className="w-32 h-0.5 bg-black mx-auto mt-1" />
+            <p className="text-[10px] italic pt-1">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
           </div>
         </div>
 
@@ -202,53 +204,49 @@ export default function RequestDetail() {
         </div>
 
         <div className="space-y-4 pt-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
             <p><span className="font-bold">Người yêu cầu:</span> {req.requesterName}</p>
             <p><span className="font-bold">Đơn vị:</span> {req.unit.toUpperCase()}</p>
             <p><span className="font-bold">Thiết bị:</span> {req.equipmentName}</p>
             <p><span className="font-bold">Ngày báo hỏng:</span> {formatDate(req.createdAt)}</p>
           </div>
 
-          <div className="border border-black p-4 rounded-md space-y-2">
+          <div className="border border-black p-4 rounded-sm space-y-2">
             <p className="font-bold text-sm">Mô tả sự cố:</p>
-            <p className="text-sm italic">{req.description}</p>
+            <p className="text-sm italic leading-relaxed">{req.description}</p>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="font-bold text-sm border-b border-black pb-1">KẾT QUẢ XỬ LÝ KỸ THUẬT</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="space-y-4 pt-2">
+            <h3 className="font-bold text-sm border-b border-black pb-1 uppercase">KẾT QUẢ XỬ LÝ KỸ THUẬT</h3>
+            <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
               <p><span className="font-bold">Kỹ thuật viên:</span> {req.technicianName || 'N/A'}</p>
               <p><span className="font-bold">Hình thức:</span> {getRepairTypeText(req.repairType)}</p>
               <p><span className="font-bold">Thời gian nhận việc:</span> {formatDate(req.assignedAt)}</p>
               <p><span className="font-bold">Thời gian hoàn thành:</span> {formatDate(req.completedAt)}</p>
               <p className="col-span-2"><span className="font-bold">Tổng thời gian xử lý:</span> {getDuration(req.assignedAt, req.completedAt)}</p>
             </div>
-            <div className="border border-black p-4 rounded-md space-y-2">
+            <div className="border border-black p-4 rounded-sm space-y-2">
               <p className="font-bold text-sm">Nội dung đã thực hiện:</p>
-              <p className="text-sm">{req.technicianReport || 'N/A'}</p>
+              <p className="text-sm leading-relaxed">{req.technicianReport || 'Chưa có báo cáo'}</p>
             </div>
           </div>
 
           {req.requesterFeedback && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-2">
               <p className="font-bold text-sm">Đánh giá của đơn vị sử dụng:</p>
-              <p className="text-sm italic">"{req.requesterFeedback}"</p>
+              <p className="text-sm italic leading-relaxed">"{req.requesterFeedback}"</p>
               <p className="text-sm font-bold text-right">Mức độ hài lòng: {req.rating || 5}/5 sao</p>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-4 pt-10 text-center text-sm font-bold">
-          <div className="space-y-20">
-            <p>NGƯỜI LẬP PHIẾU</p>
+        <div className="grid grid-cols-2 gap-4 pt-12 text-center text-sm font-bold">
+          <div className="space-y-24">
+            <p className="uppercase">PHÒNG TCHC</p>
             <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
           </div>
-          <div className="space-y-20">
-            <p>KỸ THUẬT VIÊN</p>
-            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
-          </div>
-          <div className="space-y-20">
-            <p>LÃNH ĐẠO ĐƠN VỊ</p>
+          <div className="space-y-24">
+            <p className="uppercase">PHÒNG CƠ SỞ VẬT CHẤT</p>
             <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
           </div>
         </div>

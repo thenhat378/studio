@@ -56,6 +56,7 @@
   }
   .print-only {
     display: block !important;
+    font-family: "Times New Roman", Times, serif !important;
   }
   body {
     background: white !important;
@@ -74,7 +75,7 @@
     max-width: 100% !important;
   }
   @page {
-    margin: 2cm;
+    margin: 1.5cm;
   }
 }
 
