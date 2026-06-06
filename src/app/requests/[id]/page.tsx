@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -22,7 +21,9 @@ import {
   Send,
   X,
   MessageSquareQuote,
-  Timer
+  Timer,
+  Building2,
+  MapPin
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -137,21 +138,16 @@ export default function RequestDetail() {
 
   const getRepairTypeText = (type?: RepairType) => {
     switch(type) {
-      case 'replacement': return 'Thay mới thiết bị';
-      case 'backup_replacement': return 'Thay bằng thiết bị dự phòng';
       case 'repair_only': return 'Sửa chữa tại chỗ';
-      default: return 'N/A';
+      case 'replacement': return 'Thay mới thiết bị';
+      case 'backup_replacement': return 'Thay thiết bị dự phòng';
+      default: return 'Chưa xác định';
     }
   };
 
   const handlePrint = () => { window.print(); };
 
-  const canPrint = req.status === 'closed' && (
-    currentUser?.role === 'admin' || 
-    currentUser?.role === 'technician' || 
-    currentUser?.role === 'csvc_manager' || 
-    currentUser?.role === 'unit_leader'
-  );
+  const canPrint = req.status === 'closed' || req.status === 'verified';
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "N/A";
@@ -173,6 +169,7 @@ export default function RequestDetail() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 pb-20 animate-slide-up">
+      {/* Nút điều hướng - Ẩn khi in */}
       <div className="flex items-center justify-between no-print bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/20 sticky top-24 z-30">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 font-black text-[10px] uppercase tracking-widest">
           <ChevronLeft className="h-4 w-4" /> Trở về
@@ -184,7 +181,81 @@ export default function RequestDetail() {
         )}
       </div>
 
-      <div className="space-y-4 md:space-y-6">
+      {/* Giao diện In - Chỉ hiển thị khi in */}
+      <div className="print-only p-8 space-y-8 bg-white text-black font-serif">
+        <div className="flex justify-between items-start border-b-2 border-black pb-4">
+          <div className="text-center space-y-1">
+            <p className="font-bold text-xs uppercase">ĐẠI HỌC ĐÀ NẴNG</p>
+            <p className="font-bold text-xs uppercase">TRƯỜNG ĐẠI HỌC KINH TẾ (DUE)</p>
+            <p className="text-[10px] border-t border-black pt-1">Mã phiếu: {req.id.slice(-8).toUpperCase()}</p>
+          </div>
+          <div className="text-center space-y-1">
+            <p className="font-bold text-xs uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="font-bold text-xs underline underline-offset-4">Độc lập - Tự do - Hạnh phúc</p>
+            <p className="text-[10px] italic">Đà Nẵng, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
+          </div>
+        </div>
+
+        <div className="text-center space-y-2 pt-6">
+          <h1 className="text-2xl font-bold uppercase">PHIẾU XÁC NHẬN SỬA CHỮA THIẾT BỊ</h1>
+          <p className="text-sm font-bold">(Lưu trữ hồ sơ Phòng Cơ sở vật chất)</p>
+        </div>
+
+        <div className="space-y-4 pt-4">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <p><span className="font-bold">Người yêu cầu:</span> {req.requesterName}</p>
+            <p><span className="font-bold">Đơn vị:</span> {req.unit.toUpperCase()}</p>
+            <p><span className="font-bold">Thiết bị:</span> {req.equipmentName}</p>
+            <p><span className="font-bold">Ngày báo hỏng:</span> {formatDate(req.createdAt)}</p>
+          </div>
+
+          <div className="border border-black p-4 rounded-md space-y-2">
+            <p className="font-bold text-sm">Mô tả sự cố:</p>
+            <p className="text-sm italic">{req.description}</p>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="font-bold text-sm border-b border-black pb-1">KẾT QUẢ XỬ LÝ KỸ THUẬT</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <p><span className="font-bold">Kỹ thuật viên:</span> {req.technicianName || 'N/A'}</p>
+              <p><span className="font-bold">Hình thức:</span> {getRepairTypeText(req.repairType)}</p>
+              <p><span className="font-bold">Thời gian nhận việc:</span> {formatDate(req.assignedAt)}</p>
+              <p><span className="font-bold">Thời gian hoàn thành:</span> {formatDate(req.completedAt)}</p>
+              <p className="col-span-2"><span className="font-bold">Tổng thời gian xử lý:</span> {getDuration(req.assignedAt, req.completedAt)}</p>
+            </div>
+            <div className="border border-black p-4 rounded-md space-y-2">
+              <p className="font-bold text-sm">Nội dung đã thực hiện:</p>
+              <p className="text-sm">{req.technicianReport || 'N/A'}</p>
+            </div>
+          </div>
+
+          {req.requesterFeedback && (
+            <div className="space-y-2">
+              <p className="font-bold text-sm">Đánh giá của đơn vị sử dụng:</p>
+              <p className="text-sm italic">"{req.requesterFeedback}"</p>
+              <p className="text-sm font-bold text-right">Mức độ hài lòng: {req.rating || 5}/5 sao</p>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 pt-10 text-center text-sm font-bold">
+          <div className="space-y-20">
+            <p>NGƯỜI LẬP PHIẾU</p>
+            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-20">
+            <p>KỸ THUẬT VIÊN</p>
+            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
+          </div>
+          <div className="space-y-20">
+            <p>LÃNH ĐẠO ĐƠN VỊ</p>
+            <p className="text-[10px] italic font-normal">(Ký và ghi rõ họ tên)</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Giao diện App - Ẩn khi in */}
+      <div className="space-y-4 md:space-y-6 no-print">
         <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-primary/10">
           <CardHeader className="bg-slate-50/50 pb-8 p-8 md:p-10">
             <div className="flex justify-between items-start gap-6">
@@ -241,11 +312,11 @@ export default function RequestDetail() {
                      </Select>
                    ) : (
                      <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-primary">
-                       {req.equipmentName}
+                       <Wrench className="h-3 w-3 mr-1" /> {req.equipmentName}
                      </Badge>
                    )}
                    <Badge variant="secondary" className="text-[9px] font-black uppercase px-3 py-1 rounded-lg bg-white border border-slate-100 text-slate-500">
-                     Đơn vị: {req.unit}
+                     <Building2 className="h-3 w-3 mr-1" /> {req.unit}
                    </Badge>
                 </div>
               </div>
@@ -269,7 +340,7 @@ export default function RequestDetail() {
             </div>
 
             {req.images && req.images.length > 0 && (
-              <div className="space-y-4 no-print">
+              <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest ml-1">
                   <ImageIcon className="h-4 w-4 text-primary" /> Hình ảnh minh chứng:
                 </Label>
@@ -315,7 +386,7 @@ export default function RequestDetail() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-3 no-print pt-4">
+            <div className="grid grid-cols-3 gap-3 pt-4">
               {[
                 { label: 'Đơn vị Duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', icon: ShieldCheck },
                 { label: 'CSVC Giao việc', active: !!req.technicianId, icon: Wrench },
@@ -332,21 +403,11 @@ export default function RequestDetail() {
                 </div>
               ))}
             </div>
-
-            <div className="print-only mt-24 grid grid-cols-2 gap-20 text-center">
-               <div className="space-y-24">
-                  <p className="font-black text-base">ĐƠN VỊ SỬ DỤNG</p>
-                  <p className="text-[10px] text-slate-400 italic font-medium">(Ký và ghi rõ họ tên)</p>
-               </div>
-               <div className="space-y-24">
-                  <p className="font-black text-base">NHÂN VIÊN KỸ THUẬT</p>
-                  <p className="text-[10px] text-slate-400 italic font-medium">(Ký và ghi rõ họ tên)</p>
-               </div>
-            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow no-print border-t-8 border-t-accent/10">
+        {/* Thao tác nghiệp vụ */}
+        <Card className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow border-t-8 border-t-accent/10">
           <CardHeader className="bg-slate-50/50 py-6 px-8 md:px-10">
             <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 text-slate-800">
               <ShieldAlert className="h-5 w-5 text-accent" /> Thao tác nghiệp vụ xử lý

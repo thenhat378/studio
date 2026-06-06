@@ -59,6 +59,22 @@
   }
   body {
     background: white !important;
+    font-size: 12pt !important;
+    color: black !important;
+  }
+  .card-shadow {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .max-w-3xl {
+    max-width: 100% !important;
+  }
+  @page {
+    margin: 2cm;
   }
 }
 
