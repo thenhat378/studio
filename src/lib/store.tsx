@@ -41,10 +41,10 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Hàm chuẩn hóa chuỗi dữ liệu (xóa khoảng trắng thừa)
-const normalizeString = (str: string | undefined) => {
+// Hàm chuẩn hóa chuỗi dữ liệu (xóa khoảng trắng thừa và chuyển về chữ thường để so sánh chính xác)
+const normalizeUnit = (str: string | undefined) => {
   if (!str) return '';
-  return str.trim();
+  return str.trim().toLowerCase();
 };
 
 const cleanObject = (obj: any) => {
@@ -144,7 +144,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: userId,
       name: data.name.trim(),
       role: data.role,
-      unit: normalizeString(data.unit), // Chuẩn hóa đơn vị khi đăng ký
+      unit: data.unit.trim(), // Lưu tên đơn vị hiển thị, nhưng khi so sánh sẽ dùng normalize
       phoneNumber: data.phone,
       password: data.pass
     };
@@ -169,7 +169,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!db) throw new Error("Database chưa sẵn sàng.");
     const rawData = {
       ...req,
-      unit: normalizeString(req.unit), // Chuẩn hóa đơn vị khi tạo phiếu
+      unit: req.unit.trim(), 
       createdAt: new Date().toISOString(),
       status: 'pending_approval' as const
     };

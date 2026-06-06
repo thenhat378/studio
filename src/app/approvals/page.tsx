@@ -28,7 +28,7 @@ export default function ApprovalsPage() {
   const [ratingId, setRatingId] = useState<string | null>(null);
   const [currentRating, setCurrentRating] = useState(5);
 
-  // Chuẩn hóa và lọc phiếu theo đơn vị (So sánh không phân biệt hoa thường và xóa khoảng trắng)
+  // Chuẩn hóa so sánh đơn vị để đảm bảo không bị lỗi do khoảng trắng hoặc hoa thường
   const unitRequests = useMemo(() => {
     if (!currentUser?.unit) return [];
     const normalizedUserUnit = currentUser.unit.trim().toLowerCase();
