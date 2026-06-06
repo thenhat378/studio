@@ -114,9 +114,9 @@ export default function ApprovalsPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden border-l-8 border-l-primary/20">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex-1 min-w-0 space-y-3">
-                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight">
-                    <span className="text-primary mr-2 uppercase">[{req.location}]</span>
-                    {req.equipmentName}
+                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase">
+                    <span className="text-primary mr-2">[{req.location}]</span>
+                    {req.equipmentName} / <span className="text-slate-400">{req.unit}</span>
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
@@ -166,9 +166,9 @@ export default function ApprovalsPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden border-l-8 border-l-emerald-500">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex-1 min-w-0 space-y-3">
-                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight">
-                    <span className="text-emerald-600 mr-2 uppercase">[{req.location}]</span>
-                    {req.equipmentName}
+                  <h3 className="font-black text-lg text-slate-800 tracking-tight leading-tight uppercase">
+                    <span className="text-emerald-600 mr-2">[{req.location}]</span>
+                    {req.equipmentName} / <span className="text-slate-400">{req.unit}</span>
                   </h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Xong bởi: {req.technicianName}</span>
@@ -243,3 +243,4 @@ export default function ApprovalsPage() {
     </div>
   );
 }
+

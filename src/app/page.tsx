@@ -373,8 +373,8 @@ export default function Overview() {
               <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-8 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="font-black text-base text-slate-800 truncate">{req.technicianName}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase">Nhân viên thực hiện</p>
+                    <p className="font-black text-base text-slate-800 truncate uppercase">[{req.location}] {req.technicianName}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase">Nhân viên thực hiện / {req.unit}</p>
                   </div>
                   {req.status === 'closed' && (
                     <div className="flex gap-0.5">
@@ -422,10 +422,10 @@ export default function Overview() {
                <Card className="rounded-[2.5rem] bg-white border-none card-shadow hover:bg-slate-50 transition-all overflow-hidden border-l-8 border-l-slate-100 hover:border-l-primary/30">
                   <CardContent className="p-7 flex items-center justify-between">
                      <div className="space-y-2">
-                        <p className="font-black text-base text-slate-800 tracking-tight leading-tight uppercase">{req.location}</p>
+                        <p className="font-black text-base text-slate-800 tracking-tight leading-tight uppercase">[{req.location}] {req.equipmentName}</p>
                         <div className="flex items-center gap-2">
                            <Badge variant="secondary" className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 border-none">
-                             {req.equipmentName}
+                             {req.unit}
                            </Badge>
                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{req.status.replace('_', ' ')}</p>
                         </div>
@@ -447,3 +447,4 @@ export default function Overview() {
     </div>
   );
 }
+

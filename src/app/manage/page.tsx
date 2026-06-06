@@ -101,13 +101,12 @@ export default function ManagementPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow border-l-8 border-l-indigo-500 overflow-hidden">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0 space-y-2">
-                  <h3 className="font-black text-lg text-slate-800 truncate">
-                    <span className="text-indigo-600 mr-2 uppercase">[{req.location}]</span>
-                    {req.equipmentName}
+                  <h3 className="font-black text-lg text-slate-800 truncate uppercase">
+                    <span className="text-indigo-600 mr-2">[{req.location}]</span>
+                    {req.equipmentName} / <span className="text-slate-400 font-bold">{req.unit}</span>
                   </h3>
                   <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Báo hỏng: {formatDate(req.createdAt)}</span>
-                    <span className="uppercase text-slate-600 font-black">{req.unit}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -133,9 +132,9 @@ export default function ManagementPage() {
             <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow border-l-8 border-l-cyan-500 overflow-hidden">
               <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 min-w-0 space-y-2">
-                  <h3 className="font-black text-lg text-slate-800 truncate">
-                    <span className="text-cyan-600 mr-2 uppercase">[{req.location}]</span>
-                    {req.equipmentName}
+                  <h3 className="font-black text-lg text-slate-800 truncate uppercase">
+                    <span className="text-cyan-600 mr-2">[{req.location}]</span>
+                    {req.equipmentName} / <span className="text-slate-400 font-bold">{req.unit}</span>
                   </h3>
                   <div className="flex flex-wrap gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <span className="text-slate-800 font-black">Xử lý: {req.technicianName}</span>
@@ -160,9 +159,9 @@ export default function ManagementPage() {
              <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white card-shadow overflow-hidden p-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                    <div className="space-y-2">
-                      <h3 className="font-black text-base text-slate-800">
-                        <span className="text-slate-400 mr-2 uppercase">[{req.location}]</span>
-                        {req.equipmentName}
+                      <h3 className="font-black text-base text-slate-800 uppercase">
+                        <span className="text-slate-400 mr-2">[{req.location}]</span>
+                        {req.equipmentName} / <span className="text-slate-400">{req.unit}</span>
                       </h3>
                       <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase">
                          <span className="text-primary">{req.technicianName}</span>
@@ -185,3 +184,4 @@ export default function ManagementPage() {
     </div>
   );
 }
+

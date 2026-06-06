@@ -59,12 +59,12 @@ export default function TasksPage() {
                     {req.status === 'assigned' ? 'Bước 3: Mới nhận' : 'Bước 4: Đang sửa'}
                   </Badge>
                 </div>
-                <h3 className="font-black text-lg text-slate-800 mb-2 leading-tight">
-                  {req.equipmentName}
-                  <span className="text-primary ml-2 uppercase">({req.location})</span>
+                <h3 className="font-black text-lg text-slate-800 mb-2 leading-tight uppercase">
+                  <span className="text-primary mr-2">[{req.location}]</span>
+                  {req.equipmentName} / <span className="text-slate-400">{req.unit}</span>
                 </h3>
                 <div className="grid grid-cols-1 gap-3 mb-6 text-[11px] font-bold text-slate-500 uppercase">
-                  <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-rose-400" /> {req.unit}</p>
+                  <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-rose-400" /> Vị trí: {req.location}</p>
                 </div>
                 <div className="flex gap-2">
                   <Link href={`/requests/${req.id}`} className="flex-1">
@@ -99,7 +99,7 @@ export default function TasksPage() {
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
                     <p className="font-black text-sm text-slate-800 truncate mb-1 uppercase tracking-tight">
-                      [{req.location}] {req.equipmentName}
+                      [{req.location}] {req.equipmentName} / {req.unit}
                     </p>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-[8px] font-black uppercase">{req.status}</Badge>
@@ -116,3 +116,4 @@ export default function TasksPage() {
     </div>
   );
 }
+
