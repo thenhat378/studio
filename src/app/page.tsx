@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -20,7 +21,10 @@ import {
   Info,
   Wrench,
   ChevronRight,
-  UserCircle2
+  UserCircle2,
+  BarChart3,
+  Star,
+  Timer
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -36,6 +40,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDistanceStrict } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 export default function Overview() {
   const { 
@@ -295,6 +301,15 @@ export default function Overview() {
     return true;
   });
 
+  const getDuration = (start?: string, end?: string) => {
+    if (!start || !end) return "N/A";
+    try {
+      return formatDistanceStrict(new Date(start), new Date(end), { locale: vi });
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   return (
     <div className="space-y-8 pb-safe">
       <div className="bg-primary rounded-[3rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden animate-slide-up">
@@ -334,6 +349,40 @@ export default function Overview() {
           </Card>
         ))}
       </div>
+
+      {currentUser.role === 'csvc_manager' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between px-4">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-primary" /> Hiệu suất kỹ thuật
+            </h3>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {roleFilteredRequests.filter(r => r.status === 'closed').slice(0, 4).map(req => (
+              <Card key={req.id} className="rounded-[2.5rem] bg-white border-none card-shadow p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="min-w-0">
+                    <p className="font-black text-sm text-slate-800 truncate">{req.technicianName}</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase">KT thực hiện</p>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(s => <Star key={s} className={cn("h-3 w-3", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />)}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-slate-50 rounded-2xl p-4">
+                  <div className="space-y-1">
+                    <p className="text-[8px] font-black text-slate-400 uppercase">Thời gian xử lý</p>
+                    <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                      <Timer className="h-3 w-3 text-blue-500" /> {getDuration(req.assignedAt, req.completedAt)}
+                    </p>
+                  </div>
+                  <Badge className="bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase border-none">Hoàn thành</Badge>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6">
         <div className="flex items-center justify-between px-4">

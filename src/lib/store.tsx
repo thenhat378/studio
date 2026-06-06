@@ -167,6 +167,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const updateRequestStatus = async (id: string, status: RepairRequest['status'], extra?: Partial<RepairRequest>) => {
     if (!db) return;
     const updateData: any = { status };
+    if (status === 'assigned') {
+      updateData.assignedAt = new Date().toISOString();
+    }
     if (extra) Object.assign(updateData, extra);
     await updateDoc(doc(db, 'requests', id), cleanObject(updateData));
   };
