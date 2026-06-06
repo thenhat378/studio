@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -23,7 +24,9 @@ import {
   MessageSquareQuote,
   Timer,
   Building2,
-  MapPin
+  MapPin,
+  Camera,
+  ImagePlus
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +60,7 @@ export default function RequestDetail() {
   const [selectedTechId, setSelectedTechId] = useState('');
   const [rating, setRating] = useState<number>(5);
   const [feedback, setFeedback] = useState('');
+  const [techImages, setTechImages] = useState<string[]>([]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -91,6 +95,33 @@ export default function RequestDetail() {
   const handleAction = (status: any, extra?: any) => {
     updateRequestStatus(req.id, status, extra);
     toast({ title: "Đã cập nhật", description: "Hệ thống đã ghi nhận thay đổi của bạn." });
+  };
+
+  const handleTechImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      if (file.size > 1 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "Ảnh quá lớn",
+          description: "Vui lòng chọn ảnh dưới 1MB."
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTechImages(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const removeTechImage = (index: number) => {
+    setTechImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleRequesterConfirm = () => {
@@ -382,7 +413,7 @@ export default function RequestDetail() {
             {req.images && req.images.length > 0 && (
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest ml-1">
-                  <ImageIcon className="h-4 w-4 text-primary" /> Hình ảnh minh chứng:
+                  <ImageIcon className="h-4 w-4 text-primary" /> Hình ảnh báo lỗi:
                 </Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {req.images.map((img, idx) => (
@@ -404,6 +435,21 @@ export default function RequestDetail() {
                    <Badge className="bg-blue-500 text-[9px] font-black uppercase px-3 py-1">{getRepairTypeText(req.repairType)}</Badge>
                 </div>
                 <p className="text-sm md:text-base font-bold text-blue-900 leading-relaxed bg-white/50 p-6 rounded-2xl border border-blue-50">{req.technicianReport}</p>
+                
+                {req.technicianImages && req.technicianImages.length > 0 && (
+                  <div className="space-y-4 pt-4">
+                    <Label className="text-[10px] font-black uppercase text-blue-400 flex items-center gap-2 tracking-widest ml-1">
+                      <ImageIcon className="h-4 w-4 text-blue-400" /> Hình ảnh minh chứng sửa chữa:
+                    </Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {req.technicianImages.map((img, idx) => (
+                        <div key={idx} className="relative aspect-square rounded-[2.5rem] overflow-hidden border-2 border-blue-50 shadow-sm group">
+                          <Image src={img} alt={`Repair photo ${idx + 1}`} fill className="object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -552,7 +598,51 @@ export default function RequestDetail() {
                         <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Báo cáo chi tiết công việc</Label>
                         <Textarea placeholder="Nội dung công việc, linh kiện thay thế..." className="min-h-[140px] rounded-[2rem] bg-white border-none shadow-sm font-bold p-6 leading-relaxed" value={report} onChange={e => setReport(e.target.value)} />
                       </div>
-                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType: repairType as RepairType, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
+
+                      <div className="space-y-4 pt-4">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
+                          <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng sửa chữa
+                        </Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          {techImages.map((img, idx) => (
+                            <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 group shadow-sm">
+                              <Image src={img} alt="Preview" fill className="object-cover" />
+                              <button 
+                                type="button"
+                                onClick={() => removeTechImage(idx)}
+                                className="absolute top-2 right-2 bg-rose-500 text-white p-2 rounded-full shadow-lg"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                          <label className="aspect-square rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all bg-primary/5 active:scale-95 shadow-sm">
+                            <Camera className="h-8 w-8 text-primary" />
+                            <span className="text-[10px] font-black text-primary uppercase text-center px-4 leading-tight">Mở máy ảnh</span>
+                            <input 
+                              type="file" 
+                              multiple 
+                              accept="image/*" 
+                              capture="environment" 
+                              className="hidden" 
+                              onChange={handleTechImageChange} 
+                            />
+                          </label>
+                          <label className="aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+                            <ImagePlus className="h-8 w-8 text-slate-300" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase">Thư viện</span>
+                            <input 
+                              type="file" 
+                              multiple 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={handleTechImageChange} 
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <Button className="w-full bg-emerald-600 h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType: repairType as RepairType, technicianImages: techImages, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
                     </div>
                   )}
                 </>
