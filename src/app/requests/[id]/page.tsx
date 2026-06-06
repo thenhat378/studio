@@ -17,14 +17,18 @@ import {
   User,
   Info,
   ImageIcon,
-  Check
+  Check,
+  Edit3,
+  Send,
+  X
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { 
   Select, 
   SelectContent, 
@@ -41,15 +45,33 @@ export default function RequestDetail() {
   const id = params.id as string;
   const router = useRouter();
   const { toast } = useToast();
-  const { requests, currentUser, updateRequestStatus, users } = useAppStore();
+  const { requests, currentUser, updateRequestStatus, users, equipment } = useAppStore();
   
   const [report, setReport] = useState('');
   const [repairType, setRepairType] = useState<RepairType | ''>('');
   const [selectedTechId, setSelectedTechId] = useState('');
   const [rating, setRating] = useState<number>(5);
 
+  // States for editing mode (Resend feature)
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    title: '',
+    description: '',
+    equipmentId: ''
+  });
+
   const req = requests.find(r => r.id === id);
   const technicians = users.filter(u => u.role === 'technician');
+
+  useEffect(() => {
+    if (req) {
+      setEditData({
+        title: req.title,
+        description: req.description,
+        equipmentId: req.equipmentId
+      });
+    }
+  }, [req]);
 
   if (!req) {
     return (
@@ -70,10 +92,31 @@ export default function RequestDetail() {
     toast({ title: "Xác nhận hài lòng", description: "Cảm ơn bạn đã phản hồi kết quả sửa chữa!" });
   };
 
+  const handleResend = () => {
+    if (!editData.title || !editData.description || !editData.equipmentId) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ thông tin trước khi gửi lại." });
+      return;
+    }
+
+    const equip = equipment.find(e => e.id === editData.equipmentId);
+    
+    updateRequestStatus(req.id, 'pending_approval', {
+      title: editData.title,
+      description: editData.description,
+      equipmentId: editData.equipmentId,
+      equipmentName: equip?.name || req.equipmentName,
+      category: equip?.category || req.category,
+      rejectionReason: "" // Clear rejection reason if resending
+    });
+
+    setIsEditing(false);
+    toast({ title: "Đã gửi lại phiếu", description: "Yêu cầu đã được cập nhật và gửi lại cho Quản lý đơn vị." });
+  };
+
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'pending_approval': return <Badge className="bg-rose-500 text-[10px] font-black uppercase">Chờ đơn vị duyệt</Badge>;
-      case 'approved': return <Badge className="bg-indigo-500 text-[10px] font-black uppercase">Chờ CSVC phân công</Badge>;
+      case 'pending_approval': return <Badge className="bg-rose-500 text-[10px] font-black uppercase">Chờ duyệt đơn vị</Badge>;
+      case 'approved': return <Badge className="bg-indigo-500 text-[10px] font-black uppercase">Chờ phân công</Badge>;
       case 'assigned': return <Badge className="bg-blue-500 text-[10px] font-black uppercase">Đã giao kỹ thuật</Badge>;
       case 'in_progress': return <Badge className="bg-amber-500 text-[10px] font-black uppercase">Đang sửa chữa</Badge>;
       case 'completed': return <Badge className="bg-cyan-600 text-[10px] font-black uppercase">Kỹ thuật báo xong</Badge>;
@@ -112,8 +155,17 @@ export default function RequestDetail() {
         <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
           <CardHeader className="bg-slate-50/50 pb-6 p-8">
             <div className="flex justify-between items-start gap-4">
-              <div className="space-y-2">
-                <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight">{req.title}</CardTitle>
+              <div className="space-y-2 flex-1">
+                {isEditing ? (
+                  <Input 
+                    value={editData.title}
+                    onChange={e => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                    className="h-12 text-lg font-black bg-white rounded-xl border-primary/20"
+                    placeholder="Tiêu đề mới..."
+                  />
+                ) : (
+                  <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight">{req.title}</CardTitle>
+                )}
                 <div className="flex flex-col gap-1">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                      <Clock className="h-3.5 w-3.5" /> Ngày báo: {new Date(req.createdAt).toLocaleString('vi-VN')}
@@ -124,9 +176,20 @@ export default function RequestDetail() {
                      </p>
                    )}
                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
-                        {req.equipmentName}
-                      </Badge>
+                      {isEditing ? (
+                        <Select value={editData.equipmentId} onValueChange={val => setEditData(prev => ({ ...prev, equipmentId: val }))}>
+                          <SelectTrigger className="h-10 text-[10px] font-black bg-white rounded-lg w-48">
+                            <SelectValue placeholder="Chọn thiết bị..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {equipment.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
+                          {req.equipmentName}
+                        </Badge>
+                      )}
                       <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
                         Đơn vị: {req.unit}
                       </Badge>
@@ -141,7 +204,15 @@ export default function RequestDetail() {
           <CardContent className="space-y-6 p-8 pt-0">
             <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 mt-4">
               <Label className="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest">Mô tả sự cố từ {req.requesterName}:</Label>
-              <p className="text-sm font-bold text-slate-700 leading-relaxed">{req.description}</p>
+              {isEditing ? (
+                <Textarea 
+                  value={editData.description}
+                  onChange={e => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                  className="min-h-[100px] bg-white rounded-2xl font-bold p-4 border-primary/10"
+                />
+              ) : (
+                <p className="text-sm font-bold text-slate-700 leading-relaxed">{req.description}</p>
+              )}
             </div>
 
             {req.images && req.images.length > 0 && (
@@ -209,7 +280,33 @@ export default function RequestDetail() {
           </CardHeader>
           <CardContent className="p-8">
             <div className="space-y-4">
-              {/* PHÓ TRƯỞNG ĐƠN VỊ - PHÊ DUYỆT BAN ĐẦU */}
+              {/* NHÂN VIÊN/GIẢNG VIÊN - CHỈNH SỬA & GỬI LẠI */}
+              {currentUser?.role === 'requester' && req.requesterId === currentUser.id && (req.status === 'pending_approval' || req.status === 'rejected') && (
+                <div className="space-y-3">
+                  {isEditing ? (
+                    <div className="flex gap-3">
+                      <Button className="flex-1 bg-emerald-600 h-14 font-black rounded-2xl text-white shadow-lg gap-2" onClick={handleResend}>
+                        <Send className="h-5 w-5" /> CẬP NHẬT & GỬI LẠI
+                      </Button>
+                      <Button variant="ghost" className="h-14 w-14 rounded-2xl text-slate-400" onClick={() => setIsEditing(false)}>
+                        <X className="h-6 w-6" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/5 h-14 font-black rounded-2xl shadow-sm gap-2" onClick={() => setIsEditing(true)}>
+                      <Edit3 className="h-5 w-5" /> CHỈNH SỬA & GỬI LẠI PHIẾU
+                    </Button>
+                  )}
+                  {req.status === 'rejected' && !isEditing && (
+                    <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                      <p className="text-[10px] font-black text-rose-600 uppercase mb-1">Lý do từ chối:</p>
+                      <p className="text-sm font-bold text-rose-800">{req.rejectionReason}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* QUẢN LÝ ĐƠN VỊ - PHÊ DUYỆT BAN ĐẦU */}
               {currentUser?.role === 'unit_leader' && req.status === 'pending_approval' && (
                 <div className="flex flex-col gap-3">
                   <Button className="w-full bg-emerald-600 h-14 font-black rounded-2xl text-white shadow-lg" onClick={() => handleAction('approved')}>PHÊ DUYỆT CHUYỂN PHÒNG CSVC</Button>
@@ -217,7 +314,7 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* PHÓ TRƯỞNG PHÒNG CSVC - PHÂN CÔNG KỸ THUẬT */}
+              {/* QUẢN LÝ CSVC - PHÂN CÔNG KỸ THUẬT */}
               {currentUser?.role === 'csvc_manager' && req.status === 'approved' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -238,7 +335,7 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {/* PHÓ TRƯỞNG PHÒNG CSVC - DUYỆT HOÀN THÀNH KỸ THUẬT */}
+              {/* QUẢN LÝ CSVC - DUYỆT HOÀN THÀNH KỸ THUẬT */}
               {currentUser?.role === 'csvc_manager' && req.status === 'completed' && (
                 <div className="space-y-4">
                    <div className="bg-blue-50 p-5 rounded-3xl flex items-start gap-4 border border-blue-100">
@@ -291,7 +388,7 @@ export default function RequestDetail() {
                 </Button>
               )}
 
-              {/* PHÓ TRƯỞNG ĐƠN VỊ - NGHIỆM THU & ĐÓNG PHIẾU */}
+              {/* QUẢN LÝ ĐƠN VỊ - NGHIỆM THU & ĐÓNG PHIẾU */}
               {currentUser?.role === 'unit_leader' && req.status === 'verified' && (
                 <div className="space-y-5">
                   <div className="flex flex-col items-center gap-4 py-6 bg-slate-50 rounded-[2rem] border border-slate-100">
@@ -323,7 +420,7 @@ export default function RequestDetail() {
                 </div>
               )}
 
-              {req.status === 'rejected' && (
+              {req.status === 'rejected' && !isEditing && (
                 <div className="p-6 bg-rose-50 rounded-[2rem] border border-rose-100 space-y-2">
                   <p className="text-rose-700 font-black text-sm uppercase tracking-tighter">Yêu cầu đã bị hủy bỏ</p>
                   <p className="text-xs font-bold text-rose-600">Lý do từ chối: {req.rejectionReason || 'Không có lý do chi tiết.'}</p>
