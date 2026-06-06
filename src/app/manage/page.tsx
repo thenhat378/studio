@@ -37,14 +37,14 @@ export default function ManagementPage() {
   const { toast } = useToast();
   const [selectedTechs, setSelectedTechs] = useState<Record<string, string>>({});
 
-  // 1. Chờ phân công (Chỉ những phiếu đã được Đơn vị phê duyệt 'approved')
+  // 1. Chờ phân công (Đã được Đơn vị phê duyệt 'approved')
   const pendingAssignment = requests.filter(r => r.status === 'approved');
   
   // 2. Chờ duyệt hoàn thành kỹ thuật (Kỹ thuật đã báo xong 'completed')
   const pendingVerification = requests.filter(r => r.status === 'completed');
 
-  // 3. Lịch sử các phiếu đã đóng
-  const historyRequests = requests.filter(r => r.status === 'closed');
+  // 3. Lịch sử theo dõi
+  const historyRequests = requests.filter(r => r.status === 'closed' || r.status === 'verified');
 
   const technicians = users.filter(u => u.role === 'technician');
 
@@ -226,11 +226,16 @@ export default function ManagementPage() {
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">
                        <h3 className="font-black text-base text-slate-800">{req.title}</h3>
-                       <div className="flex gap-0.5">
-                          {[1,2,3,4,5].map(s => (
-                            <Star key={s} className={cn("h-3 w-3", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />
-                          ))}
-                       </div>
+                       {req.status === 'closed' && (
+                         <div className="flex gap-0.5">
+                            {[1,2,3,4,5].map(s => (
+                              <Star key={s} className={cn("h-3 w-3", s <= (req.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-100")} />
+                            ))}
+                         </div>
+                       )}
+                       <Badge variant="outline" className="text-[8px] font-black uppercase">
+                         {req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}
+                       </Badge>
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -251,12 +256,12 @@ export default function ManagementPage() {
                           <div className="text-[11px] font-bold text-slate-700">{req.unit}</div>
                        </div>
                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đánh giá</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Trạng thái</p>
                           <Badge className={cn(
                             "text-[9px] font-black uppercase px-2 py-0.5 border-none",
-                            (req.rating || 0) >= 4 ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                            req.status === 'closed' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
                           )}>
-                            {(req.rating || 0)} sao
+                            {req.status === 'closed' ? 'Hoàn tất' : 'Chờ nghiệm thu'}
                           </Badge>
                        </div>
                     </div>

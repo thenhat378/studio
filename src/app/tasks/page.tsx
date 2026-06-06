@@ -47,8 +47,8 @@ export default function TasksPage() {
     t.unit.toLowerCase().includes(search.toLowerCase())
   );
 
-  const activeTasks = filteredTasks.filter(r => r.status !== 'closed' && r.status !== 'rejected');
-  const closedTasks = filteredTasks.filter(r => r.status === 'closed');
+  const activeTasks = filteredTasks.filter(r => r.status !== 'closed' && r.status !== 'rejected' && r.status !== 'verified');
+  const finishedTasks = filteredTasks.filter(r => r.status === 'closed' || r.status === 'verified');
 
   const handleStart = (id: string) => {
     updateRequestStatus(id, 'in_progress');
@@ -76,8 +76,9 @@ export default function TasksPage() {
     switch(status) {
       case 'assigned': return { label: 'Mới nhận', color: 'text-blue-600', bg: 'bg-blue-50' };
       case 'in_progress': return { label: 'Đang làm', color: 'text-amber-600', bg: 'bg-amber-50' };
-      case 'completed': return { label: 'Báo xong', color: 'text-cyan-600', bg: 'bg-cyan-50' };
+      case 'completed': return { label: 'Kỹ thuật báo xong', color: 'text-cyan-600', bg: 'bg-cyan-50' };
       case 'verified': return { label: 'Chờ nghiệm thu', color: 'text-emerald-600', bg: 'bg-emerald-50' };
+      case 'closed': return { label: 'Đã đóng', color: 'text-slate-600', bg: 'bg-slate-50' };
       default: return { label: status, color: 'text-slate-500', bg: 'bg-slate-50' };
     }
   };
@@ -110,11 +111,11 @@ export default function TasksPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="closed" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Đã hoàn tất
-            {closedTasks.length > 0 && (
+          <TabsTrigger value="finished" className="gap-2 text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
+            Lưu trữ & In ấn
+            {finishedTasks.length > 0 && (
               <Badge variant="secondary" className="h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-[9px] border-none">
-                {closedTasks.length}
+                {finishedTasks.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -178,8 +179,8 @@ export default function TasksPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="closed" className="space-y-4">
-          {closedTasks.map(req => (
+        <TabsContent value="finished" className="space-y-4">
+          {finishedTasks.map(req => (
             <Link key={req.id} href={`/requests/${req.id}`}>
               <Card className="border-none shadow-sm rounded-[2rem] bg-white card-shadow overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
                 <CardContent className="p-6 flex items-center justify-between gap-4">
@@ -189,7 +190,12 @@ export default function TasksPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-black text-sm text-slate-800 truncate mb-0.5">{req.title}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Đã đóng: {req.completedAt && new Date(req.completedAt).toLocaleDateString('vi-VN')}</p>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[8px] font-black uppercase">
+                          {req.status === 'closed' ? 'Đã đóng' : 'Chờ nghiệm thu'}
+                        </Badge>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Xong: {req.completedAt && new Date(req.completedAt).toLocaleDateString('vi-VN')}</p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 text-primary">
@@ -200,6 +206,12 @@ export default function TasksPage() {
               </Card>
             </Link>
           ))}
+          {finishedTasks.length === 0 && (
+            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow">
+              <Printer className="h-16 w-16 text-slate-100 mx-auto mb-6" />
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Chưa có phiếu để in lưu trữ</p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
@@ -255,4 +267,3 @@ export default function TasksPage() {
     </div>
   );
 }
-

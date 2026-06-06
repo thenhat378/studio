@@ -20,8 +20,7 @@ import {
   X,
   Info,
   Wrench,
-  ChevronRight,
-  ShieldAlert
+  ChevronRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -197,7 +196,7 @@ export default function Overview() {
 
   const getRoleLabel = (role: UserRole) => {
     switch(role) {
-      case 'requester': return 'Nhân viên';
+      case 'requester': return 'Nhân viên / Giảng viên';
       case 'unit_leader': return 'Phó Trưởng đơn vị';
       case 'csvc_manager': return 'Phó Trưởng phòng CSVC';
       case 'technician': return 'Nhân viên kỹ thuật';

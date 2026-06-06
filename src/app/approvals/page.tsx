@@ -36,7 +36,7 @@ export default function ApprovalsPage() {
     return r.unit.trim().toLowerCase() === currentUser.unit.trim().toLowerCase();
   });
 
-  // Phiếu chờ duyệt bước 2 (Chỉ đơn vị mình)
+  // Phiếu chờ duyệt bước 2 (Chờ duyệt đơn vị)
   const pendingRequests = unitRequests.filter(r => r.status === 'pending_approval');
   
   // Phiếu chờ nghiệm thu bước 7 (sau khi CSVC đã verified)

@@ -16,7 +16,8 @@ import {
   Wrench,
   User,
   Info,
-  ImageIcon
+  ImageIcon,
+  Check
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +78,7 @@ export default function RequestDetail() {
       case 'in_progress': return <Badge className="bg-amber-500 text-[10px] font-black uppercase">Đang sửa chữa</Badge>;
       case 'completed': return <Badge className="bg-cyan-600 text-[10px] font-black uppercase">Kỹ thuật báo xong</Badge>;
       case 'verified': return <Badge className="bg-emerald-600 text-[10px] font-black uppercase">Chờ nghiệm thu</Badge>;
-      case 'closed': return <Badge className="bg-green-700 text-[10px] font-black uppercase">Đã hoàn tất</Badge>;
+      case 'closed': return <Badge className="bg-green-700 text-[10px] font-black uppercase">Đã đóng</Badge>;
       case 'rejected': return <Badge variant="destructive" className="text-[10px] font-black uppercase">Đã từ chối</Badge>;
       default: return <Badge variant="outline" className="text-[10px] font-black uppercase">{status}</Badge>;
     }
@@ -107,32 +108,44 @@ export default function RequestDetail() {
         )}
       </div>
 
-      <div className="no-print space-y-4">
+      <div className="space-y-4">
         <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
           <CardHeader className="bg-slate-50/50 pb-6 p-8">
             <div className="flex justify-between items-start gap-4">
               <div className="space-y-2">
                 <CardTitle className="text-xl md:text-2xl font-black text-slate-800 leading-tight">{req.title}</CardTitle>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-1">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                     <Clock className="h-3.5 w-3.5" /> {new Date(req.createdAt).toLocaleString('vi-VN')}
+                     <Clock className="h-3.5 w-3.5" /> Ngày báo: {new Date(req.createdAt).toLocaleString('vi-VN')}
                    </p>
-                   <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
-                     {req.equipmentName}
-                   </Badge>
+                   {req.completedAt && (
+                     <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
+                       <Check className="h-3.5 w-3.5" /> Hoàn thành: {new Date(req.completedAt).toLocaleString('vi-VN')}
+                     </p>
+                   )}
+                   <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
+                        {req.equipmentName}
+                      </Badge>
+                      <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border-slate-200">
+                        Đơn vị: {req.unit}
+                      </Badge>
+                   </div>
                 </div>
               </div>
-              {getStatusBadge(req.status)}
+              <div className="no-print">
+                {getStatusBadge(req.status)}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6 p-8 pt-0">
-            <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
+            <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 mt-4">
               <Label className="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest">Mô tả sự cố từ {req.requesterName}:</Label>
               <p className="text-sm font-bold text-slate-700 leading-relaxed">{req.description}</p>
             </div>
 
             {req.images && req.images.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-3 no-print">
                 <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest">
                   <ImageIcon className="h-3.5 w-3.5" /> Hình ảnh minh chứng:
                 </Label>
@@ -156,7 +169,7 @@ export default function RequestDetail() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 no-print">
               {[
                 { label: 'Đơn vị Duyệt', active: req.status !== 'pending_approval' && req.status !== 'rejected', icon: ShieldCheck },
                 { label: 'CSVC Giao việc', active: !!req.technicianId, icon: Wrench },
@@ -169,17 +182,29 @@ export default function RequestDetail() {
                     : "bg-slate-50/50 border-slate-100 text-slate-300"
                 )}>
                   <step.icon className={cn("h-5 w-5", step.active ? "text-emerald-500" : "text-slate-200")} />
-                  <span className="text-[9px] font-black uppercase tracking-tighter">{step.label}</span>
+                  <span className="text-[9px] font-black uppercase tracking-tighter text-center">{step.label}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Phần chữ ký khi in */}
+            <div className="print-only mt-20 grid grid-cols-2 gap-20 text-center">
+               <div className="space-y-20">
+                  <p className="font-bold">ĐƠN VỊ SỬ DỤNG</p>
+                  <p className="text-xs text-slate-400 italic">(Ký và ghi rõ họ tên)</p>
+               </div>
+               <div className="space-y-20">
+                  <p className="font-bold">NHÂN VIÊN KỸ THUẬT</p>
+                  <p className="text-xs text-slate-400 italic">(Ký và ghi rõ họ tên)</p>
+               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
+        <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow no-print">
           <CardHeader className="bg-slate-50/50 py-4 px-8">
             <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-slate-800">
-              <ShieldAlert className="h-4 w-4 text-accent" /> Thao tác xử lý theo vai trò
+              <ShieldAlert className="h-4 w-4 text-accent" /> Thao tác xử lý
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
@@ -229,7 +254,7 @@ export default function RequestDetail() {
               )}
 
               {/* NHÂN VIÊN KỸ THUẬT - THỰC HIỆN */}
-              {currentUser?.role === 'technician' && (
+              {currentUser?.role === 'technician' && req.technicianId === currentUser.id && (
                 <>
                   {req.status === 'assigned' && (
                     <Button className="w-full bg-amber-500 h-14 font-black rounded-xl text-white shadow-lg" onClick={() => handleAction('in_progress')}>BẮT ĐẦU SỬA CHỮA</Button>
@@ -257,6 +282,13 @@ export default function RequestDetail() {
                     </div>
                   )}
                 </>
+              )}
+
+              {/* NGƯỜI DÙNG - XÁC NHẬN HÀI LÒNG */}
+              {currentUser?.role === 'requester' && req.requesterId === currentUser.id && req.status === 'completed' && !req.requesterConfirmed && (
+                <Button className="w-full bg-primary h-14 font-black rounded-2xl text-white shadow-lg gap-2" onClick={handleRequesterConfirm}>
+                  <ThumbsUp className="h-5 w-5" /> XÁC NHẬN HÀI LÒNG
+                </Button>
               )}
 
               {/* PHÓ TRƯỞNG ĐƠN VỊ - NGHIỆM THU & ĐÓNG PHIẾU */}
