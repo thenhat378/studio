@@ -25,7 +25,9 @@ import {
   Star,
   Timer,
   Clock,
-  MapPin
+  MapPin,
+  BookOpen,
+  ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -70,6 +72,7 @@ export default function Overview() {
   });
 
   const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [forgotData, setForgotData] = useState({
     phone: '',
     newPass: '',
@@ -216,7 +219,14 @@ export default function Overview() {
                       <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
                       <Input type="password" placeholder="••••••••" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPass} onChange={e => setLoginPass(e.target.value)} required />
                     </div>
-                    <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[11px] font-black text-primary hover:underline uppercase float-right pr-4 tracking-tighter">Quên mật khẩu?</button>
+                    <div className="flex justify-between px-2">
+                      <button type="button" onClick={() => setIsGuideOpen(true)} className="text-[11px] font-black text-secondary hover:underline uppercase tracking-tighter flex items-center gap-1">
+                        <BookOpen className="h-3 w-3" /> Hướng dẫn sử dụng
+                      </button>
+                      <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[11px] font-black text-primary hover:underline uppercase tracking-tighter">
+                        Quên mật khẩu?
+                      </button>
+                    </div>
                   </div>
                   <Button className="w-full h-20 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-primary/20 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "Vào hệ thống"}
@@ -286,6 +296,57 @@ export default function Overview() {
             </p>
           </footer>
         </div>
+
+        {/* Hướng dẫn sử dụng Dialog */}
+        <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
+          <DialogContent className="rounded-[3.5rem] p-8 md:p-12 border-none shadow-2xl max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="uppercase font-black text-primary text-2xl tracking-tighter flex items-center gap-3">
+                <BookOpen className="h-7 w-7 text-secondary" /> Hướng dẫn quy trình
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-8 mt-8">
+              <div className="space-y-6">
+                {[
+                  { step: "Bước 1", title: "Tạo yêu cầu", role: "Nhân viên", desc: "Nhập mô tả sự cố, sử dụng AI gợi ý nguyên nhân và chụp ảnh hiện trường." },
+                  { step: "Bước 2", title: "Phê duyệt tại đơn vị", role: "Lãnh đạo đơn vị", desc: "Kiểm tra và duyệt phiếu tại khoa/phòng để chuyển lên Phòng CSVC." },
+                  { step: "Bước 3", title: "Phân công kỹ thuật", role: "Quản lý CSVC", desc: "Phòng CSVC tiếp nhận và giao việc cho kỹ thuật viên phù hợp." },
+                  { step: "Bước 4", title: "Thực hiện sửa chữa", role: "Kỹ thuật viên", desc: "Kỹ thuật viên thực hiện, chụp ảnh minh chứng và báo cáo hoàn thành." },
+                  { step: "Bước 5", title: "Duyệt hoàn thành", role: "Quản lý CSVC", desc: "Quản lý CSVC kiểm tra chất lượng và xác nhận kết quả kỹ thuật." },
+                  { step: "Bước 6", title: "Xác nhận hài lòng", role: "Nhân viên", desc: "Người báo hỏng kiểm tra và nhấn xác nhận hài lòng với kết quả." },
+                  { step: "Bước 7", title: "Nghiệm thu & Đóng phiếu", role: "Lãnh đạo đơn vị", desc: "Đánh giá 1-5 sao và đóng hồ sơ để lưu trữ/in ấn." }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-5 group">
+                    <div className="flex flex-col items-center">
+                      <div className="h-10 w-10 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center font-black text-xs text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        {i + 1}
+                      </div>
+                      {i < 6 && <div className="w-[2px] h-full bg-slate-50" />}
+                    </div>
+                    <div className="space-y-1 pb-4">
+                      <div className="flex items-center gap-3">
+                        <h4 className="font-black text-sm uppercase text-slate-800">{item.step}: {item.title}</h4>
+                        <Badge variant="secondary" className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-100">{item.role}</Badge>
+                      </div>
+                      <p className="text-xs font-bold text-slate-500 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10">
+                <p className="text-[10px] font-black uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
+                   <Info className="h-4 w-4" /> Lưu ý quan trọng
+                </p>
+                <p className="text-xs font-bold text-slate-600 leading-relaxed italic">
+                  Để có trải nghiệm tốt nhất trên điện thoại, hãy chọn "Thêm vào màn hình chính" trên trình duyệt để sử dụng như ứng dụng di động thực thụ.
+                </p>
+              </div>
+            </div>
+            <DialogFooter className="mt-8">
+              <Button className="w-full h-16 rounded-2xl bg-primary text-white font-black uppercase text-xs" onClick={() => setIsGuideOpen(false)}>Đã rõ, quay lại</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
           <DialogContent className="rounded-[3.5rem] p-10 border-none shadow-2xl max-w-lg">
