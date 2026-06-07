@@ -18,9 +18,15 @@ Dự án Quản lý Phiếu yêu cầu sửa chữa thiết bị được thiế
 
 ## 📂 HƯỚNG DẪN ĐẨY LÊN GITHUB (GIT UPLOAD)
 
-Để lưu trữ mã nguồn lên GitHub cá nhân, bạn hãy thực hiện các bước sau trong Terminal tại thư mục dự án:
+### 🛑 Sửa lỗi "Need to specify how to reconcile divergent branches"
+Nếu bạn gặp lỗi này khi chạy `git pull`, hãy chạy lệnh sau để thiết lập chế độ hợp nhất (merge) mặc định:
+```bash
+git config pull.rebase false
+git pull origin main
+```
 
-1. **Khởi tạo Git**:
+### Các bước đẩy code lên:
+1. **Khởi tạo Git** (nếu chưa làm):
    ```bash
    git init
    ```
@@ -30,13 +36,12 @@ Dự án Quản lý Phiếu yêu cầu sửa chữa thiết bị được thiế
    git add .
    ```
 
-3. **Tạo bản cam kết đầu tiên**:
+3. **Tạo bản cam kết**:
    ```bash
-   git commit -m "Initial commit: Requisition Form DUE v1.0"
+   git commit -m "Update App Icon and GitHub Actions v1.1"
    ```
 
 4. **Kết nối với Repository của bạn**:
-   *(Tạo 1 repo mới trên GitHub và thay link dưới bằng link của bạn)*
    ```bash
    git remote add origin https://github.com/user/your-repo-name.git
    ```
