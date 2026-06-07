@@ -385,6 +385,7 @@ export default function RequestDetail() {
                       <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                       <Input 
                         type="number"
+                        min="1"
                         value={editData.quantity}
                         onChange={e => setEditData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
                         className="h-14 rounded-2xl bg-white border-none font-bold pl-14 shadow-sm"
@@ -486,7 +487,7 @@ export default function RequestDetail() {
                       {isEditing ? (
                         <>
                           <Button className="flex-1 bg-secondary hover:bg-secondary/90 h-16 font-black rounded-[1.8rem] text-white shadow-xl gap-2 transition-all active:scale-95" onClick={handleResend}>
-                            <Send className="h-5 w-5" /> CẬP NHẬT & GỬI LẠI
+                            <Send className="h-5 w-5" /> CẬPNHẬT & GỬI LẠI
                           </Button>
                           <Button variant="ghost" className="h-16 w-16 rounded-[1.8rem] text-slate-400 bg-slate-100" onClick={() => setIsEditing(false)}>
                             <X className="h-6 w-6" />
