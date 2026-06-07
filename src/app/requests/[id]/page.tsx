@@ -241,7 +241,7 @@ export default function RequestDetail() {
             <div className="print-row"><span className="print-label">Người báo:</span><span className="print-value">{req.requesterName}</span></div>
             <div className="print-row"><span className="print-label">Đơn vị:</span><span className="print-value">{req.unit.toUpperCase()}</span></div>
             <div className="print-row"><span className="print-label">Vị trí:</span><span className="print-value">{req.location}</span></div>
-            <div className="print-row"><span className="print-label">Số lượng:</span><span className="print-value">{req.quantity || 1}</span></div>
+            <div className="print-row"><span className="print-label">Số lượng yêu cầu:</span><span className="print-value">{req.quantity || 1}</span></div>
             <div className="print-row"><span className="print-label">Thời gian:</span><span className="print-value">{formatDate(req.createdAt)}</span></div>
             <div className="mt-0.5"><span className="print-label">Mô tả hỏng hóc:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.description}</p></div>
           </div>
@@ -251,7 +251,7 @@ export default function RequestDetail() {
             <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
             <div className="print-row"><span className="print-label">Kỹ thuật viên:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
             <div className="print-row"><span className="print-label">Hình thức:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
-            <div className="print-row"><span className="print-label">Số lượng xử lý:</span><span className="print-value">{req.quantity || 1}</span></div>
+            <div className="print-row"><span className="print-label">Số lượng hoàn thành:</span><span className="print-value">{req.quantity || 1}</span></div>
             <div className="print-row"><span className="print-label">Hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
             <div className="mt-0.5"><span className="print-label">Nội dung thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.technicianReport || 'N/A'}</p></div>
           </div>
