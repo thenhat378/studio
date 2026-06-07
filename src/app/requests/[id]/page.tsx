@@ -251,6 +251,7 @@ export default function RequestDetail() {
             <div className="print-row"><span className="print-label">Thiết bị:</span><span className="print-value">{req.equipmentName}</span></div>
             <div className="print-row"><span className="print-label">Kỹ thuật viên:</span><span className="print-value">{req.technicianName || 'N/A'}</span></div>
             <div className="print-row"><span className="print-label">Hình thức:</span><span className="print-value">{getRepairTypeText(req.repairType)}</span></div>
+            <div className="print-row"><span className="print-label">Số lượng xử lý:</span><span className="print-value">{req.quantity || 1}</span></div>
             <div className="print-row"><span className="print-label">Hoàn thành:</span><span className="print-value">{formatDate(req.completedAt)}</span></div>
             <div className="mt-0.5"><span className="print-label">Nội dung thực hiện:</span><p style={{ fontStyle: 'italic', marginTop: '1px', paddingLeft: '8px', borderLeft: '1px solid black', fontSize: '9.5pt', lineHeight: '1.2' }}>{req.technicianReport || 'N/A'}</p></div>
           </div>
@@ -338,20 +339,13 @@ export default function RequestDetail() {
                    {isEditing ? (
                      <div className="flex gap-2">
                        <Select value={editData.equipmentId} onValueChange={val => setEditData(prev => ({ ...prev, equipmentId: val }))}>
-                         <SelectTrigger className="h-12 text-[10px] font-black bg-white rounded-xl w-60">
+                         <SelectTrigger className="h-12 text-[10px] font-black bg-white rounded-xl w-full">
                            <SelectValue placeholder="Chọn thiết bị..." />
                          </SelectTrigger>
                          <SelectContent className="rounded-2xl">
                            {equipment.map(e => <SelectItem key={e.id} value={e.id} className="rounded-xl font-bold">{e.name}</SelectItem>)}
                          </SelectContent>
                        </Select>
-                       <Input 
-                         type="number"
-                         value={editData.quantity}
-                         onChange={e => setEditData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                         className="h-12 w-20 text-[10px] font-black bg-white rounded-xl"
-                         placeholder="SL"
-                       />
                      </div>
                    ) : (
                      <>
@@ -377,18 +371,35 @@ export default function RequestDetail() {
             <div className="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100">
               <div className="flex justify-between items-center mb-3 ml-1">
                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Mô tả cụ thể từ {req.requesterName}:</Label>
-                <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase">
-                  <Hash className="h-3.5 w-3.5" /> Số lượng: {req.quantity || 1}
-                </div>
               </div>
               {isEditing ? (
-                <Textarea 
-                  value={editData.description}
-                  onChange={e => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                  className="min-h-[120px] bg-white rounded-[2rem] font-bold p-6 border-primary/10 leading-relaxed shadow-sm"
-                />
+                <div className="space-y-4">
+                  <Textarea 
+                    value={editData.description}
+                    onChange={e => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                    className="min-h-[120px] bg-white rounded-[2rem] font-bold p-6 border-primary/10 leading-relaxed shadow-sm"
+                  />
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng thiết bị</Label>
+                    <div className="relative">
+                      <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                      <Input 
+                        type="number"
+                        value={editData.quantity}
+                        onChange={e => setEditData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                        className="h-14 rounded-2xl bg-white border-none font-bold pl-14 shadow-sm"
+                        placeholder="Số lượng..."
+                      />
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <p className="text-sm md:text-base font-bold text-slate-700 leading-relaxed">{req.description}</p>
+                <div className="space-y-4">
+                  <p className="text-sm md:text-base font-bold text-slate-700 leading-relaxed">{req.description}</p>
+                  <div className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    <Hash className="h-4 w-4 text-primary/40" /> Số lượng yêu cầu: {req.quantity || 1}
+                  </div>
+                </div>
               )}
             </div>
 
@@ -416,7 +427,12 @@ export default function RequestDetail() {
                    </div>
                    <Badge className="bg-primary text-[9px] font-black uppercase px-3 py-1">{getRepairTypeText(req.repairType)}</Badge>
                 </div>
-                <p className="text-sm md:text-base font-bold text-slate-700 leading-relaxed bg-white/50 p-6 rounded-2xl border border-blue-50">{req.technicianReport}</p>
+                <div className="space-y-4 bg-white/50 p-6 rounded-2xl border border-blue-50">
+                  <p className="text-sm md:text-base font-bold text-slate-700 leading-relaxed">{req.technicianReport}</p>
+                  <div className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest">
+                    <Hash className="h-4 w-4 text-primary/40" /> Số lượng đã xử lý: {req.quantity || 1}
+                  </div>
+                </div>
                 
                 {req.technicianImages && req.technicianImages.length > 0 && (
                   <div className="space-y-4 pt-4">
@@ -558,8 +574,14 @@ export default function RequestDetail() {
                           </SelectContent>
                         </Select>
                       </div>
+                      
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng xử lý</Label>
+                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Báo cáo chi tiết công việc</Label>
+                        <Textarea placeholder="Nội dung công việc, linh kiện thay thế..." className="min-h-[140px] rounded-[2rem] bg-white border-none shadow-sm font-bold p-6 leading-relaxed" value={report} onChange={e => setReport(e.target.value)} />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng xử lý thực tế</Label>
                         <div className="relative">
                           <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                           <Input 
@@ -570,10 +592,6 @@ export default function RequestDetail() {
                             onChange={e => setTechQuantity(parseInt(e.target.value) || 1)}
                           />
                         </div>
-                      </div>
-                      <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Báo cáo chi tiết công việc</Label>
-                        <Textarea placeholder="Nội dung công việc, linh kiện thay thế..." className="min-h-[140px] rounded-[2rem] bg-white border-none shadow-sm font-bold p-6 leading-relaxed" value={report} onChange={e => setReport(e.target.value)} />
                       </div>
 
                       <div className="space-y-4 pt-4">

@@ -207,6 +207,16 @@ export default function TasksPage() {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Chi tiết công việc</Label>
+              <Textarea 
+                placeholder="Nội dung đã làm, linh kiện đã thay..." 
+                className="min-h-[140px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed" 
+                value={reportText} 
+                onChange={e => setReportText(e.target.value)} 
+              />
+            </div>
 
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng xử lý thực tế</Label>
@@ -220,16 +230,6 @@ export default function TasksPage() {
                   onChange={e => setTechQuantity(parseInt(e.target.value) || 1)}
                 />
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Chi tiết công việc</Label>
-              <Textarea 
-                placeholder="Nội dung đã làm, linh kiện đã thay..." 
-                className="min-h-[140px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed" 
-                value={reportText} 
-                onChange={e => setReportText(e.target.value)} 
-              />
             </div>
 
             <div className="space-y-4">
