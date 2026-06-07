@@ -4,7 +4,7 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wrench, Play, CheckCircle2, ChevronRight, MapPin, Camera, ImagePlus, X, ShieldAlert } from 'lucide-react';
+import { Wrench, Play, CheckCircle2, ChevronRight, MapPin, Camera, ImagePlus, X, ShieldAlert, Hash } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { compressImage } from '@/lib/image-utils';
 import Image from 'next/image';
 
@@ -29,6 +30,7 @@ export default function TasksPage() {
   const [reportText, setReportText] = useState('');
   const [repairType, setRepairType] = useState<RepairType | ''>('');
   const [techImages, setTechImages] = useState<string[]>([]);
+  const [techQuantity, setTechQuantity] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const myTasks = useMemo(() => requests.filter(r => r.technicianId === currentUser?.id), [requests, currentUser?.id]);
@@ -45,6 +47,7 @@ export default function TasksPage() {
     setReportText(req.technicianReport || '');
     setRepairType(req.repairType || '');
     setTechImages(req.technicianImages || []);
+    setTechQuantity(req.quantity || 1);
     setIsReportOpen(true);
   };
 
@@ -81,6 +84,7 @@ export default function TasksPage() {
         technicianReport: reportText,
         repairType: repairType as RepairType,
         technicianImages: techImages,
+        quantity: techQuantity,
         completedAt: new Date().toISOString()
       });
       toast({ title: "Đã báo cáo hoàn thành", description: "Yêu cầu đã được chuyển lên Quản lý CSVC duyệt." });
@@ -131,6 +135,7 @@ export default function TasksPage() {
                 </h3>
                 <div className="flex items-center gap-2 mb-6 text-[11px] font-bold text-slate-500 uppercase">
                   <MapPin className="h-4 w-4 text-rose-400" /> {req.location}
+                  <Badge variant="outline" className="ml-auto text-[9px] font-black border-slate-200">SL: {req.quantity || 1}</Badge>
                 </div>
                 <div className="flex gap-3">
                   <Link href={`/requests/${req.id}`} className="flex-1">
@@ -168,6 +173,7 @@ export default function TasksPage() {
                     <div className="flex items-center gap-3">
                       <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 border-slate-200 text-slate-500">{req.status}</Badge>
                       <span className="text-[10px] font-bold text-slate-400 uppercase">{req.unit}</span>
+                      <span className="text-[10px] font-black text-primary">SL: {req.quantity || 1}</span>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-300" />
@@ -200,6 +206,20 @@ export default function TasksPage() {
                   <SelectItem value="new_replacement" className="rounded-xl font-bold">Thay thế bằng thiết bị mua mới</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng xử lý thực tế</Label>
+              <div className="relative">
+                <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                <Input 
+                  type="number"
+                  min="1"
+                  className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold pl-14 pr-6 shadow-sm"
+                  value={techQuantity}
+                  onChange={e => setTechQuantity(parseInt(e.target.value) || 1)}
+                />
+              </div>
             </div>
             
             <div className="space-y-2">

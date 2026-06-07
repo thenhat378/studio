@@ -33,6 +33,7 @@ export interface RepairRequest {
   id: string;
   location: string; // Vị trí hư hỏng (Tiêu đề ngắn) - Nay là định danh chính
   description: string;
+  quantity?: number;
   equipmentId: string;
   equipmentName: string;
   category: string;

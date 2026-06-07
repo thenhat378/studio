@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera, AlertCircle, MapPin } from 'lucide-react';
+import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, Camera, AlertCircle, MapPin, Hash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +28,7 @@ export default function NewRequest() {
     location: '',
     description: '',
     equipmentId: '',
+    quantity: 1
   });
 
   const [images, setImages] = useState<string[]>([]);
@@ -46,7 +47,6 @@ export default function NewRequest() {
       reader.onloadend = async () => {
         const originalDataUrl = reader.result as string;
         try {
-          // Tự động nén ảnh xuống dưới 500KB bằng cách giảm kích thước và chất lượng
           const compressed = await compressImage(originalDataUrl, 1280, 1280, 0.7);
           setImages(prev => [...prev, compressed]);
         } catch (err) {
@@ -124,6 +124,7 @@ export default function NewRequest() {
     const requestData: any = {
       location: formData.location.trim(),
       description: formData.description.trim(),
+      quantity: Number(formData.quantity) || 1,
       equipmentId: formData.equipmentId,
       equipmentName: equip?.name || 'Thiết bị không xác định',
       category: equip?.category || 'General',
@@ -229,6 +230,22 @@ export default function NewRequest() {
                   onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   required
                 />
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="quantity" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Số lượng thiết bị</Label>
+                <div className="relative">
+                  <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                  <Input 
+                    id="quantity" 
+                    type="number"
+                    min="1"
+                    className="h-16 rounded-2xl bg-slate-50 border-none font-bold pl-14 pr-6"
+                    value={formData.quantity}
+                    onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-3">
