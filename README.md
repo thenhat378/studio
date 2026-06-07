@@ -1,6 +1,18 @@
+
 # 🚀 Requisition Form DUE - Bản Chuẩn Triển Khai v1.0
 
 Dự án Quản lý Phiếu yêu cầu sửa chữa thiết bị được thiết kế riêng cho DUE, tích hợp AI và quy trình 7 bước chuẩn hóa.
+
+---
+
+## 🛠️ CẤU HÌNH QUAN TRỌNG ĐỂ BUILD TRÊN GITHUB
+
+Để GitHub Actions có thể build thành công (không bị lỗi API Key), bạn cần thực hiện:
+1. Vào Repository của bạn trên GitHub.
+2. Chọn **Settings** -> **Secrets and variables** -> **Actions**.
+3. Nhấn **New repository secret**.
+4. Name: `FIREBASE_API_KEY`
+5. Value: Coppy mã API Key từ tệp `src/firebase/config.ts` (ví dụ: `AIzaSyAXP...`) dán vào.
 
 ---
 
@@ -20,7 +32,7 @@ Dự án Quản lý Phiếu yêu cầu sửa chữa thiết bị được thiế
 
 3. **Tạo bản cam kết đầu tiên**:
    ```bash
-   git commit -m "Initial commit: Requisition Form DUE v1.0 - Full Production Ready"
+   git commit -m "Initial commit: Requisition Form DUE v1.0"
    ```
 
 4. **Kết nối với Repository của bạn**:
@@ -56,18 +68,10 @@ Sau khi tải code về, hãy thực hiện các lệnh sau:
 
 ## 📱 CÁCH CÀI ĐẶT LÊN ĐIỆN THOẠI (PWA)
 
-Ứng dụng hỗ trợ công nghệ PWA cao cấp, giúp cài đặt không cần qua App Store:
+Ứng dụng hỗ trợ công nghệ PWA cao cấp với biểu tượng 3 màu D-U-E:
 1. Mở link ứng dụng đã deploy bằng trình duyệt điện thoại.
 2. **Android (Chrome)**: Chọn 3 chấm -> **"Thêm vào màn hình chính"**.
 3. **iPhone (Safari)**: Chọn nút Share -> **"Thêm vào màn hình chính"**.
-4. Biểu tượng DUE sẽ xuất hiện trên màn hình nền, chạy toàn màn hình cực kỳ mượt mà.
-
----
-
-## ⚠️ LƯU Ý TRƯỚC KHI BÀN GIAO
-
-- **Làm sạch dữ liệu**: Đăng nhập quyền **Admin**, vào mục **Quản lý người dùng** và nhấn **"Dọn dẹp hệ thống"** để xóa toàn bộ phiếu thử nghiệm và tài khoản rác.
-- **Firebase**: Đảm bảo cấu hình trong `src/firebase/config.ts` đã chính xác với dự án Firebase của bạn.
 
 ---
 *Phát triển bởi Phòng Cơ sở vật chất - DUE © 2026*
