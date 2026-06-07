@@ -257,17 +257,20 @@ export default function RequestDetail() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 mt-6 text-center" style={{ pageBreakInside: 'avoid' }}>
-          <div className="space-y-12">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>NGƯỜI YÊU CẦU</p>
-            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
+          <div className="flex flex-col items-center">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt', margin: 0 }}>NGƯỜI YÊU CẦU</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic', margin: 0 }}>(Ký ghi rõ họ tên)</p>
+            <div style={{ height: '50px' }}></div>
           </div>
-          <div className="space-y-12">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>LÃNH ĐẠO ĐƠN VỊ</p>
-            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký ghi rõ họ tên)</p>
+          <div className="flex flex-col items-center">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt', margin: 0 }}>LÃNH ĐẠO ĐƠN VỊ</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic', margin: 0 }}>(Ký ghi rõ họ tên)</p>
+            <div style={{ height: '50px' }}></div>
           </div>
-          <div className="space-y-12">
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt' }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
-            <p style={{ fontSize: '8pt', fontStyle: 'italic' }}>(Ký và đóng dấu)</p>
+          <div className="flex flex-col items-center">
+            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9pt', margin: 0 }}>PHÒNG CƠ SỞ VẬT CHẤT</p>
+            <p style={{ fontSize: '8pt', fontStyle: 'italic', margin: 0 }}>(Ký và đóng dấu)</p>
+            <div style={{ height: '50px' }}></div>
           </div>
         </div>
       </div>
