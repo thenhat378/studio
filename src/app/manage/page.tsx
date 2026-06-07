@@ -80,13 +80,15 @@ export default function ManagementPage() {
 
     const methodMap = {
       'Sửa chữa': 0,
-      'Thay mới': 0,
-      'Khác': 0
+      'Thay dự phòng': 0,
+      'Thay mua mới': 0,
+      'Chờ mua sắm': 0
     };
     requests.forEach(r => {
       if (r.repairType === 'repair_only') methodMap['Sửa chữa']++;
-      else if (r.repairType === 'backup_replacement') methodMap['Thay mới']++;
-      else if (r.repairType === 'pending_purchase') methodMap['Khác']++;
+      else if (r.repairType === 'backup_replacement') methodMap['Thay dự phòng']++;
+      else if (r.repairType === 'new_replacement') methodMap['Thay mua mới']++;
+      else if (r.repairType === 'pending_purchase') methodMap['Chờ mua sắm']++;
     });
     const methodData = Object.entries(methodMap).map(([name, value]) => ({ name, value }));
 
@@ -341,7 +343,7 @@ export default function ManagementPage() {
             <Card className="rounded-[3rem] border-none bg-white card-shadow p-8">
               <CardHeader className="px-0 pt-0 pb-6">
                 <CardTitle className="text-sm font-black uppercase text-slate-800 flex items-center gap-3">
-                  <TrendingUp className="h-5 w-5 text-secondary" /> Hình thức xử lý (Sửa vs Thay mới)
+                  <TrendingUp className="h-5 w-5 text-secondary" /> Phân tích Hình thức xử lý
                 </CardTitle>
               </CardHeader>
               <div className="h-[320px] w-full">
@@ -371,8 +373,8 @@ export default function ManagementPage() {
                    <p className="text-xl font-black">{((historyRequests.length / (requests.length || 1)) * 100).toFixed(0)}%</p>
                 </div>
                 <div className="bg-white/10 p-4 rounded-2xl">
-                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Thay mới</p>
-                   <p className="text-xl font-black">{stats.methodData.find(m => m.name === 'Thay mới')?.value || 0} ca</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Mua mới</p>
+                   <p className="text-xl font-black">{stats.methodData.find(m => m.name === 'Thay mua mới')?.value || 0} ca</p>
                 </div>
               </div>
             </Card>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -167,6 +168,7 @@ export default function RequestDetail() {
       case 'repair_only': return 'Sửa chữa, khắc phục tại chỗ';
       case 'backup_replacement': return 'Thay mới bằng thiết bị dự phòng';
       case 'pending_purchase': return 'Chờ mua sắm thiết bị mới';
+      case 'new_replacement': return 'Thay thế bằng thiết bị mua mới';
       default: return 'Chưa xác định';
     }
   };
@@ -524,6 +526,7 @@ export default function RequestDetail() {
                             <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa, khắc phục tại chỗ</SelectItem>
                             <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay mới bằng thiết bị dự phòng</SelectItem>
                             <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ thiết bị mua mới</SelectItem>
+                            <SelectItem value="new_replacement" className="rounded-xl font-bold">Thay thế bằng thiết bị mua mới</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

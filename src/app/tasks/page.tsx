@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -192,6 +193,7 @@ export default function TasksPage() {
                   <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa tại chỗ</SelectItem>
                   <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay thiết bị dự phòng</SelectItem>
                   <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ mua sắm mới</SelectItem>
+                  <SelectItem value="new_replacement" className="rounded-xl font-bold">Thay thế bằng thiết bị mua mới</SelectItem>
                 </SelectContent>
               </Select>
             </div>
