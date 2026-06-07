@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/lib/store';
 import { FirebaseProvider } from '@/firebase/provider';
 
+// Biểu tượng SVG DUE: D (Cam #F58220), U (Xanh lá #009E49), E (Xanh dương #0054A4) trên nền trắng
 const appIconSvg = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRkZGRkZGIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj48dHNwYW4gZmlsbD0iI0Y1ODIyMCI+RDwvdHNwYW4+PHRzcGFuIGZpbGw9IiMwMDlFNDkiPlU8L3RzcGFuPjx0c3BhbiBmaWxsPSIjMDA1NEE0Ij5FPC90c3Bhbj48L3RleHQ+PC9zdmc+`;
 
 export const metadata: Metadata = {
