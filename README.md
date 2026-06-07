@@ -1,57 +1,49 @@
-# 🚀 Requisition Form DUE - Bản Chuẩn Triển Khai v1.1
+# 🚀 Requisition Form DUE - Hệ Thống Quản Lý Sửa Chữa v1.2
 
-Dự án Quản lý Phiếu yêu cầu sửa chữa thiết bị được thiết kế riêng cho DUE, tích hợp AI và quy trình 7 bước chuẩn hóa.
-
----
-
-## 🛠️ CẤU HÌNH QUAN TRỌNG ĐỂ BUILD TRÊN GITHUB
-
-Để GitHub Actions có thể build thành công (không bị lỗi API Key hay Node 22), bạn cần:
-1. Vào Repository của bạn trên GitHub.
-2. Chọn **Settings** -> **Secrets and variables** -> **Actions**.
-3. Nhấn **New repository secret**.
-4. Name: `FIREBASE_API_KEY`
-5. Value: Coppy mã API Key từ tệp `src/firebase/config.ts` (ví dụ: `AIzaSyAXP...`) dán vào.
+Dự án tích hợp AI và quy trình 7 bước chuẩn hóa dành cho DUE.
 
 ---
 
-## 📂 HƯỚNG DẪN ĐẨY CODE VÀ FIX LỖI GIT (DIVERGENT BRANCHES)
+## 🌍 LỰA CHỌN TRIỂN KHAI (DEPLOYMENT)
 
-### 🛑 Sửa lỗi "Need to specify how to reconcile divergent branches"
-Nếu bạn gặp lỗi này khi chạy `git pull`, hãy chạy lệnh sau để thiết lập chế độ hợp nhất (merge) làm mặc định:
+Ngoài Vercel, bạn nên sử dụng **Firebase App Hosting** để có sự đồng bộ tốt nhất với dữ liệu:
+
+1.  **Firebase App Hosting (Khuyên dùng)**: 
+    - Truy cập [Firebase Console](https://console.firebase.google.com/).
+    - Chọn **App Hosting** ở menu bên trái.
+    - Kết nối với Repository GitHub của bạn.
+    - Firebase sẽ tự động nhận diện cấu hình trong `apphosting.yaml` và triển khai mỗi khi bạn push code.
+
+2.  **Cách thiết lập GitHub Secrets (Để build không bị lỗi)**:
+    - Vào Repo của bạn trên GitHub -> **Settings** -> **Secrets and variables** -> **Actions**.
+    - Tạo `New repository secret` tên là `FIREBASE_API_KEY`.
+    - Dán giá trị API Key từ tệp `src/firebase/config.ts` vào.
+
+---
+
+## 🛠️ HƯỚNG DẪN FIX LỖI GIT THƯỜNG GẶP
+
+### 1. Sửa lỗi "Need to specify how to reconcile divergent branches"
+Nếu bạn gặp lỗi này khi `git pull`, hãy chạy lệnh sau để thiết lập chế độ hợp nhất (merge) làm mặc định:
 ```bash
 git config pull.rebase false
 git pull origin main
 ```
 
-### Các bước đẩy code lên GitHub:
-1. **Thêm các tệp vào danh sách theo dõi**:
-   ```bash
-   git add .
-   ```
-2. **Tạo bản cam kết**:
-   ```bash
-   git commit -m "Cập nhật App Icon 3 màu và cấu hình Deployment v1.1"
-   ```
-3. **Đẩy code lên**:
-   ```bash
-   git push origin main
-   ```
+### 2. Các bước đẩy code an toàn:
+```bash
+git add .
+git commit -m "Cập nhật cấu hình App Hosting và Fix lỗi Số lượng"
+git push origin main
+```
 
 ---
 
-## 💻 CÁCH CHẠY LOCAL (TRÊN MÁY TÍNH CÁ NHÂN)
-1. **Cài đặt thư viện**: `npm install`
-2. **Chạy chế độ phát triển**: `npm run dev`
-   *Ứng dụng chạy tại: http://localhost:3000*
-
----
-
-## 📱 CÀI ĐẶT LÊN ĐIỆN THOẠI (ICON 3 MÀU)
-Ứng dụng hỗ trợ PWA với biểu tượng D-U-E 3 màu (Cam-Xanh lá-Xanh dương):
-1. Mở link ứng dụng trên trình duyệt điện thoại.
-2. Chọn **"Thêm vào màn hình chính"** (Add to Home Screen).
-3. Biểu tượng 3 màu chuyên nghiệp sẽ xuất hiện trên màn hình của bạn.
+## 📱 TÍNH NĂNG MỚI CẬP NHẬT
+- **App Icon 3 màu**: Hiển thị chuẩn D-U-E (Cam-Xanh lá-Xanh dương) trên nền trắng khi cài lên điện thoại.
+- **Tự động nén ảnh**: Hình ảnh chụp từ máy ảnh được nén giảm dung lượng trước khi gửi để đảm bảo tốc độ mượt mà.
+- **Quản lý số lượng**: Thêm trường "Số lượng" ngay sau phần mô tả chi tiết trong mọi biểu mẫu và báo cáo.
+- **Push Notifications**: Thông báo đẩy chuyên nghiệp như ứng dụng di động.
 
 ---
 *Phát triển bởi Phòng Cơ sở vật chất - DUE © 2026*

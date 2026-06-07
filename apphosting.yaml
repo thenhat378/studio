@@ -1,7 +1,7 @@
-# Cấu hình Firebase App Hosting cho Next.js
+# Cấu hình Firebase App Hosting tối ưu cho Next.js 15
 runConfig:
   minInstances: 0
-  maxInstances: 2
+  maxInstances: 5
   concurrency: 80
   cpu: 1
   memoryMiB: 512
@@ -11,3 +11,9 @@ env:
     value: production
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     secret: FIREBASE_API_KEY
+  - variable: FIREBASE_API_KEY
+    secret: FIREBASE_API_KEY
+
+# Tự động hóa quá trình build và deploy khi push code lên GitHub
+scripts:
+  build: npm run build
