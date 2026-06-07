@@ -13,6 +13,7 @@ import { Sparkles, Loader2, ChevronLeft, CheckCircle2, ImagePlus, X, ImageIcon, 
 import { useRouter } from 'next/navigation';
 import { aiAssistedRequestCreation } from '@/ai/flows/ai-assisted-request-creation-flow';
 import { useToast } from '@/hooks/use-toast';
+import { compressImage } from '@/lib/image-utils';
 import Image from 'next/image';
 
 export default function NewRequest() {
@@ -36,27 +37,25 @@ export default function NewRequest() {
     recommendedEquipment: string[];
   } | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    Array.from(files).forEach(file => {
-      // Tăng giới hạn lên 500MB (500 * 1024 * 1024 bytes)
-      if (file.size > 500 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "Ảnh quá lớn",
-          description: "Vui lòng chọn ảnh dưới 500MB."
-        });
-        return;
-      }
-
+    for (const file of Array.from(files)) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages(prev => [...prev, reader.result as string]);
+      reader.onloadend = async () => {
+        const originalDataUrl = reader.result as string;
+        try {
+          // Tự động nén ảnh xuống dưới 500KB bằng cách giảm kích thước và chất lượng
+          const compressed = await compressImage(originalDataUrl, 1280, 1280, 0.7);
+          setImages(prev => [...prev, compressed]);
+        } catch (err) {
+          console.error("Compression error:", err);
+          setImages(prev => [...prev, originalDataUrl]);
+        }
       };
       reader.readAsDataURL(file);
-    });
+    }
     e.target.value = '';
   };
 
@@ -251,7 +250,7 @@ export default function NewRequest() {
 
               <div className="space-y-4 pt-4">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
-                  <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng
+                  <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng (Đã tự động nén)
                 </Label>
                 <div className="grid grid-cols-2 gap-4">
                   {images.map((img, idx) => (

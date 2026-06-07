@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { RepairType } from '@/lib/types';
+import { compressImage } from '@/lib/image-utils';
 import Image from 'next/image';
 import { format, formatDistanceStrict } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -93,26 +94,24 @@ export default function RequestDetail() {
     toast({ title: "Đã cập nhật", description: "Hệ thống đã ghi nhận thay đổi của bạn." });
   };
 
-  const handleTechImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTechImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    Array.from(files).forEach(file => {
-      if (file.size > 500 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "Ảnh quá lớn",
-          description: "Vui lòng chọn ảnh dưới 500MB."
-        });
-        return;
-      }
-
+    for (const file of Array.from(files)) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setTechImages(prev => [...prev, reader.result as string]);
+      reader.onloadend = async () => {
+        const originalDataUrl = reader.result as string;
+        try {
+          const compressed = await compressImage(originalDataUrl, 1280, 1280, 0.7);
+          setTechImages(prev => [...prev, compressed]);
+        } catch (err) {
+          console.error("Compression error:", err);
+          setTechImages(prev => [...prev, originalDataUrl]);
+        }
       };
       reader.readAsDataURL(file);
-    });
+    }
     e.target.value = '';
   };
 
@@ -540,7 +539,7 @@ export default function RequestDetail() {
 
                       <div className="space-y-4 pt-4">
                         <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
-                          <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng sửa chữa
+                          <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng sửa chữa (Tự động nén)
                         </Label>
                         <div className="grid grid-cols-2 gap-4">
                           {techImages.map((img, idx) => (
