@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0054A4', // Màu xanh DUE làm chủ đạo
+  themeColor: '#0054A4',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.Node;
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="vi">

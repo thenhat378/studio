@@ -1,5 +1,4 @@
-
-name: Next.js CI
+name: Next.js CI/CD
 
 on:
   push:
@@ -14,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Node.js
+    - name: Set up Node.js 22
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -27,3 +26,4 @@ jobs:
       run: npm run build
       env:
         NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+        NODE_ENV: production
