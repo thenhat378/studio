@@ -115,7 +115,6 @@ export default function Overview() {
     setIsSubmitting(true);
     try {
       await login(loginPhone, loginPass);
-      // Removed toast notification for faster UX as requested
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -283,7 +282,7 @@ export default function Overview() {
                         <SelectItem value="unit_leader" className="rounded-xl h-12 font-bold">Quản lý đơn vị</SelectItem>
                         <SelectItem value="csvc_manager" className="rounded-xl h-12 font-bold">Quản lý CSVC</SelectItem>
                         <SelectItem value="technician" className="rounded-xl h-12 font-bold">Nhân viên kỹ thuật</SelectItem>
-                        <SelectItem value="admin" className="rounded-xl h-12 font-bold">Quản trị viên (Admin)</SelectItem>
+                        {/* Ẩn tùy chọn Quản trị viên để người dùng không tự ý đăng ký */}
                       </SelectContent>
                     </Select>
                   </div>
