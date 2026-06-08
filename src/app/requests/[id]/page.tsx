@@ -59,14 +59,14 @@ export default function RequestDetail() {
   const [rating, setRating] = useState<number>(5);
   const [feedback, setFeedback] = useState('');
   const [techImages, setTechImages] = useState<string[]>([]);
-  const [techQuantity, setTechQuantity] = useState<number>(1);
+  const [techQuantity, setTechQuantity] = useState<string>('');
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     location: '',
     description: '',
     equipmentId: '',
-    quantity: 1
+    quantity: '' as any
   });
 
   const req = requests.find(r => r.id === id);
@@ -78,9 +78,9 @@ export default function RequestDetail() {
         location: req.location || '',
         description: req.description,
         equipmentId: req.equipmentId,
-        quantity: req.quantity || 1
+        quantity: req.quantity?.toString() || ''
       });
-      setTechQuantity(req.quantity || 1);
+      setTechQuantity(req.quantity?.toString() || '');
       if (req.requesterFeedback) setFeedback(req.requesterFeedback);
     }
   }, [req]);
@@ -133,8 +133,8 @@ export default function RequestDetail() {
   };
 
   const handleResend = () => {
-    if (!editData.location || !editData.description || !editData.equipmentId) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ thông tin trước khi gửi lại." });
+    if (!editData.location || !editData.description || !editData.equipmentId || !editData.quantity) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ thông tin, bao gồm cả số lượng, trước khi gửi lại." });
       return;
     }
 
@@ -387,9 +387,9 @@ export default function RequestDetail() {
                         type="number"
                         min="1"
                         value={editData.quantity}
-                        onChange={e => setEditData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                        onChange={e => setEditData(prev => ({ ...prev, quantity: e.target.value }))}
                         className="h-14 rounded-2xl bg-white border-none font-bold pl-14 shadow-sm"
-                        placeholder="Số lượng..."
+                        placeholder="Nhập số lượng..."
                       />
                     </div>
                   </div>
@@ -590,7 +590,8 @@ export default function RequestDetail() {
                             min="1"
                             className="h-16 rounded-[1.8rem] bg-white border-none font-bold pl-14 pr-6 shadow-sm"
                             value={techQuantity}
-                            onChange={e => setTechQuantity(parseInt(e.target.value) || 1)}
+                            onChange={e => setTechQuantity(e.target.value)}
+                            placeholder="Nhập số lượng..."
                           />
                         </div>
                       </div>
@@ -638,7 +639,7 @@ export default function RequestDetail() {
                         </div>
                       </div>
 
-                      <Button className="w-full bg-secondary h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType} onClick={() => handleAction('completed', { technicianReport: report, repairType: repairType as RepairType, technicianImages: techImages, quantity: techQuantity, completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
+                      <Button className="w-full bg-secondary h-16 font-black rounded-[1.8rem] text-white shadow-xl transition-all active:scale-95" disabled={!report.trim() || !repairType || !techQuantity} onClick={() => handleAction('completed', { technicianReport: report, repairType: repairType as RepairType, technicianImages: techImages, quantity: Number(techQuantity), completedAt: new Date().toISOString() })}>XÁC NHẬN HOÀN THÀNH</Button>
                     </div>
                   )}
                 </>

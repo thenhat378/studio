@@ -28,7 +28,7 @@ export default function NewRequest() {
     location: '',
     description: '',
     equipmentId: '',
-    quantity: 1
+    quantity: '' as any // Để trống để nhân viên tự nhập
   });
 
   const [images, setImages] = useState<string[]>([]);
@@ -109,11 +109,11 @@ export default function NewRequest() {
       return;
     }
 
-    if (!formData.location || !formData.description || !formData.equipmentId) {
+    if (!formData.location || !formData.description || !formData.equipmentId || !formData.quantity) {
       toast({
         variant: "destructive",
         title: "Thiếu thông tin",
-        description: "Vui lòng điền đầy đủ các trường bắt buộc."
+        description: "Vui lòng điền đầy đủ các trường bắt buộc, bao gồm cả số lượng."
       });
       return;
     }
@@ -124,7 +124,7 @@ export default function NewRequest() {
     const requestData: any = {
       location: formData.location.trim(),
       description: formData.description.trim(),
-      quantity: Number(formData.quantity) || 1,
+      quantity: Number(formData.quantity),
       equipmentId: formData.equipmentId,
       equipmentName: equip?.name || 'Thiết bị không xác định',
       category: equip?.category || 'General',
@@ -242,7 +242,8 @@ export default function NewRequest() {
                     min="1"
                     className="h-16 rounded-2xl bg-slate-50 border-none font-bold pl-14 pr-6"
                     value={formData.quantity}
-                    onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                    onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                    placeholder="Nhập số lượng..."
                     required
                   />
                 </div>

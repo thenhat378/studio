@@ -30,7 +30,7 @@ export default function TasksPage() {
   const [reportText, setReportText] = useState('');
   const [repairType, setRepairType] = useState<RepairType | ''>('');
   const [techImages, setTechImages] = useState<string[]>([]);
-  const [techQuantity, setTechQuantity] = useState<number>(1);
+  const [techQuantity, setTechQuantity] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const myTasks = useMemo(() => requests.filter(r => r.technicianId === currentUser?.id), [requests, currentUser?.id]);
@@ -47,7 +47,7 @@ export default function TasksPage() {
     setReportText(req.technicianReport || '');
     setRepairType(req.repairType || '');
     setTechImages(req.technicianImages || []);
-    setTechQuantity(req.quantity || 1);
+    setTechQuantity(req.quantity?.toString() || '');
     setIsReportOpen(true);
   };
 
@@ -77,14 +77,17 @@ export default function TasksPage() {
   };
 
   const submitReport = async () => {
-    if (!activeRequest || !reportText.trim() || !repairType) return;
+    if (!activeRequest || !reportText.trim() || !repairType || !techQuantity) {
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ các thông tin, bao gồm cả số lượng." });
+      return;
+    }
     setIsSubmitting(true);
     try {
       await updateRequestStatus(activeRequest.id, 'completed', {
         technicianReport: reportText,
         repairType: repairType as RepairType,
         technicianImages: techImages,
-        quantity: techQuantity,
+        quantity: Number(techQuantity),
         completedAt: new Date().toISOString()
       });
       toast({ title: "Đã báo cáo hoàn thành", description: "Yêu cầu đã được chuyển lên Quản lý CSVC duyệt." });
@@ -227,7 +230,8 @@ export default function TasksPage() {
                   min="1"
                   className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold pl-14 pr-6 shadow-sm"
                   value={techQuantity}
-                  onChange={e => setTechQuantity(parseInt(e.target.value) || 1)}
+                  onChange={e => setTechQuantity(e.target.value)}
+                  placeholder="Nhập số lượng..."
                 />
               </div>
             </div>
@@ -259,7 +263,7 @@ export default function TasksPage() {
           <DialogFooter className="pt-4 flex flex-col gap-3 sm:flex-col">
             <Button 
               className="w-full bg-secondary h-18 rounded-[2rem] font-black text-white text-base uppercase tracking-widest shadow-2xl shadow-secondary/10 transition-all active:scale-95" 
-              disabled={isSubmitting || !reportText.trim() || !repairType} 
+              disabled={isSubmitting || !reportText.trim() || !repairType || !techQuantity} 
               onClick={submitReport}
             >
               {isSubmitting ? "Đang gửi..." : "Xác nhận hoàn thành"}
