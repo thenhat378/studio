@@ -1,53 +1,41 @@
-# 🚀 Requisition Form DUE - Hệ Thống Quản Lý Sửa Chữa v1.2
+# 🚀 REQUISITION FORM DUE - HỆ THỐNG QUẢN LÝ SỬA CHỮA v1.2
 
-Dự án tích hợp AI và quy trình 7 bước chuẩn hóa dành cho DUE.
+Dự án tích hợp AI và quy trình 7 bước chuẩn hóa dành cho DUE. Hệ thống được tối ưu hóa cho di động, hỗ trợ PWA và thông báo đẩy.
 
 ---
 
-## 🛠️ HƯỚNG DẪN FIX LỖI GIT (KHÔNG CẬP NHẬT ĐƯỢC)
+## 📖 TÀI LIỆU QUAN TRỌNG
+*   **[Báo cáo Tổng kết Hệ thống (Board Report)](docs/system-report.md)**: Dành cho trình hội đồng và thuyết minh dự án.
+*   **[Hướng dẫn Sử dụng chi tiết](docs/user-guide.md)**: Dành cho các vai trò trong hệ thống.
 
-Nếu bạn gặp lỗi **"Need to specify how to reconcile divergent branches"** khi `git pull`, hãy chạy lệnh sau để thiết lập chế độ hợp nhất (merge) làm mặc định:
+---
 
-1. **Chạy lệnh cấu hình:**
+## 🛠️ HƯỚNG DẪN FIX LỖI GIT & TRIỂN KHAI
+
+### 1. Khắc phục lỗi Git (Không cập nhật được code)
+Nếu gặp lỗi **"Need to specify how to reconcile divergent branches"**, hãy chạy các lệnh sau:
 ```bash
 git config pull.rebase false
-```
-
-2. **Tiến hành kéo code mới nhất:**
-```bash
 git pull origin main
-```
-
-3. **Đẩy code của bạn lên (nếu có):**
-```bash
 git add .
 git commit -m "Cập nhật tính năng"
 git push origin main
 ```
 
----
-
-## 🌍 LỰA CHỌN TRIỂN KHAI (DEPLOYMENT)
-
-Hệ thống được tối ưu hóa cho **Firebase App Hosting** hoặc **Vercel**:
-
-1. **Cách thiết lập GitHub Secrets (Bắt buộc để build thành công):**
-    - Vào Repo của bạn trên GitHub -> **Settings** -> **Secrets and variables** -> **Actions**.
-    - Tạo `New repository secret` tên là `FIREBASE_API_KEY`.
-    - Dán giá trị API Key từ tệp `src/firebase/config.ts` vào.
-
-2. **Chuyển sang tài khoản khác:**
-    - Tạo một dự án Firebase mới trong tài khoản mới.
-    - Copy thông tin Config (apiKey, projectId...) vào tệp `src/firebase/config.ts`.
-    - Đẩy mã nguồn lên GitHub của tài khoản mới và kết nối với dịch vụ Hosting.
+### 2. Triển khai sang tài khoản khác (Firebase/GitHub)
+*   **Bước 1:** Tạo dự án mới trên Firebase Console.
+*   **Bước 2:** Cập nhật thông tin trong tệp `src/firebase/config.ts` với thông số mới của bạn.
+*   **Bước 3:** Trên GitHub của tài khoản mới, vào **Settings** -> **Secrets** -> **Actions** và tạo một Secret tên là `FIREBASE_API_KEY` với giá trị là API Key của bạn.
+*   **Bước 4:** Kết nối Repository với **Firebase App Hosting** hoặc **Vercel** để tự động triển khai.
 
 ---
 
-## 📱 TÍNH NĂNG MỚI CẬP NHẬT
-- **Quản lý số lượng tự nhập**: Nhân viên và Kỹ thuật viên có thể tự do nhập số lượng chính xác ngay sau phần mô tả chi tiết.
-- **App Icon 3 màu**: Hiển thị chuẩn D-U-E (Cam-Xanh lá-Xanh dương) trên nền trắng.
-- **Tự động nén ảnh**: Hình ảnh chụp từ máy ảnh được nén giảm dung lượng (70%) trước khi gửi.
-- **Push Notifications**: Thông báo đẩy chuyên nghiệp như ứng dụng di động.
+## 📱 TÍNH NĂNG NỔI BẬT
+- **D-U-E Branding**: Biểu tượng 3 màu (Cam-Xanh lá-Xanh dương) chuẩn nhận diện thương hiệu.
+- **Smart Quantity**: Cho phép tự nhập số lượng linh kiện/thiết bị linh hoạt ngay sau phần mô tả.
+- **Auto Image Compression**: Tự động nén ảnh (70%) giúp tải nhanh và tiết kiệm dung lượng.
+- **AI Analytics**: Sử dụng Gemini 2.5 Flash để gợi ý nguyên nhân hư hỏng.
+- **Admin Tools**: Công cụ "Dọn dẹp hệ thống" chuyên nghiệp để bàn giao dự án sạch.
 
 ---
 *Phát triển bởi Phòng Cơ sở vật chất - DUE © 2026*
