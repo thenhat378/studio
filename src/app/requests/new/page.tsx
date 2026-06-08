@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -28,7 +27,7 @@ export default function NewRequest() {
     location: '',
     description: '',
     equipmentId: '',
-    quantity: '' as any // Để trống để nhân viên tự nhập
+    quantity: '' as any // Ô nhập liệu trống cho phép nhân viên tự nhập
   });
 
   const [images, setImages] = useState<string[]>([]);
@@ -160,21 +159,6 @@ export default function NewRequest() {
     }
   };
 
-  if (!currentUser?.unit) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-white rounded-[3rem] card-shadow border-none animate-slide-up mx-4">
-        <div className="h-20 w-20 rounded-[2rem] bg-rose-50 flex items-center justify-center mb-6">
-          <AlertCircle className="h-10 w-10 text-rose-500" />
-        </div>
-        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Chưa thiết lập Đơn vị</h2>
-        <p className="text-sm text-slate-500 max-w-md font-medium">
-          Tài khoản của bạn cần có thông tin Đơn vị công tác để gửi phiếu đến đúng người quản lý.
-        </p>
-        <Button variant="link" onClick={() => router.back()} className="mt-4 font-black uppercase text-[10px] tracking-widest">Quay lại</Button>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-safe animate-slide-up">
       <div className="flex items-center gap-3 mb-6 px-4">
@@ -189,7 +173,6 @@ export default function NewRequest() {
           <Card className="border-none shadow-sm rounded-[3rem] bg-white card-shadow overflow-hidden">
             <CardHeader className="bg-slate-50/50 p-8">
               <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tighter">Thông tin sự cố</CardTitle>
-              <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Mô tả tình trạng hỏng hóc</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8 p-8">
               <div className="space-y-3">
@@ -224,7 +207,7 @@ export default function NewRequest() {
                 </div>
                 <Textarea 
                   id="description" 
-                  placeholder="Mô tả cụ thể tình trạng lỗi để AI hỗ trợ..." 
+                  placeholder="Mô tả cụ thể tình trạng lỗi..." 
                   className="min-h-[160px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed"
                   value={formData.description}
                   onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -232,6 +215,7 @@ export default function NewRequest() {
                 />
               </div>
 
+              {/* Ô Số lượng tự nhập ngay sau phần mô tả */}
               <div className="space-y-3">
                 <Label htmlFor="quantity" className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Số lượng thiết bị</Label>
                 <div className="relative">
@@ -268,80 +252,26 @@ export default function NewRequest() {
 
               <div className="space-y-4 pt-4">
                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
-                  <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng (Đã tự động nén)
+                  <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng (Tự động nén)
                 </Label>
                 <div className="grid grid-cols-2 gap-4">
-                  {images.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 group shadow-sm">
-                      <Image src={img} alt="Preview" fill className="object-cover" />
-                      <button 
-                        type="button"
-                        onClick={() => removeImage(idx)}
-                        className="absolute top-2 right-2 bg-rose-500 text-white p-2 rounded-full shadow-lg"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
                   <label className="aspect-square rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all bg-primary/5 active:scale-95 shadow-sm">
                     <Camera className="h-8 w-8 text-primary" />
                     <span className="text-[10px] font-black text-primary uppercase text-center px-4 leading-tight">Mở máy ảnh</span>
-                    <input 
-                      type="file" 
-                      multiple 
-                      accept="image/*" 
-                      capture="environment" 
-                      className="hidden" 
-                      onChange={handleImageChange} 
-                    />
+                    <input type="file" multiple accept="image/*" capture="environment" className="hidden" onChange={handleImageChange} />
                   </label>
                   <label className="aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
                     <ImagePlus className="h-8 w-8 text-slate-300" />
                     <span className="text-[10px] font-black text-slate-400 uppercase">Thư viện</span>
-                    <input 
-                      type="file" 
-                      multiple 
-                      accept="image/*" 
-                      className="hidden" 
-                      onChange={handleImageChange} 
-                    />
+                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
                   </label>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {aiSuggestions && (
-            <Card className="border-none bg-accent/10 rounded-[3rem] overflow-hidden card-shadow">
-              <CardHeader className="pb-4 p-8">
-                <CardTitle className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-[0.2em]">
-                  <Sparkles className="h-4 w-4 text-accent" /> Phân tích bởi AI
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 p-8 pt-0">
-                <div className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] shadow-sm">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Gợi ý phân loại & nguyên nhân:</p>
-                  <ul className="space-y-2">
-                    {aiSuggestions.causes.map((cause, i) => (
-                      <li key={i} className="text-xs font-bold flex items-start gap-3 text-slate-700 leading-snug">
-                        <CheckCircle2 className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-                        {cause}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="flex flex-col gap-4 pt-4">
-            <Button type="submit" className="w-full bg-primary h-18 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi phiếu phê duyệt"}
-            </Button>
-            <Button type="button" variant="ghost" className="w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400" onClick={() => router.back()}>
-              Hủy bỏ yêu cầu
-            </Button>
-          </div>
+          <Button type="submit" className="w-full bg-primary h-18 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="animate-spin" /> : "Gửi phiếu phê duyệt"}
+          </Button>
         </div>
       </form>
     </div>

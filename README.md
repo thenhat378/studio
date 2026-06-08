@@ -1,4 +1,3 @@
-
 # 🚀 Requisition Form DUE - Hệ Thống Quản Lý Sửa Chữa v1.2
 
 Dự án tích hợp AI và quy trình 7 bước chuẩn hóa dành cho DUE.
@@ -30,12 +29,17 @@ git push origin main
 
 ## 🌍 LỰA CHỌN TRIỂN KHAI (DEPLOYMENT)
 
-Hệ thống được tối ưu hóa cho **Firebase App Hosting**:
+Hệ thống được tối ưu hóa cho **Firebase App Hosting** hoặc **Vercel**:
 
 1. **Cách thiết lập GitHub Secrets (Bắt buộc để build thành công):**
     - Vào Repo của bạn trên GitHub -> **Settings** -> **Secrets and variables** -> **Actions**.
     - Tạo `New repository secret` tên là `FIREBASE_API_KEY`.
     - Dán giá trị API Key từ tệp `src/firebase/config.ts` vào.
+
+2. **Chuyển sang tài khoản khác:**
+    - Tạo một dự án Firebase mới trong tài khoản mới.
+    - Copy thông tin Config (apiKey, projectId...) vào tệp `src/firebase/config.ts`.
+    - Đẩy mã nguồn lên GitHub của tài khoản mới và kết nối với dịch vụ Hosting.
 
 ---
 

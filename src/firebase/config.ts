@@ -1,8 +1,9 @@
 'use client';
 
 /**
- * Cấu hình Firebase chính thức.
- * Đảm bảo các thông số này khớp chính xác với Firebase Console của bạn.
+ * CẤU HÌNH FIREBASE QUAN TRỌNG
+ * Khi chuyển sang tài khoản mới, bạn hãy thay thế các thông số dưới đây 
+ * bằng thông tin lấy từ Firebase Console của tài khoản đó.
  */
 
 export const firebaseConfig = {
