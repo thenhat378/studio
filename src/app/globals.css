@@ -93,10 +93,22 @@ input, select, textarea {
 /* Tối ưu khoảng cách cho các thiết bị di động có thanh điều hướng dưới */
 .pb-safe {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 7.5rem);
+  transition: padding 0.3s ease;
 }
 
 .pt-safe {
   padding-top: calc(env(safe-area-inset-top, 0px) + 5.5rem);
+  transition: padding 0.3s ease;
+}
+
+/* Tối ưu hóa cho chế độ xoay ngang (Landscape) trên di động */
+@media (max-height: 500px) and (orientation: landscape) {
+  .pt-safe {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+  }
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+  }
 }
 
 .glass-morphism {
