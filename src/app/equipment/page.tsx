@@ -107,50 +107,50 @@ export default function EquipmentCatalog() {
 
   return (
     <div className="space-y-8 pb-safe animate-slide-up">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 md:px-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 mt-4">
         <div>
           <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3 uppercase tracking-tighter">
-            <Package className="h-8 w-8 text-primary" />
+            <Package className="h-9 w-9 text-primary" />
             Danh mục thiết bị
           </h1>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5 opacity-80">THIẾT LẬP DỮ LIỆU GỐC HỆ THỐNG</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5 opacity-80">QUẢN TRỊ DỮ LIỆU GỐC</p>
         </div>
-        <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-2xl h-16 md:h-14 font-black text-xs uppercase tracking-widest gap-2 shadow-2xl shadow-primary/10 active:scale-95 transition-all">
+        <Button onClick={handleOpenAdd} className="bg-primary hover:bg-primary/90 rounded-[1.8rem] h-18 md:h-16 px-8 font-black text-xs uppercase tracking-widest gap-2 shadow-2xl shadow-primary/10 active-scale transition-all">
           <Plus className="h-5 w-5" />
           Thêm thiết bị mới
         </Button>
       </div>
 
-      <div className="relative px-4 md:px-0">
-        <Search className="absolute left-9 md:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+      <div className="relative px-4">
+        <Search className="absolute left-10 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
         <Input 
           placeholder="Tìm theo tên thiết bị hoặc danh mục..." 
-          className="pl-16 md:pl-14 h-16 bg-white border-none shadow-sm rounded-[1.8rem] font-bold text-sm text-slate-700 placeholder:text-slate-300"
+          className="pl-16 h-18 bg-white border-none shadow-sm rounded-[2rem] font-bold text-base text-slate-700 placeholder:text-slate-300 shadow-inner"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 md:px-0">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4">
         {filteredEquipment.map((item) => (
-          <Card key={item.id} className="border-none shadow-sm rounded-[3rem] bg-white card-shadow group hover:bg-slate-50 transition-all overflow-hidden border-t-8 border-t-primary/5 active:scale-95">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 p-8">
-              <div className="p-4 bg-primary/5 rounded-[1.5rem]">
-                <HardDrive className="h-7 w-7 text-primary" />
+          <Card key={item.id} className="border-none shadow-sm rounded-[3rem] bg-white card-shadow group hover:bg-slate-50 transition-all overflow-hidden border-t-8 border-t-primary/5 active-scale">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-10">
+              <div className="p-5 bg-primary/5 rounded-[1.8rem]">
+                <HardDrive className="h-8 w-8 text-primary" />
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-blue-50 text-blue-600" onClick={() => handleOpenEdit(item)}>
-                  <Edit className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl hover:bg-blue-50 text-blue-600" onClick={() => handleOpenEdit(item)}>
+                  <Edit className="h-6 w-6" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-rose-50 text-rose-600" onClick={() => handleDelete(item.id)}>
-                  <Trash2 className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl hover:bg-rose-50 text-rose-600" onClick={() => handleDelete(item.id)}>
+                  <Trash2 className="h-6 w-6" />
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-8 pt-0">
-              <CardTitle className="text-xl font-black text-slate-800 mb-4 tracking-tight leading-tight">{item.name}</CardTitle>
+            <CardContent className="p-10 pt-0">
+              <CardTitle className="text-xl font-black text-slate-800 mb-6 tracking-tight leading-tight uppercase">{item.name}</CardTitle>
               <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-black text-[9px] uppercase px-4 py-1.5 rounded-full">
+                <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-black text-[9px] uppercase px-5 py-2 rounded-full">
                   {item.category}
                 </Badge>
                 <span className="text-[10px] font-bold text-slate-200 uppercase tracking-widest">#{item.id.slice(-4)}</span>
@@ -160,50 +160,43 @@ export default function EquipmentCatalog() {
         ))}
       </div>
 
-      {filteredEquipment.length === 0 && (
-        <div className="text-center py-32 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100 mx-4 md:mx-0">
-           <Package className="h-24 w-24 text-slate-100 mx-auto mb-6" />
-           <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">CHƯA CÓ DỮ LIỆU THIẾT BỊ</p>
-        </div>
-      )}
-
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="rounded-[3.5rem] p-10 border-none shadow-2xl w-[90vw] max-w-lg">
+        <DialogContent className="rounded-[4rem] p-12 border-none shadow-2xl w-[94vw] max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter">
               {editingItem ? 'Cập nhật thiết bị' : 'Thêm thiết bị mới'}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-8 py-8">
+          <form onSubmit={handleSubmit} className="space-y-8 py-10">
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Tên thiết bị</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest">Tên thiết bị</Label>
               <Input 
                 placeholder="Ví dụ: Máy chiếu Panasonic VX430" 
-                className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6"
+                className="h-18 rounded-[2rem] bg-slate-50 border-none font-bold px-8 shadow-inner"
                 value={formData.name}
                 onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 required
               />
             </div>
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Nhóm thiết bị</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest">Nhóm thiết bị</Label>
               <Select 
                 value={formData.category} 
                 onValueChange={val => setFormData(prev => ({ ...prev, category: val }))}
               >
-                <SelectTrigger className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6">
+                <SelectTrigger className="h-18 rounded-[2rem] bg-slate-50 border-none font-bold text-base px-8 shadow-inner">
                   <SelectValue placeholder="Chọn nhóm phân loại..." />
                 </SelectTrigger>
-                <SelectContent className="rounded-[2rem] border-none shadow-2xl p-2">
+                <SelectContent className="rounded-[2.5rem] p-4">
                   {categories.map(cat => (
-                    <SelectItem key={cat} value={cat} className="rounded-xl h-12 font-bold">{cat}</SelectItem>
+                    <SelectItem key={cat} value={cat} className="rounded-xl h-14 font-bold text-sm mb-1">{cat}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <DialogFooter className="pt-6">
-              <Button type="submit" className="w-full bg-primary h-18 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-2xl shadow-primary/10 active:scale-95 transition-all" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="animate-spin" /> : 'Lưu vào danh mục'}
+            <DialogFooter className="pt-8">
+              <Button type="submit" className="w-full bg-primary h-20 rounded-[2.5rem] font-black text-lg uppercase tracking-widest shadow-2xl shadow-primary/10 active-scale transition-all" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin h-6 w-6" /> : 'LƯU VÀO DANH MỤC'}
               </Button>
             </DialogFooter>
           </form>

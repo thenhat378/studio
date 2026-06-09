@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useAppStore } from '@/lib/store';
@@ -78,7 +77,7 @@ export default function TasksPage() {
 
   const submitReport = async () => {
     if (!activeRequest || !reportText.trim() || !repairType || !techQuantity) {
-      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ các thông tin, bao gồm cả số lượng." });
+      toast({ variant: "destructive", title: "Thiếu thông tin", description: "Vui lòng điền đầy đủ các thông tin." });
       return;
     }
     setIsSubmitting(true);
@@ -90,96 +89,99 @@ export default function TasksPage() {
         quantity: Number(techQuantity),
         completedAt: new Date().toISOString()
       });
-      toast({ title: "Đã báo cáo hoàn thành", description: "Yêu cầu đã được chuyển lên Quản lý CSVC duyệt." });
+      toast({ title: "Đã hoàn thành", description: "Báo cáo kỹ thuật đã được gửi." });
       setIsReportOpen(false);
     } catch (error) {
-      toast({ variant: "destructive", title: "Lỗi", description: "Không thể gửi báo cáo lúc này." });
+      toast({ variant: "destructive", title: "Lỗi", description: "Không thể gửi báo cáo." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <div>
-        <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Nhiệm vụ của tôi</h1>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vai trò: Nhân viên kỹ thuật</p>
+    <div className="space-y-8 pb-24 animate-slide-up">
+      <div className="px-4 mt-6">
+        <h1 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">Nhiệm vụ của tôi</h1>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 opacity-80">TRÌNH KỸ THUẬT VIÊN DUE</p>
       </div>
 
       <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-14 p-1 bg-white rounded-2xl shadow-sm border mb-6 max-w-[400px]">
-          <TabsTrigger value="active" className="text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Nhiệm vụ hiện tại
-            {activeTasks.length > 0 && <Badge variant="destructive" className="ml-1 h-5 w-5 p-0">{activeTasks.length}</Badge>}
+        <TabsList className="grid w-full grid-cols-2 h-16 p-1.5 bg-white rounded-[2rem] shadow-sm border mb-8 max-w-[420px] mx-4">
+          <TabsTrigger value="active" className="rounded-2xl text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            Đang thực hiện {activeTasks.length > 0 && <Badge variant="destructive" className="ml-1 h-5 w-5 p-0">{activeTasks.length}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="finished" className="text-[10px] font-black uppercase data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl transition-all">
-            Lịch sử & In ấn
+          <TabsTrigger value="finished" className="rounded-2xl text-[10px] font-black uppercase tracking-tighter data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            Đã hoàn thành
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="active" className="space-y-4">
+        <TabsContent value="active" className="space-y-6 px-4">
           {activeTasks.map(req => (
-            <Card key={req.id} className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden card-shadow">
-              <CardContent className="p-8">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="h-14 w-14 rounded-2xl bg-primary/5 flex items-center justify-center border border-primary/10">
-                    <Wrench className="h-7 w-7 text-primary" />
+            <Card key={req.id} className="border-none shadow-sm rounded-[3rem] bg-white overflow-hidden card-shadow active-scale">
+              <CardContent className="p-10">
+                <div className="flex justify-between items-start mb-8">
+                  <div className="h-16 w-16 rounded-[1.8rem] bg-primary/5 flex items-center justify-center border border-primary/10">
+                    <Wrench className="h-8 w-8 text-primary" />
                   </div>
                   <Badge className={cn(
-                    "text-[9px] font-black uppercase px-4 py-1.5 border-none rounded-lg",
+                    "text-[9px] font-black uppercase px-4 py-2 border-none rounded-xl",
                     req.status === 'assigned' ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
                   )}>
-                    {req.status === 'assigned' ? 'Bước 3: Mới nhận' : 'Bước 4: Đang sửa'}
+                    {req.status === 'assigned' ? 'Bước 3: Mới giao' : 'Bước 4: Đang làm'}
                   </Badge>
                 </div>
-                <h3 className="font-black text-lg text-slate-800 mb-2 leading-tight uppercase tracking-tight">
+                <h3 className="font-black text-xl text-slate-800 mb-2 leading-tight uppercase tracking-tight">
                   <span className="text-primary mr-2">[{req.location}]</span>
-                  {req.equipmentName} / <span className="text-slate-400 font-bold">{req.unit}</span>
+                  {req.equipmentName}
                 </h3>
-                <div className="flex items-center gap-2 mb-6 text-[11px] font-bold text-slate-500 uppercase">
-                  <MapPin className="h-4 w-4 text-rose-400" /> {req.location}
-                  <Badge variant="outline" className="ml-auto text-[9px] font-black border-slate-200">SL: {req.quantity || 1}</Badge>
+                <div className="flex items-center gap-2 mb-8 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <MapPin className="h-4 w-4 text-rose-400" /> {req.unit} 
+                  <span className="mx-2 opacity-20">|</span>
+                  <Hash className="h-4 w-4 text-primary" /> SL: {req.quantity || 1}
                 </div>
-                <div className="flex gap-3">
-                  <Link href={`/requests/${req.id}`} className="flex-1">
-                    <Button variant="outline" className="w-full h-14 rounded-2xl font-black text-[10px] uppercase border-2 hover:bg-slate-50">Chi tiết</Button>
-                  </Link>
+                <div className="flex gap-4">
                   {req.status === 'assigned' ? (
-                    <Button className="flex-[2] bg-primary h-14 rounded-2xl text-white font-black text-[10px] uppercase shadow-xl shadow-primary/10 transition-all active:scale-95" onClick={() => handleStart(req.id)}>
-                      <Play className="h-4 w-4 mr-2" /> Bắt đầu làm
+                    <Button className="flex-1 bg-primary h-16 rounded-2xl text-white font-black text-xs uppercase shadow-xl shadow-primary/10 transition-all active-scale" onClick={() => handleStart(req.id)}>
+                      <Play className="h-5 w-5 mr-2" /> Bắt đầu làm
                     </Button>
                   ) : (
-                    <Button className="flex-[2] bg-secondary h-14 rounded-2xl text-white font-black text-[10px] uppercase shadow-xl shadow-secondary/10 transition-all active:scale-95" onClick={() => openReportDialog(req)}>
-                      <CheckCircle2 className="h-4 w-4 mr-2" /> Báo cáo hoàn thành
+                    <Button className="flex-1 bg-secondary h-16 rounded-2xl text-white font-black text-xs uppercase shadow-xl shadow-secondary/10 transition-all active-scale" onClick={() => openReportDialog(req)}>
+                      <CheckCircle2 className="h-5 w-5 mr-2" /> Báo cáo xong
                     </Button>
                   )}
+                   <Link href={`/requests/${req.id}`} className="h-16 w-16">
+                    <Button variant="ghost" className="h-full w-full rounded-2xl bg-slate-50 text-slate-400">
+                      <ChevronRight className="h-6 w-6" />
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
           ))}
           {activeTasks.length === 0 && (
-            <div className="text-center py-24 bg-white rounded-[3rem] card-shadow border-2 border-dashed border-slate-100">
+            <div className="text-center py-24 bg-white rounded-[4rem] card-shadow border-2 border-dashed border-slate-100 mx-4">
                <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">Hiện không có nhiệm vụ xử lý</p>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="finished" className="space-y-4">
+        <TabsContent value="finished" className="space-y-4 px-4">
           {finishedTasks.map(req => (
             <Link key={req.id} href={`/requests/${req.id}`}>
-              <Card className="border-none shadow-sm rounded-[2rem] bg-white p-6 hover:bg-slate-50 transition-all active:scale-[0.98]">
+              <Card className="border-none shadow-sm rounded-[2.5rem] bg-white p-8 hover:bg-slate-50 transition-all active-scale">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="font-black text-base text-slate-800 truncate mb-1 uppercase tracking-tight">
+                    <p className="font-black text-lg text-slate-800 truncate mb-2 uppercase tracking-tight">
                       [{req.location}] {req.equipmentName}
                     </p>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 border-slate-200 text-slate-500">{req.status}</Badge>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">{req.unit}</span>
-                      <span className="text-[10px] font-black text-primary">SL: {req.quantity || 1}</span>
+                    <div className="flex items-center gap-4">
+                      <Badge variant="outline" className="text-[9px] font-black uppercase px-3 py-1 border-slate-100 bg-slate-50 text-slate-500 rounded-lg">{req.status}</Badge>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.unit}</span>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-slate-300" />
+                  <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-200">
+                    <ChevronRight className="h-5 w-5" />
+                  </div>
                 </div>
               </Card>
             </Link>
@@ -187,48 +189,47 @@ export default function TasksPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Report Dialog for Technicians */}
       <Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
-        <DialogContent className="rounded-[3rem] p-8 md:p-10 border-none shadow-2xl max-w-lg w-[90vw] overflow-y-auto max-h-[90vh]">
+        <DialogContent className="rounded-[4rem] p-10 border-none shadow-2xl max-w-lg w-[94vw] overflow-y-auto max-h-[92vh]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-primary uppercase tracking-tighter flex items-center gap-3">
-              <ShieldAlert className="h-6 w-6 text-accent" /> Báo cáo & Hoàn thành
+            <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter flex items-center gap-3">
+              <ShieldAlert className="h-7 w-7 text-accent" /> Báo cáo hoàn thành
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Hình thức xử lý</Label>
+          <div className="space-y-8 py-8">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest">Hình thức xử lý</Label>
               <Select value={repairType} onValueChange={(val) => setRepairType(val as RepairType)}>
-                <SelectTrigger className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold px-6 shadow-sm">
+                <SelectTrigger className="h-18 rounded-[2rem] bg-slate-50 border-none font-bold text-base px-8 shadow-inner">
                   <SelectValue placeholder="Chọn hình thức..." />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  <SelectItem value="repair_only" className="rounded-xl font-bold">Sửa chữa tại chỗ</SelectItem>
-                  <SelectItem value="backup_replacement" className="rounded-xl font-bold">Thay thiết bị dự phòng</SelectItem>
-                  <SelectItem value="pending_purchase" className="rounded-xl font-bold">Chờ mua sắm mới</SelectItem>
-                  <SelectItem value="new_replacement" className="rounded-xl font-bold">Thay thế bằng thiết bị mua mới</SelectItem>
+                <SelectContent className="rounded-[2.5rem] p-4">
+                  <SelectItem value="repair_only" className="rounded-xl h-14 font-bold text-sm mb-1">Sửa chữa tại chỗ</SelectItem>
+                  <SelectItem value="backup_replacement" className="rounded-xl h-14 font-bold text-sm mb-1">Thay thiết bị dự phòng</SelectItem>
+                  <SelectItem value="pending_purchase" className="rounded-xl h-14 font-bold text-sm mb-1">Chờ mua sắm mới</SelectItem>
+                  <SelectItem value="new_replacement" className="rounded-xl h-14 font-bold text-sm">Thay thiết bị mua mới</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Chi tiết công việc</Label>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest">Nội dung chi tiết</Label>
               <Textarea 
                 placeholder="Nội dung đã làm, linh kiện đã thay..." 
-                className="min-h-[140px] rounded-[2rem] bg-slate-50 border-none font-bold p-6 leading-relaxed" 
+                className="min-h-[140px] rounded-[2.5rem] bg-slate-50 border-none font-bold p-8 leading-relaxed shadow-inner" 
                 value={reportText} 
                 onChange={e => setReportText(e.target.value)} 
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Số lượng xử lý thực tế</Label>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest">Số lượng xử lý</Label>
               <div className="relative">
-                <Hash className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                <Hash className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/40" />
                 <Input 
                   type="number"
                   min="1"
-                  className="h-16 rounded-[1.8rem] bg-slate-50 border-none font-bold pl-14 pr-6 shadow-sm"
+                  className="h-18 rounded-[2rem] bg-slate-50 border-none font-bold text-base pl-16 pr-6 shadow-inner"
                   value={techQuantity}
                   onChange={e => setTechQuantity(e.target.value)}
                   placeholder="Nhập số lượng..."
@@ -237,38 +238,35 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2 tracking-widest">
-                <Camera className="h-4 w-4 text-primary" /> Hình ảnh minh chứng (Tự động nén)
+              <Label className="text-[10px] font-black uppercase text-slate-400 ml-4 flex items-center gap-2 tracking-widest">
+                <Camera className="h-4 w-4 text-primary" /> Ảnh minh chứng
               </Label>
               <div className="grid grid-cols-2 gap-4">
                 {techImages.map((img, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 group shadow-sm">
+                  <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border-2 border-slate-50 shadow-sm">
                     <Image src={img} alt="Preview" fill className="object-cover" />
-                    <button type="button" onClick={() => removeTechImage(idx)} className="absolute top-2 right-2 bg-rose-500 text-white p-2 rounded-full shadow-lg"><X className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => removeTechImage(idx)} className="absolute top-3 right-3 bg-rose-500 text-white p-2.5 rounded-full shadow-lg"><X className="h-4 w-4" /></button>
                   </div>
                 ))}
-                <label className="aspect-square rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all bg-primary/5 active:scale-95 shadow-sm">
-                  <Camera className="h-8 w-8 text-primary" />
-                  <span className="text-[10px] font-black text-primary uppercase text-center px-4 leading-tight">Máy ảnh</span>
+                <label className="aspect-square rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-primary/5 transition-all bg-primary/5 active-scale">
+                  <div className="p-4 bg-white rounded-2xl">
+                    <Camera className="h-7 w-7 text-primary" />
+                  </div>
+                  <span className="text-[10px] font-black text-primary uppercase text-center px-4 leading-tight">Chụp ảnh</span>
                   <input type="file" multiple accept="image/*" capture="environment" className="hidden" onChange={handleTechImageChange} />
-                </label>
-                <label className="aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
-                  <ImagePlus className="h-8 w-8 text-slate-300" />
-                  <span className="text-[10px] font-black text-slate-400 uppercase">Thư viện</span>
-                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleTechImageChange} />
                 </label>
               </div>
             </div>
           </div>
-          <DialogFooter className="pt-4 flex flex-col gap-3 sm:flex-col">
+          <DialogFooter className="pt-4 flex flex-col gap-4">
             <Button 
-              className="w-full bg-secondary h-18 rounded-[2rem] font-black text-white text-base uppercase tracking-widest shadow-2xl shadow-secondary/10 transition-all active:scale-95" 
+              className="w-full bg-secondary h-20 rounded-[2.5rem] font-black text-white text-lg uppercase tracking-widest shadow-2xl shadow-secondary/10 transition-all active-scale" 
               disabled={isSubmitting || !reportText.trim() || !repairType || !techQuantity} 
               onClick={submitReport}
             >
-              {isSubmitting ? "Đang gửi..." : "Xác nhận hoàn thành"}
+              {isSubmitting ? "ĐANG GỬI..." : "XÁC NHẬN HOÀN THÀNH"}
             </Button>
-            <Button variant="ghost" className="w-full h-12 rounded-2xl font-black text-slate-400 uppercase text-[10px]" onClick={() => setIsReportOpen(false)}>Hủy</Button>
+            <Button variant="ghost" className="w-full h-12 rounded-2xl font-black text-slate-400 uppercase text-[10px] tracking-widest" onClick={() => setIsReportOpen(false)}>HỦY BỎ</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
