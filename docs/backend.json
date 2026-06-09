@@ -22,8 +22,9 @@
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "title": { "type": "string" },
+        "location": { "type": "string" },
         "description": { "type": "string" },
+        "quantity": { "type": "number" },
         "equipmentId": { "type": "string" },
         "equipmentName": { "type": "string" },
         "status": { "type": "string" },
@@ -44,6 +45,10 @@
     "/requests/{requestId}": {
       "schema": "RepairRequest",
       "description": "Lưu trữ các phiếu yêu cầu sửa chữa"
+    },
+    "/equipment/{equipmentId}": {
+      "schema": "object",
+      "description": "Danh mục thiết bị"
     }
   }
 }

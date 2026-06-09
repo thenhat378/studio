@@ -41,6 +41,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Helper to remove undefined fields before saving to Firestore
 const cleanObject = (obj: any) => {
   if (obj === null || typeof obj !== 'object') return obj;
   const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
@@ -63,6 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Persistence: Restore user session from localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('due_user');
     if (savedUser) {
@@ -77,6 +79,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
+  // Sync Requests from Firestore
   useEffect(() => {
     if (!db) return;
     const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
@@ -86,6 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
+  // Sync Users from Firestore
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -94,6 +98,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, [db]);
 
+  // Sync Equipment from Firestore
   useEffect(() => {
     if (!db) return;
     const unsub = onSnapshot(collection(db, 'equipment'), (snapshot) => {
@@ -204,7 +209,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ...userSnap.docs.filter(d => d.id !== currentUser.id).map(d => d.ref)
       ];
 
-      // Cơ chế xóa theo Batch để tránh giới hạn 500 bản ghi của Firestore
       for (let i = 0; i < refsToDelete.length; i += 400) {
         const batch = writeBatch(db);
         const chunk = refsToDelete.slice(i, i + 400);
