@@ -42,6 +42,8 @@
     @apply bg-[#F4F7FE] text-foreground font-body antialiased selection:bg-primary/20 selection:text-primary overflow-x-hidden;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    /* Ngăn chặn kéo xê dịch trên mobile */
+    overscroll-behavior-y: none;
   }
 }
 
@@ -52,16 +54,12 @@
 }
 
 @media print {
-  /* Hide EVERYTHING by default */
   body * {
     visibility: hidden;
   }
-  
-  /* Show only the print-only container and its children */
   .print-only, .print-only * {
     visibility: visible;
   }
-
   .print-only {
     position: absolute;
     left: 0;
@@ -71,61 +69,15 @@
     font-family: "Times New Roman", Times, serif !important;
     background: white !important;
     color: black !important;
-    padding: 2mm !important;
+    padding: 0 !important;
     margin: 0 !important;
-    box-shadow: none !important;
   }
-
   .no-print {
     display: none !important;
   }
-
-  body {
-    background: white !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Reset all potential background colors and shadows */
-  * {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
   @page {
     size: A4;
-    margin: 8mm 12mm;
-  }
-
-  .print-section-title {
-    border-bottom: 1px solid black !important;
-    font-weight: bold !important;
-    text-transform: uppercase !important;
-    font-size: 10pt !important;
-    margin-top: 4px !important;
-    padding-bottom: 0.5px !important;
-    display: block !important;
-  }
-
-  .print-row {
-    display: flex !important;
-    justify-content: space-between !important;
-    padding: 1px 0 !important;
-    border-bottom: 0.5px dotted #ddd !important;
-    line-height: 1.1 !important;
-  }
-
-  .print-label {
-    font-weight: bold !important;
-    font-size: 9.5pt !important;
-  }
-
-  .print-value {
-    text-align: right !important;
-    font-size: 9.5pt !important;
+    margin: 10mm;
   }
 }
 
@@ -138,29 +90,42 @@ input, select, textarea {
   @apply !text-base md:!text-sm focus:ring-4 focus:ring-accent/5 transition-all outline-none;
 }
 
-/* Safe area for mobile with bottom nav */
+/* Tối ưu khoảng cách cho các thiết bị di động có thanh điều hướng dưới */
 .pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 7.5rem);
+}
+
+.pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 5.5rem);
 }
 
 .glass-morphism {
-  @apply bg-white/80 backdrop-blur-lg border-t border-white/20;
+  @apply bg-white/90 backdrop-blur-xl border-none shadow-[0_-1px_0_0_rgba(0,0,0,0.05)];
 }
 
 .card-shadow {
-  box-shadow: 0px 15px 35px rgba(245, 130, 32, 0.05);
+  box-shadow: 0px 10px 30px rgba(0, 84, 164, 0.04);
 }
 
 .active-scale {
-  @apply active:scale-95 transition-all duration-200;
+  @apply active:scale-95 transition-transform duration-200;
 }
 
 /* Animations */
 .animate-slide-up {
-  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slide-up {
-  from { transform: translateY(20px); opacity: 0; }
+  from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Custom Scroll for cards */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
