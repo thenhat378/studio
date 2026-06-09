@@ -191,12 +191,12 @@ export default function Overview() {
   if (!currentUser) {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center p-6 bg-[#F4F7FE]">
-        <div className="w-full max-w-[480px] space-y-8 text-center animate-slide-up">
-          <div className="flex flex-col items-center gap-2 mb-8">
-            <div className="h-24 w-24 bg-accent rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-accent/30 active-scale">
-              <Wrench className="h-12 w-12 text-white" />
+        <div className="w-full max-w-[480px] space-y-6 text-center animate-slide-up">
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <div className="h-20 w-20 bg-accent rounded-[2rem] flex items-center justify-center shadow-2xl shadow-accent/30 active-scale">
+              <Wrench className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-4xl font-black tracking-tighter mt-4 leading-none uppercase">
+            <h1 className="text-3xl font-black tracking-tighter mt-4 leading-none uppercase">
               <span className="text-slate-800">Requisition Form</span>
               <div className="mt-2">
                 <span className="text-accent">D</span><span className="text-secondary">U</span><span className="text-primary">E</span>
@@ -206,87 +206,86 @@ export default function Overview() {
           
           <Card className="rounded-[3.5rem] overflow-hidden bg-white card-shadow text-left border-none">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 h-20 bg-slate-50 p-2">
-                <TabsTrigger value="login" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-accent">Đăng nhập</TabsTrigger>
-                <TabsTrigger value="register" className="h-full rounded-3xl font-black text-[12px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-secondary">Đăng ký</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-16 bg-slate-50 p-2">
+                <TabsTrigger value="login" className="h-full rounded-2xl font-black text-[11px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-accent">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register" className="h-full rounded-2xl font-black text-[11px] uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-secondary">Đăng ký</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="login" className="p-8 md:p-12 space-y-8">
+              <TabsContent value="login" className="p-8 md:p-10 space-y-6">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">SỐ ĐIỆN THOẠI</Label>
+                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">SỐ ĐIỆN THOẠI</Label>
                     <div className="relative">
-                      <Phone className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
-                      <Input placeholder="Số điện thoại" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPhone} onChange={e => setLoginPhone(e.target.value)} required />
+                      <Phone className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                      <Input placeholder="Số điện thoại" className="pl-16 h-16 rounded-2xl bg-slate-50 border-none font-bold text-base" value={loginPhone} onChange={e => setLoginPhone(e.target.value)} required />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Mật khẩu</Label>
+                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Mật khẩu</Label>
                     <div className="relative">
-                      <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300" />
-                      <Input type="password" placeholder="••••••••" className="pl-16 h-18 rounded-3xl bg-slate-50 border-none font-bold text-lg" value={loginPass} onChange={e => setLoginPass(e.target.value)} required />
+                      <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                      <Input type="password" placeholder="••••••••" className="pl-16 h-16 rounded-2xl bg-slate-50 border-none font-bold text-base" value={loginPass} onChange={e => setLoginPass(e.target.value)} required />
                     </div>
                     <div className="flex justify-between px-2">
-                      <button type="button" onClick={() => setIsGuideOpen(true)} className="text-[11px] font-black text-secondary hover:underline uppercase tracking-tighter flex items-center gap-1">
+                      <button type="button" onClick={() => setIsGuideOpen(true)} className="text-[10px] font-black text-secondary hover:underline uppercase tracking-tighter flex items-center gap-1">
                         <BookOpen className="h-3 w-3" /> Hướng dẫn sử dụng
                       </button>
-                      <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[11px] font-black text-primary hover:underline uppercase tracking-tighter">
+                      <button type="button" onClick={() => setIsForgotOpen(true)} className="text-[10px] font-black text-primary hover:underline uppercase tracking-tighter">
                         Quên mật khẩu?
                       </button>
                     </div>
                   </div>
-                  <Button className="w-full h-20 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-primary/20 active-scale" disabled={isSubmitting}>
+                  <Button className="w-full h-18 rounded-[2rem] bg-primary text-white font-black text-base uppercase tracking-widest mt-2 shadow-2xl shadow-primary/20 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "ĐĂNG NHẬP"}
                   </Button>
                 </form>
               </TabsContent>
 
-              <TabsContent value="register" className="p-8 md:p-12 space-y-6">
+              <TabsContent value="register" className="p-8 md:p-10 space-y-6">
                 <form onSubmit={handleRegister} className="space-y-5">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Họ và tên</Label>
-                    <Input placeholder="Nguyễn Văn A" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.name} onChange={e => setRegData(prev => ({...prev, name: e.target.value}))} required />
+                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Họ và tên</Label>
+                    <Input placeholder="Nguyễn Văn A" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.name} onChange={e => setRegData(prev => ({...prev, name: e.target.value}))} required />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">SỐ ĐIỆN THOẠI</Label>
-                      <Input placeholder="Số điện thoại" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.phone} onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))} required />
+                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">SỐ ĐIỆN THOẠI</Label>
+                      <Input placeholder="Số điện thoại" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.phone} onChange={e => setRegData(prev => ({...prev, phone: e.target.value}))} required />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Mật khẩu</Label>
-                      <Input type="password" placeholder="••••" className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.pass} onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))} required onFocus={() => setShowPassHint(true)} />
+                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Mật khẩu</Label>
+                      <Input type="password" placeholder="••••" className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.pass} onChange={e => setRegData(prev => ({...prev, pass: e.target.value}))} required onFocus={() => setShowPassHint(true)} />
                     </div>
                   </div>
                   {showPassHint && (
-                    <div className="p-5 bg-slate-50 rounded-[2rem] border text-[11px] space-y-2 font-bold uppercase tracking-tighter">
+                    <div className="p-4 bg-slate-50 rounded-[1.5rem] border text-[10px] space-y-2 font-bold uppercase tracking-tighter">
                       <div className="flex items-center gap-3">
-                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.length ? "bg-secondary" : "bg-slate-200")} />
+                        <div className={cn("h-3 w-3 rounded-full shrink-0", passValidation.length ? "bg-secondary" : "bg-slate-200")} />
                         <span className={passValidation.length ? "text-secondary" : "text-slate-400"}>Tối thiểu 8 ký tự</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className={cn("h-4 w-4 rounded-full shrink-0", passValidation.special ? "bg-secondary" : "bg-slate-200")} />
+                        <div className={cn("h-3 w-3 rounded-full shrink-0", passValidation.special ? "bg-secondary" : "bg-slate-200")} />
                         <span className={passValidation.special ? "text-secondary" : "text-slate-400"}>Có ký tự đặc biệt (!@#...)</span>
                       </div>
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Đơn vị công tác</Label>
-                    <Input placeholder="Ví dụ: Phòng CSVC, Khoa CNTT..." className="h-16 rounded-3xl bg-slate-50 border-none font-bold" value={regData.unit} onChange={e => setRegData(prev => ({...prev, unit: e.target.value}))} required />
+                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Đơn vị công tác</Label>
+                    <Input placeholder="Ví dụ: Phòng CSVC, Khoa CNTT..." className="h-14 rounded-2xl bg-slate-50 border-none font-bold" value={regData.unit} onChange={e => setRegData(prev => ({...prev, unit: e.target.value}))} required />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-black text-slate-400 uppercase ml-4">Chức danh</Label>
+                    <Label className="text-[10px] font-black text-slate-400 uppercase ml-4">Chức danh</Label>
                     <Select value={regData.role} onValueChange={(val: any) => setRegData(prev => ({...prev, role: val}))}>
-                      <SelectTrigger className="h-16 rounded-3xl bg-slate-50 border-none font-bold shadow-none"><SelectValue /></SelectTrigger>
-                      <SelectContent className="rounded-[2rem] border-none shadow-2xl p-2">
+                      <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-none font-bold shadow-none"><SelectValue /></SelectTrigger>
+                      <SelectContent className="rounded-[1.5rem] border-none shadow-2xl p-2">
                         <SelectItem value="requester" className="rounded-xl h-12 font-bold">Nhân viên / Giảng viên</SelectItem>
                         <SelectItem value="unit_leader" className="rounded-xl h-12 font-bold">Quản lý đơn vị</SelectItem>
                         <SelectItem value="csvc_manager" className="rounded-xl h-12 font-bold">Quản lý CSVC</SelectItem>
                         <SelectItem value="technician" className="rounded-xl h-12 font-bold">Nhân viên kỹ thuật</SelectItem>
-                        {/* Ẩn tùy chọn Quản trị viên để người dùng không tự ý đăng ký */}
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full h-20 rounded-[2rem] bg-secondary text-white font-black text-base uppercase tracking-widest mt-6 shadow-2xl shadow-secondary/10 active-scale" disabled={isSubmitting}>
+                  <Button className="w-full h-18 rounded-[2rem] bg-secondary text-white font-black text-base uppercase tracking-widest mt-2 shadow-2xl shadow-secondary/10 active-scale" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận đăng ký"}
                   </Button>
                 </form>
@@ -294,8 +293,8 @@ export default function Overview() {
             </Tabs>
           </Card>
 
-          <footer className="pt-8 pb-4 text-center space-y-1 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+          <footer className="pt-2 pb-4 text-center space-y-1 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <div className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
               © 2026 Hệ thống quản lý Phiếu yêu cầu, cáp phát sửa chữa v1.0
             </div>
             <div className="text-[9px] font-bold text-primary uppercase tracking-widest opacity-60">
